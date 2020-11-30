@@ -147,3 +147,6 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# Host binary
+xscope_fileio/host/xscope_host_endpoint

@@ -1,4 +1,5 @@
 from distutils.command.build import build
+from setuptools.command.develop import develop
 import os
 import setuptools
 import subprocess
@@ -16,20 +17,29 @@ def pushd(new_dir):
 
 
 class CustomBuildCommand(build):
-    """Customized setuptools install command - prints a friendly greeting."""
+    """Customized distutils build command """
 
     def run(self):
         # Make the host binary
         with pushd("xscope_fileio/host/"):
-            subprocess.run("make")
-
+            subprocess.check_output("make")
         build.run(self)
+
+
+class CustomDevelopCommand(develop):
+    """Customized setuptools develop command """
+
+    def run(self):
+        # Make the host binary
+        with pushd("xscope_fileio/host/"):
+            subprocess.check_output("make")
+        develop.run(self)
 
 
 setuptools.setup(
     name="xscope_fileio",
     version="0.1.0",
-    cmdclass={"build": CustomBuildCommand,},
+    cmdclass={"build": CustomBuildCommand, "develop": CustomDevelopCommand,},
     # Note for anyone trying to copy this pattern:
     # package_data keys are NAMES OF PACKAGES, not dirs
     # So it's "xscope_fileio" not "xscope_fileio/"
