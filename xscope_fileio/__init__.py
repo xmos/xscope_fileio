@@ -15,6 +15,12 @@ import sh
 XRUN_TIMEOUT = 20
 
 
+def list_rel_files():
+    """ Function to test package "data_files" in setup.py """
+    print(Path(__file__))
+    print(os.listdir((Path(__file__).parent).resolve()))
+    return os.listdir((Path(__file__).parent / "host_src").resolve())
+
 @contextlib.contextmanager
 def pushd(new_dir):
     previous_dir = os.getcwd()
