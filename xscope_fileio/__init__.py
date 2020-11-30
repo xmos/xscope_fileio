@@ -14,12 +14,13 @@ import sh
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
+HOST_PATH = (Path(__file__).parent / "host")
 
-def list_rel_files():
-    """ Function to test package "data_files" in setup.py """
-    print(Path(__file__))
-    print(os.listdir((Path(__file__).parent).resolve()))
-    return os.listdir((Path(__file__).parent / "host_src").resolve())
+
+def _get_host_exe():
+    """ Returns the path the the host exe. Builds if the host exe doesn't exist """
+    return HOST_PATH / "xscope_host_endpoint"
+
 
 @contextlib.contextmanager
 def pushd(new_dir):
@@ -75,7 +76,7 @@ class xrun_exit_handler:
             self.host_process.terminate()
 
 
-def run_on_target(adapter_id, test_wav_exe, host_exe, use_xsim=False):
+def run_on_target(adapter_id, test_wav_exe, use_xsim=False):
     port = get_open_port()
     xrun_cmd = (
         f"--xscope-port localhost:{port} --adapter-id {adapter_id} {test_wav_exe}"
@@ -113,10 +114,10 @@ def run_on_target(adapter_id, test_wav_exe, host_exe, use_xsim=False):
 
     print("Starting host app...", end="\n")
 
+    host_exe = _get_host_exe()
     host_args = f"{port}"
     host_proc = sh.Command(host_exe)(host_args.split(), _bg=True, _out=sh_print)
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
 
     print("Running on target finished")
-
