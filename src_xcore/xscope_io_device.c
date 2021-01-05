@@ -25,7 +25,7 @@ void xscope_io_init(chanend_t xscope_end){
     xscope_connect_data_from_host(c_xscope);
 }
 
-xscope_file_t xscope_open_file(char* filename, char* attributes){
+xscope_file_t xscope_open_file(const char* filename, char* attributes){
     lock_acquire(file_access_lock);
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);

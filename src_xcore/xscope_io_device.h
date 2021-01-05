@@ -37,7 +37,7 @@ void xscope_io_init(chanend_t xscope_end);
  * @param   write_file_name to open on host
  * @return  an initialised xscope_file_handle  
  ******************************************************************************/
-xscope_file_t xscope_open_file(char* filename, char* attributes);
+xscope_file_t xscope_open_file(const char* filename, char* attributes);
 
 /******************************************************************************
  * xscope_fread
