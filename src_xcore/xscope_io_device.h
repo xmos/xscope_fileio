@@ -96,7 +96,7 @@ int xscope_ftell( xscope_file_t *xscope_file);
 /******************************************************************************
  * xscope_close_files
  *
- * Closes both the read and write file on the host.
+ * Closes all files on the host.
  * This must be called at the end of device application as it also signals
  * terminate to the host app.
  *
