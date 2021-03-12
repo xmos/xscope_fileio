@@ -198,9 +198,7 @@ void xscope_record(
         {
             assert(length == 1);
             unsigned file_idx = databytes[0] - '0';
-            printf("%d\n", file_idx);
             int offset = ftell(host_files[file_idx].fp);
-            printf("%d\n", 3);
             if(VERBOSE) printf("[HOST] tell file idx: %d offset: %d\n", file_idx, offset);
             xscope_ep_request_upload(sizeof(offset), (const unsigned char *)&offset); 
         }
