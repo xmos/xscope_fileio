@@ -150,6 +150,17 @@ void xscope_fseek(int offset, int whence, xscope_file_t *xscope_file){
     lock_release(file_access_lock);
 }
 
+int xscope_ftell( xscope_file_t *xscope_file){
+    lock_acquire(file_access_lock);
+    const unsigned char idx = xscope_file->index + '0';
+    xscope_bytes(XSCOPE_ID_TELL, 1, &idx);
+    int offset, bytes_read = 0;
+    xscope_data_from_host(c_xscope, (char *)&offset, &bytes_read);
+    xassert(bytes_read = sizeof(offset));
+    if(VERBOSE) printf("Tell file id: %u offset %d\n", xscope_file->index, offset);
+    lock_release(file_access_lock);
+    return offset;
+}
 
 void xscope_close_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");

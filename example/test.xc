@@ -20,24 +20,29 @@ void test(void){
 
     //Seek relative to start for read
     xscope_fseek(10, SEEK_SET, &read_xscope_file);
+    printf("Should say 10: %d\n", xscope_ftell(&read_xscope_file));
+
     memset(buffer, 0, sizeof(buffer));
     xscope_fread(buffer, 2, &read_xscope_file);
     printf("Should say 'is': %s\n", buffer);
 
     //Seek relative to end for read
     xscope_fseek(-29, SEEK_END, &read_xscope_file);
+    printf("Should say 79: %d\n", xscope_ftell(&read_xscope_file));
     memset(buffer, 0, sizeof(buffer));
     xscope_fread(buffer, 4, &read_xscope_file);
     printf("Should say 'over': %s\n", buffer);
 
     //Seek relative to current for read
     xscope_fseek(1, SEEK_CUR, &read_xscope_file);
+    printf("Should say 84: %d\n", xscope_ftell(&read_xscope_file));
     memset(buffer, 0, sizeof(buffer));
     xscope_fread(buffer, 10, &read_xscope_file);
     printf("Should say 'successive': %s\n", buffer);
 
     //Load in full ref again
     xscope_fseek(0, SEEK_SET, &read_xscope_file);
+    printf("Should say 0: %d\n", xscope_ftell(&read_xscope_file));
     num_bytes = xscope_fread(buffer, sizeof(ref_array), &read_xscope_file);
     printf("Full sentence (%u): %s\n", num_bytes, buffer);
 
@@ -50,8 +55,10 @@ void test(void){
     const char dut_mod_file_name[] = "dut_mod.bin";
     xscope_file_t write_xscope_fil_mod = xscope_open_file(dut_mod_file_name, "wb");
     xscope_fwrite(buffer, sizeof(ref_array), &write_xscope_fil_mod);
-    xscope_fseek(10, SEEK_SET, &write_xscope_fil_mod);
-    xscope_fwrite("IS ", 3, &write_xscope_fil_mod);
+    xscope_fseek(10, SEEK_SET, &write_xscope_fil_mod);  
+    printf("Should say 10: %d\n", xscope_ftell(&write_xscope_fil_mod));
+    xscope_fwrite("IS", 2, &write_xscope_fil_mod);
+    printf("Should say 12: %d\n", xscope_ftell(&write_xscope_fil_mod));
 
     xscope_close_files();
 }

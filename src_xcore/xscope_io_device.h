@@ -81,6 +81,16 @@ void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xsco
 void xscope_fseek(int offset, int whence, xscope_file_t *xscope_io_handle);
 
 /******************************************************************************
+ * xscope_ftell
+ *
+ * Obtain the file position of the stream
+ *
+ * @return  void    
+ ******************************************************************************/
+int xscope_ftell( xscope_file_t *xscope_file);  
+
+
+/******************************************************************************
  * xscope_close_files
  *
  * Closes both the read and write file on the host.

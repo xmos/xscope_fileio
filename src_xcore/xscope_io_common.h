@@ -21,7 +21,8 @@ enum{
     XSCOPE_ID_WRITE_SETUP   = 2,
     XSCOPE_ID_WRITE_BYTES   = 3,
     XSCOPE_ID_SEEK          = 4,
-    XSCOPE_ID_HOST_QUIT     = 5, 
+    XSCOPE_ID_TELL          = 5,
+    XSCOPE_ID_HOST_QUIT     = 6, 
 };
 
 #endif

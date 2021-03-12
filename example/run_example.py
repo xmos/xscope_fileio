@@ -16,7 +16,7 @@ with open("dut.bin", "rb") as dut_file:
 with open("dut_mod.bin", "rb") as dut_mod_file:
     dut_mod_text = dut_mod_file.read()
 
-ref_mod_text = ref_text[0:10] + b"IS" + ref_text[12:-1]
+ref_mod_text = ref_text[0:10] + b"IS" + ref_text[12:]
 
 assert dut_text == ref_text
 print(dut_mod_text, ref_mod_text)
