@@ -3,7 +3,7 @@ TARGET_EXEC ?= fileio_test.xe
 
 XCC ?= xcc
 
-SRCS := test.xc ../src_xcore/xscope_io_device.c
+SRCS := test.xc ../../src_xcore/xscope_io_device.c
 INC_DIRS += $(dir $(SRCS))
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
@@ -14,7 +14,7 @@ DEPS := $(OBJS:.o=.d)
 CFLAGS := -c $(INC_FLAGS) $(TARGET_FLAG) -Os -g
 XCFLAGS := $(CFLAGS)
 
-$(TARGET_EXEC): $(OBJS) ../src_xcore/config.xscope
+$(TARGET_EXEC): $(OBJS) ../../src_xcore/config.xscope
 #	@echo $^
 # 	@echo $(SRCS)
 	@echo "**HELLO LINKER**"
