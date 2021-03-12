@@ -18,6 +18,9 @@ typedef struct{
     unsigned index;
 } xscope_file_t;
 
+#ifdef __XC__
+extern "C"{
+#endif
 
 /******************************************************************************
  * xscope_io_init
@@ -101,5 +104,8 @@ int xscope_ftell( xscope_file_t *xscope_file);
  ******************************************************************************/
 void xscope_close_files(void);
 
+#ifdef __XC__
+}
+#endif
 
 #endif
