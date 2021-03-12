@@ -28,7 +28,7 @@ void xscope_print(
   unsigned char *data)
 {
   if (length) {
-    printf("Device: ");
+    printf("[DEVICE] ");
     for (int i = 0; i < length; i++)
       printf("%c", *(&data[i]));
   }
@@ -47,7 +47,7 @@ void xscope_register(
   unsigned int data_type,
   unsigned char *data_name)
 {
-  if(VERBOSE) printf("Host: xSCOPE register event (id [%d] name [%s])\n", id, name);
+  if(VERBOSE) printf("[HOST] xSCOPE register event (id [%d] name [%s])\n", id, name);
 }
 
 int send_file_chunk(unsigned file_idx, unsigned req_size)
@@ -58,7 +58,7 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
     n_bytes_read = fread(buf, 1, req_size, host_files[file_idx].fp);
 
     if(n_bytes_read < req_size){
-        if(VERBOSE) printf("Host: Unexpected end of file, device requested: %u available: %u sent: 0\n", req_size, n_bytes_read);
+        if(VERBOSE) printf("[HOST] Unexpected end of file, device requested: %u available: %u sent: 0\n", req_size, n_bytes_read);
         xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
         free(buf);
         return(-1);
@@ -72,10 +72,10 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
         xscope_ep_request_upload(left_over, &buf[(n_bytes_read / MAX_XSCOPE_SIZE_BYTES) * MAX_XSCOPE_SIZE_BYTES]);
     }
 
-    if(VERBOSE) printf("Host: sent block %u\n", n_bytes_read);
+    if(VERBOSE) printf("[HOST] sent block %u\n", n_bytes_read);
 
     if(feof(host_files[file_idx].fp)){
-        if(VERBOSE) printf("Host: End of file\n");
+        if(VERBOSE) printf("[HOST] End of file\n");
         xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
     }
 
@@ -100,7 +100,7 @@ void xscope_record(
             assert(file_idx < MAX_FILES_OPEN);
             strcpy(host_files[file_idx].file_name, (const char *)&databytes[2]);
             host_files[file_idx].mode = databytes[1] - '0';
-            if(VERBOSE) printf("Host: Open file: %d, %lu, %s, idx: %u mode: %u\n", length, strlen((char*)databytes),
+            if(VERBOSE) printf("[HOST] Open file: %d, %lu, %s, idx: %u mode: %u\n", length, strlen((char*)databytes),
                                 host_files[file_idx].file_name, file_idx, host_files[file_idx].mode);
             switch(host_files[file_idx].mode){
                 case XSCOPE_IO_READ_BINARY:
@@ -137,7 +137,7 @@ void xscope_record(
             unsigned file_idx = databytes[0] - '0';
             unsigned transfer_size;
             memcpy(&transfer_size, &databytes[1], sizeof(transfer_size));
-            if(VERBOSE) printf("Host: read bytes idx: %u transfer length: %u\n", file_idx, transfer_size);
+            if(VERBOSE) printf("[HOST] read bytes idx: %u transfer length: %u\n", file_idx, transfer_size);
             send_file_chunk(file_idx, transfer_size);
         }
         break;
@@ -146,25 +146,25 @@ void xscope_record(
         {
             unsigned file_idx = databytes[0] - '0';
             if(write_size != 0){
-                printf("Host: Error - write_size not initialised to 0. Last write incomplete?\n");
+                printf("[HOST] Error - write_size not initialised to 0. Last write incomplete?\n");
                 assert(0);
             }
             write_file_idx = file_idx;
             memcpy(&write_size, &databytes[1], sizeof(write_size));
-            if(VERBOSE) printf("Host: write transfer setup idx: %u, bytes: %u\n", file_idx, write_size);
+            if(VERBOSE) printf("[HOST] write transfer setup idx: %u, bytes: %u\n", file_idx, write_size);
         }
         break;
 
         case XSCOPE_ID_WRITE_BYTES:
         {
-            if(VERBOSE) printf("Host: write idx: %u bytes transfer length: %u\n",write_file_idx, length);
+            if(VERBOSE) printf("[HOST] write idx: %u bytes transfer length: %u\n", write_file_idx, length);
             fwrite(databytes, 1, length, host_files[write_file_idx].fp);
             write_size -= length;
             if(write_size == 0){
-                if(VERBOSE) printf("Host: Normal end of write transfer\n");
+                if(VERBOSE) printf("[HOST] Normal end of write transfer\n");
             }
             else if(write_size < 0){
-                printf("Host: Error - write overran by %d bytes.", -write_size);
+                printf("[HOST] Error - write overran by %d bytes.", -write_size);
                 assert(0);
             }
             else{
@@ -204,7 +204,7 @@ void xscope_record(
 
         default:
         {
-            printf("Host: unexpected xSCOPE record event (id [%u] length [%u]\n", id, length);
+            printf("[HOST] unexpected xSCOPE record event (id [%u] length [%u]\n", id, length);
         }
         break;
     }
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
         usleep(10000); //Back off for 10ms to reduce processor usage during poll
     }
 
-    if(VERBOSE) printf("Host: Exit received\n");
+    if(VERBOSE) printf("[HOST] Exit received\n");
     //Wait another 100ms to allow any remaining outs from the device to arrive before we terminate
     usleep(100000);
     for(unsigned idx = 0; idx < MAX_FILES_OPEN; idx++){
