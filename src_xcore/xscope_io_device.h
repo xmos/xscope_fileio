@@ -2,8 +2,14 @@
 #ifndef XSCOPE_IO_DEVICE_H_
 #define XSCOPE_IO_DEVICE_H_
 
+#ifdef __XC__
+#define chanend_t chanend
+#else
 #include <xcore/chanend.h>
+#endif
+
 #include <stddef.h>
+#include <stdint.h>
 #include "xscope_io_common.h"
 
 typedef struct{
