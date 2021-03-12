@@ -173,9 +173,30 @@ void xscope_record(
         }
         break;
 
+        case XSCOPE_ID_SEEK:
+        {
+            assert(length == 6);
+            unsigned file_idx = databytes[0] - '0';
+            int whence = databytes[1] - '0';
+            int offset;
+            memcpy(&offset, &databytes[2], sizeof(offset));
+
+            if(VERBOSE) printf("[HOST] seek file idx: %u whence: %d offset: %d\n", file_idx, whence, offset);
+
+            int ret = fseek(host_files[file_idx].fp, offset, whence);
+            if(ret == 0){
+                if(VERBOSE) printf("[HOST] Normal seek. New position: %ld\n", ftell(host_files[file_idx].fp));
+            }
+            else {
+                printf("[HOST] Error - fseek on file %s returned: %d\n", host_files[file_idx].file_name, ret);
+                assert(0);
+            }
+        }
+        break;
+
         case XSCOPE_ID_HOST_QUIT:
         {
-            if(VERBOSE) printf("Host: quit received\n");
+            if(VERBOSE) printf("[HOST] quit received\n");
             running = 0;
             return;
         }

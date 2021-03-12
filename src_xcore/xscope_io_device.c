@@ -138,6 +138,19 @@ void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xsco
     lock_release(file_access_lock);
 }
 
+void xscope_fseek(int offset, int whence, xscope_file_t *xscope_file){
+    lock_acquire(file_access_lock);
+    xassert(whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END);
+    unsigned char packet[1 + 1 + sizeof(offset)];
+    packet[0] = xscope_file->index + '0';
+    packet[1] = whence + '0';
+    memcpy(&packet[2], &offset, sizeof(offset));
+    xscope_bytes(XSCOPE_ID_SEEK, sizeof(packet), packet);
+    if(VERBOSE) printf("Seeking file id: %u whence %d offset %d\n", xscope_file->index, whence, offset);
+    lock_release(file_access_lock);
+}
+
+
 void xscope_close_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");

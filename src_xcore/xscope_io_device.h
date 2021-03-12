@@ -58,16 +58,28 @@ size_t xscope_fread(uint8_t *buffer, size_t n_bytes_to_read, xscope_file_t *xsco
  * Writes a number of bytes from the buffer provided by the application.
  *
  * @param   buffer that will be read and sent to be written on the host 
- * @param   n_bytes_to_read
+ * @param   n_bytes_to_write
  * @return  void    
  ******************************************************************************/
 void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xscope_io_handle);
 
 /******************************************************************************
+ * xscope_seek SEEK_SET, SEEK_CUR or SEEK_END. Note no error checking yet!!
+ *
+ * Sets the file position of the stream to the given offset
+ *
+ * @param   offset in bytes 
+ * @param   whence - SEEK_SET, SEEK_CUR or SEEK_END
+ * @return  void    
+ ******************************************************************************/
+void xscope_fseek(int offset, int whence, xscope_file_t *xscope_io_handle);
+
+/******************************************************************************
  * xscope_close_files
  *
  * Closes both the read and write file on the host.
- * This must be called at the end of device application.
+ * This must be called at the end of device application as it also signals
+ * terminate to the host app.
  *
  * @return  void    
  ******************************************************************************/
