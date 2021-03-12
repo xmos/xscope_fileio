@@ -150,3 +150,5 @@ _deps
 
 # Host binary
 xscope_fileio/host/xscope_host_endpoint
+*.bin
+*.o
