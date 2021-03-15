@@ -14,7 +14,7 @@ import sh
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = (Path(__file__).parent / "host")
+HOST_PATH = (Path(__file__).parent / "../host")
 
 
 def _get_host_exe():

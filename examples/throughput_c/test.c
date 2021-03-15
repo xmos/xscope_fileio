@@ -25,9 +25,9 @@ void do_test(void){
 
     uint8_t buffer[256*1024] = {0};
 
-    xscope_fseek(0, SEEK_END, &read_xscope_file);
+    xscope_fseek(&read_xscope_file, 0, SEEK_END);
     unsigned fsize = xscope_ftell(&read_xscope_file);
-    xscope_fseek(0, SEEK_SET, &read_xscope_file);
+    xscope_fseek(&read_xscope_file, 0, SEEK_SET);
     printf("Input file size kB: %d\n", fsize / 1000);
 
     unsigned read_total_time = 0;
@@ -38,12 +38,12 @@ void do_test(void){
     size_t num_bytes = 0;
     do{
         unsigned t0 = get_reference_time();
-        num_bytes = xscope_fread(buffer, sizeof(buffer), &read_xscope_file);
+        num_bytes = xscope_fread(&read_xscope_file, buffer, sizeof(buffer));
         unsigned t1 = get_reference_time();
         read_total_time += t1 - t0;
 
         unsigned t2 = get_reference_time();
-        xscope_fwrite(buffer, num_bytes, &write_xscope_file);
+        xscope_fwrite(&write_xscope_file, buffer, num_bytes);
         unsigned t3 = get_reference_time();
         write_total_time += t3 - t2;
     } while(num_bytes > 0);
@@ -59,5 +59,5 @@ void main_tile0(chanend_t xscope_chan)
 {
     xscope_io_init(xscope_chan);
     do_test();
-    xscope_close_files();
+    xscope_close_all_files();
 }

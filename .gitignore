@@ -152,3 +152,4 @@ _deps
 xscope_fileio/host/xscope_host_endpoint
 *.bin
 *.o
+examples/fileio_features_xc/.build

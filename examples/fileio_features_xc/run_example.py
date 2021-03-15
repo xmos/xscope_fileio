@@ -1,14 +1,15 @@
 #We assume that the Xscope FileIO Python library has been installed via pip beforehand and is available to import. Please see readme for instuctions.
-
+import subprocess
 import xscope_fileio
 
-firmware_xe = "fileio_test.xe"
+
+firmware_xe = "bin/fileio_features_xc.xe"
 adapter_id = "L4Ss6YfM"
 ref_text = b"Evolution is change in the heritable characteristics of biological populations over successive generations." + b"\x00";
 with open("ref.bin", "wb") as ref_file:
     ref_file.write(ref_text)
 
-xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
+xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=True)
 
 with open("dut.bin", "rb") as dut_file:
     dut_text = dut_file.read()

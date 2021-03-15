@@ -3,9 +3,9 @@ TARGET_EXEC ?= fileio_test.xe
 
 XCC ?= xcc
 
-SRCS := main.xc test.c ../../src_xcore/xscope_io_device.c
+SRCS := main.xc test.c ../../xscope_fileio/src/xscope_io_device.c
 INC_DIRS += $(dir $(SRCS))
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+INC_FLAGS := $(addprefix -I,$(INC_DIRS)) -I../../xscope_fileio/api -I../../xscope_fileio
 
 BUILD_DIR := build
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -14,28 +14,26 @@ DEPS := $(OBJS:.o=.d)
 CFLAGS := -c $(INC_FLAGS) $(TARGET_FLAG) -Os -g
 XCFLAGS := $(CFLAGS)
 
-$(TARGET_EXEC): $(OBJS) ../../src_xcore/config.xscope
-#	@echo $^
-# 	@echo $(SRCS)
-	@echo "**HELLO LINKER**"
+$(TARGET_EXEC): $(OBJS) ../../xscope_fileio/config.xscope
+# 	@echo "**HELLO LINKER**"
 	$(XCC) $(TARGET_FLAG) -o $@ $^ -report
 
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO C**"
+# 	@echo "**HELLO C**"
 	$(XCC) $(CFLAGS) -c $< -o $@
 
 # xc source
 $(BUILD_DIR)/%.xc.o: %.xc
 	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO XC**"
+# 	@echo "**HELLO XC**"
 	$(XCC) $(XCFLAGS) -c $< -o $@
 
 # asm source
 $(BUILD_DIR)/%.S.o: %.S
 	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO ASM**"
+# 	@echo "**HELLO ASM**"
 	$(XCC) $(ASMFLAGS) -c $< -o $@
 
 .PHONY: clean

@@ -1,49 +1,29 @@
-TARGET_FLAG ?= -target=XCORE-AI-EXPLORER
-TARGET_EXEC ?= fileio_test.xe
+# The TARGET variable determines what target system the application is
+# compiled for. It either refers to an XN file in the source directories
+# or a valid argument for the --target option when compiling
+TARGET = XCORE-AI-EXPLORER
 
-XCC ?= xcc
+# The APP_NAME variable determines the name of the final .xe file. It should
+# not include the .xe postfix. If left blank the name will default to
+# the project name
+APP_NAME = 
 
-SRCS := test.xc ../../src_xcore/xscope_io_device.c
-INC_DIRS += $(dir $(SRCS))
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+# The USED_MODULES variable lists other modules used by the application.
+USED_MODULES = xscope_fileio(>=0.1.0)
 
-BUILD_DIR := build
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
+# The flags passed to xcc when building the application
+# You can also set the following to override flags for a particular language:
+# XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
+# If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
+# xcc for the final link (mapping) stage.
+XCC_FLAGS = -Os -g -report -DTEST_WAV_XSCOPE=1
 
-CFLAGS := -c $(INC_FLAGS) $(TARGET_FLAG) -Os -g
-XCFLAGS := $(CFLAGS)
+# The XCORE_ARM_PROJECT variable, if set to 1, configures this
+# project to create both xCORE and ARM binaries.
+XCORE_ARM_PROJECT = 0
 
-$(TARGET_EXEC): $(OBJS) ../../src_xcore/config.xscope
-#	@echo $^
-# 	@echo $(SRCS)
-	@echo "**HELLO LINKER**"
-	$(XCC) $(TARGET_FLAG) -o $@ $^ -report
+# The VERBOSE variable, if set to 1, enables verbose output from the make system.
+VERBOSE = 0
 
-# c source
-$(BUILD_DIR)/%.c.o: %.c
-	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO C**"
-	$(XCC) $(CFLAGS) -c $< -o $@
-
-# xc source
-$(BUILD_DIR)/%.xc.o: %.xc
-	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO XC**"
-	$(XCC) $(XCFLAGS) -c $< -o $@
-
-# asm source
-$(BUILD_DIR)/%.S.o: %.S
-	$(MKDIR_P) $(dir $@)
-	@echo "**HELLO ASM**"
-	$(XCC) $(ASMFLAGS) -c $< -o $@
-
-.PHONY: clean
-
-clean:
-	$(RM) -r build
-	$(RM) $(TARGET_EXEC)
-
--include $(DEPS)
-
-MKDIR_P ?= mkdir -p
+XMOS_MAKE_PATH ?= ../..
+-include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
