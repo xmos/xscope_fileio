@@ -7,13 +7,11 @@ Currently it supports:
 
   * Arbitrary number (32 currently) of **read or write** files (not read/write)
 
-  * **Sequential** (not random) access only
-
-  * “wb” and “rb” file access mode only
+  * “wb” or “rb” file access mode only
 
   * 6-8MBytes/s Device to Host speed
 
-  * 150-850kBytes/s Host to Device speed (Linux < 200kB, Mac > 800kB)
+  * Up to 1MBytes/s Host to Device speed (on tools 15.0.4)
 
 This compares to around 2kBytes/s for fileio over JTAG supported using `xrun --io`.
 
