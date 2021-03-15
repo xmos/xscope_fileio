@@ -162,7 +162,7 @@ int xscope_ftell(xscope_file_t *xscope_file){
     return offset;
 }
 
-void xscope_close_files(void){
+void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
     hwtimer_t t = hwtimer_alloc(); hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
