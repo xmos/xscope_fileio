@@ -63,6 +63,9 @@ void xscope_close_all_files(void);
 The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
 to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
 
+You will also need a copy of `config.xscope` in your firmware directory. This
+enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You 
+can find a copy in `xscope_fileio/config.xscope xscope_fileio/config.xscope.txt` which you should rename to `config.xscope`.
 
 Note currently missing from fileio api:
 

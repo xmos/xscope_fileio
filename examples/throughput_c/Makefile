@@ -14,7 +14,7 @@ DEPS := $(OBJS:.o=.d)
 CFLAGS := -c $(INC_FLAGS) $(TARGET_FLAG) -Os -g
 XCFLAGS := $(CFLAGS)
 
-$(TARGET_EXEC): $(OBJS) ../../xscope_fileio/config.xscope
+$(TARGET_EXEC): $(OBJS) config.xscope
 # 	@echo "**HELLO LINKER**"
 	$(XCC) $(TARGET_FLAG) -o $@ $^ -report
 
