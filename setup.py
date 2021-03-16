@@ -21,7 +21,7 @@ class CustomBuildCommand(build):
 
     def run(self):
         # Make the host binary
-        with pushd("xscope_fileio/host/"):
+        with pushd("host/"):
             subprocess.check_output("make")
         build.run(self)
 
@@ -31,7 +31,7 @@ class CustomDevelopCommand(develop):
 
     def run(self):
         # Make the host binary
-        with pushd("xscope_fileio/host/"):
+        with pushd("host/"):
             subprocess.check_output("make")
         develop.run(self)
 
