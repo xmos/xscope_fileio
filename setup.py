@@ -45,9 +45,9 @@ setuptools.setup(
     # So it's "xscope_fileio" not "xscope_fileio/"
     package_data={
         "xscope_fileio": [
-            "host/Makefile",
-            "host/xscope_io_host.c",
-            "host/xscope_host_endpoint",
+            "../host/Makefile",
+            "../host/xscope_io_host.c",
+            "../host/xscope_host_endpoint",
         ]
     },
     packages=setuptools.find_packages(),
