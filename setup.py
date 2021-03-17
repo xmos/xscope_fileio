@@ -21,7 +21,7 @@ class CustomBuildCommand(build):
 
     def run(self):
         # Make the host binary
-        with pushd("xscope_fileio/host/"):
+        with pushd("host/"):
             subprocess.check_output("make")
         build.run(self)
 
@@ -31,7 +31,7 @@ class CustomDevelopCommand(develop):
 
     def run(self):
         # Make the host binary
-        with pushd("xscope_fileio/host/"):
+        with pushd("host/"):
             subprocess.check_output("make")
         develop.run(self)
 
@@ -45,9 +45,9 @@ setuptools.setup(
     # So it's "xscope_fileio" not "xscope_fileio/"
     package_data={
         "xscope_fileio": [
-            "host/Makefile",
-            "host/xscope_io_host.c",
-            "host/xscope_host_endpoint",
+            "../host/Makefile",
+            "../host/xscope_io_host.c",
+            "../host/xscope_host_endpoint",
         ]
     },
     packages=setuptools.find_packages(),

@@ -7,13 +7,11 @@ Currently it supports:
 
   * Arbitrary number (32 currently) of **read or write** files (not read/write)
 
-  * **Sequential** (not random) access only
-
-  * “wb” and “rb” file access mode only
+  * “wb” or “rb” file access mode only
 
   * 6-8MBytes/s Device to Host speed
 
-  * 150-850kBytes/s Host to Device speed (Linux < 200kB, Mac > 800kB)
+  * Up to 1MBytes/s Host to Device speed (on tools 15.0.4)
 
 This compares to around 2kBytes/s for fileio over JTAG supported using `xrun --io`.
 
@@ -51,17 +49,28 @@ void xscope_io_init(chanend_t xscope_end);
 
 xscope_file_t xscope_open_file(char* filename, char* attributes);
 
-size_t xscope_fread(uint8_t *buffer, size_t n_bytes_to_read, xscope_file_t *xscope_io_handle);
+size_t xscope_fread(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_read);
 
-void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xscope_io_handle);
+void xscope_fwrite(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_write);
 
-void xscope_close_files(void);
+void xscope_fseek(xscope_file_t *xscope_io_handle, int offset, int whence);
+
+int xscope_ftell(xscope_file_t *xscope_file);  
+
+void xscope_close_all_files(void);
 ```
+
+The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
+to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
+
+You will also need a copy of `config.xscope` in your firmware directory. This
+enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You 
+can find a copy in `xscope_fileio/config.xscope xscope_fileio/config.xscope.txt` which you should rename to `config.xscope`.
 
 Note currently missing from fileio api:
 
 ```
-fseek, ftell, fprintf,  fscanf
+fprintf,  fscanf
 ```
 
 ## System Architecture

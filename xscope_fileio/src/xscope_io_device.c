@@ -62,7 +62,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     return xscope_file;
 }
 
-size_t xscope_fread(uint8_t *buffer, size_t n_bytes_to_read, xscope_file_t *xscope_file){
+size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_read){
     lock_acquire(file_access_lock);
     xassert(xscope_file->mode == XSCOPE_IO_READ_BINARY || xscope_file->mode == XSCOPE_IO_READ_TEXT);
 
@@ -107,7 +107,7 @@ size_t xscope_fread(uint8_t *buffer, size_t n_bytes_to_read, xscope_file_t *xsco
     return n_bytes_read;
 }
 
-void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xscope_file){
+void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_write){
     lock_acquire(file_access_lock);
     xassert(xscope_file->mode == XSCOPE_IO_WRITE_BINARY || xscope_file->mode == XSCOPE_IO_WRITE_TEXT);
 
@@ -138,7 +138,31 @@ void xscope_fwrite(uint8_t *buffer, size_t n_bytes_to_write, xscope_file_t *xsco
     lock_release(file_access_lock);
 }
 
-void xscope_close_files(void){
+void xscope_fseek(xscope_file_t *xscope_file, int offset, int whence){
+    lock_acquire(file_access_lock);
+    xassert(whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END);
+    unsigned char packet[1 + 1 + sizeof(offset)];
+    packet[0] = xscope_file->index + '0';
+    packet[1] = whence + '0';
+    memcpy(&packet[2], &offset, sizeof(offset));
+    xscope_bytes(XSCOPE_ID_SEEK, sizeof(packet), packet);
+    if(VERBOSE) printf("Seeking file id: %u whence %d offset %d\n", xscope_file->index, whence, offset);
+    lock_release(file_access_lock);
+}
+
+int xscope_ftell(xscope_file_t *xscope_file){
+    lock_acquire(file_access_lock);
+    const unsigned char idx = xscope_file->index + '0';
+    xscope_bytes(XSCOPE_ID_TELL, 1, &idx);
+    int offset, bytes_read = 0;
+    xscope_data_from_host(c_xscope, (char *)&offset, &bytes_read);
+    xassert(bytes_read = sizeof(offset));
+    if(VERBOSE) printf("Tell file id: %u offset %d\n", xscope_file->index, offset);
+    lock_release(file_access_lock);
+    return offset;
+}
+
+void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
     hwtimer_t t = hwtimer_alloc(); hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
