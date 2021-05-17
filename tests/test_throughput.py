@@ -16,12 +16,11 @@ def cd(path):
     os.chdir(CWD)
 
 
-
-def run_throughput():
+def run_throughput(size_mb):
     tmpdirname = 'tmp_throughput_' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
     test_dir = os.path.dirname(os.path.realpath(__file__)) + "/" + tmpdirname
     with cd(test_dir):
-        ref = np.random.randint(256, size=(30 * 1024 * 1024)).astype(np.uint8)
+        ref = np.random.randint(256, size=(size_mb * 1024 * 1024)).astype(np.uint8)
         ref.tofile("throughput_ref.bin")
 
         with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as adapter_id:
@@ -35,4 +34,8 @@ def run_throughput():
     print("PASS")
 
 if __name__ == "__main__":
-    run_throughput()
+    if len(sys.argv) > 1:
+        size_mb = int(sys.argv[1])
+    else:
+        size_mb =  30
+    run_throughput(size_mb)
