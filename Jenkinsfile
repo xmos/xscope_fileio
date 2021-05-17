@@ -30,15 +30,16 @@ pipeline {
     stage('Install Dependencies') {
       steps {
         sh '/XMOS/get_tools.py ' + params.TOOLS_VERSION
-        installDependencies()
+        toolsEnv(TOOLS_PATH) {
+          installDependencies()
+        }
       }
     }
     stage('Static analysis') {
       steps {
         withVenv() {
-          // python -m pip install git+git://github0.xmos.com/xmos-int/xtagctl.git@3.8.3
-          // sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-          // recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+          sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+          recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
         }
       }
     }
