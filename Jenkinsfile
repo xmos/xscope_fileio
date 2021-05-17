@@ -66,7 +66,7 @@ pipeline {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
                     sh 'tree'
-                    sh 'python3 -m pip install -e ../xtagctl -e .'
+                    sh 'python3 -m pip install -e xtagctl -e .'
                     sh 'python3 test_end_to_end.py'
                   }
                 }
