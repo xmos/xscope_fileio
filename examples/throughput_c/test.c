@@ -8,8 +8,8 @@
 
 #include <assert.h>
 
-#define IN_FILE_NAME    "ref.bin"
-#define OUT_FILE_NAME   "dut.bin"
+#define IN_FILE_NAME    "throughput_ref.bin"
+#define OUT_FILE_NAME   "throughput_dut.bin"
 
 float ticks_to_KBPS(unsigned ticks, unsigned num_bytes){
     const float ticks_per_second = 100000000;
