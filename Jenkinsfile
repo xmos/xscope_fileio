@@ -58,6 +58,7 @@ pipeline {
           stages{
             stage('Cleanup xtagctl'){
               steps {
+                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
               }
             }
