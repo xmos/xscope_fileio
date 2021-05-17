@@ -67,7 +67,7 @@ pipeline {
                   toolsEnv(TOOLS_PATH) {
                     sh 'tree'
                     sh 'python3 -m pip install -e xtagctl -e .'
-                    sh 'python3 test_end_to_end.py'
+                    sh 'python3 examples/throughput_c/run_example.py'
                   }
                 }
               }
@@ -95,7 +95,7 @@ pipeline {
       println "Do some sort of promotion: viewfiles/submodules/branches/tags"
     }
     always {
-      archiveArtifacts artifacts: "*.zip", fingerprint: true, allowEmptyArchive: true
+      archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
     }
     cleanup {
       cleanWs()
