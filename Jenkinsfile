@@ -60,9 +60,6 @@ pipeline {
             stage('Cleanup xtagctl'){
               steps {
                 withVenv() {
-                  sh 'pip install -e xtagctl'
-                }
-                withVenv() {
                   toolsEnv(TOOLS_PATH) {
                     sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                     sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
