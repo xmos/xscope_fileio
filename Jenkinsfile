@@ -61,12 +61,13 @@ pipeline {
                 sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
               }
             }
-            stage('Transfer tests'){
+            stage('Transfer test'){
               steps {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
+                    sh 'tree'
                     sh 'python -m pip install -e ../xtagctl -e .'
-                    sh 'python -m test_end_to_end.py --junitxml=pytest_result.xml -s'
+                    sh 'python -m test_end_to_end.py'
                   }
                 }
               }
