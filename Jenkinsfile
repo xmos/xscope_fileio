@@ -15,7 +15,7 @@ pipeline {
   }
   environment {
     // '/XMOS/tools' from get_tools.py and rest from tools installers
-    TOOLS_PATH = "/XMOS/tools/${params.TOOLS_VERSION}/XMOS/xTIMEcomposer/${params.TOOLS_VERSION}"
+    TOOLS_PATH = "/XMOS/tools/${params.TOOLS_VERSION}/XMOS/XTC/${params.TOOLS_VERSION}"
   }
   options {
     skipDefaultCheckout()
