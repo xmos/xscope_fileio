@@ -66,8 +66,8 @@ pipeline {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
                     sh 'tree'
-                    sh 'python -m pip install -e ../xtagctl -e .'
-                    sh 'python -m test_end_to_end.py'
+                    sh 'pip install -e ../xtagctl -e .'
+                    sh 'python test_end_to_end.py'
                   }
                 }
               }
@@ -76,13 +76,11 @@ pipeline {
         }
         stage('xsim tests'){
           stages{
-            stage('callback test'){
+            stage('feature test'){
               steps {
-                dir('tests/test_callback') {
-                  withVenv() {
-                    toolsEnv(TOOLS_PATH) {
+                withVenv() {
+                  toolsEnv(TOOLS_PATH) {
                       // sh 'xsim test_isr.xe'
-                    }          
                   }
                 }
               }
