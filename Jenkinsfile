@@ -74,8 +74,7 @@ pipeline {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
                     sh 'tree'
-                    sh 'python3 -m pip install -e . numpy'
-                    sh 'python3 tests/test_throughput.py'
+                    sh 'python tests/test_throughput.py'
                   }
                 }
               }
