@@ -95,9 +95,7 @@ pipeline {
       println "Do some sort of promotion: viewfiles/submodules/branches/tags"
     }
     always {
-      // archiveArtifacts artifacts: "tests/pipelines/sensory_input/*.wav", fingerprint: true, allowEmptyArchive: true
-      // archiveArtifacts artifacts: "tests/pipelines/configs/*.cfg", fingerprint: true, allowEmptyArchive: true
-      // archiveArtifacts artifacts: "tests/pipelines/*.png", fingerprint: true, allowEmptyArchive: true
+      archiveArtifacts artifacts: "*.zip", fingerprint: true, allowEmptyArchive: true
     }
     cleanup {
       cleanWs()
