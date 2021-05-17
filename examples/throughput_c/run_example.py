@@ -3,8 +3,9 @@ import numpy as np
 import xscope_fileio
 import os
 
+
 firmware_xe = os.path.dirname(os.path.realpath(__file__)) + "/fileio_test.xe"
-adapter_id = "L4Ss6YfM"
+adapter_id = "L4Ss6YfM" #enter your xtag id here. Use xrun -l to find out what it is
 
 ref = np.random.randint(256, size=(30 * 1024 * 1024)).astype(np.uint8)
 ref.tofile("throughput_ref.bin")
