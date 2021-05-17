@@ -45,13 +45,8 @@ pipeline {
       steps {
         toolsEnv(TOOLS_PATH) {  // load xmos tools
           sh 'tree'
-          // sh 'cd tests/test_callback && make'
-          // sh 'cd tests/test_timing && make'
-          // //sh 'cd tests/test_end_to_end && make' - This is built by the test and will fail otherwise
-          // sh 'cd tests/test_tools/xscope_file_io_host && make'
-          // sh 'export VOICE_FRONT_END_PATH=`pwd` && cd examples/app_vu && ls && cmake . -B build && cd build && make'
-          // if you want to build once and distribute to multiple later stages
-          // use "stash/unstash"
+          sh 'cd examples/throughput_c && make'
+          sh 'cd examples/fileio_features_xc && xmake'
         }
       }
     }
@@ -65,14 +60,12 @@ pipeline {
                 sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
               }
             }
-            stage('Basic tests'){
+            stage('Transfer tests'){
               steps {
-                dir('tests') {
-                  withVenv() {
-                    toolsEnv(TOOLS_PATH) {
-                      sh 'python -m pytest test_end_to_end.py --junitxml=pytest_result.xml -s'
-                      junit 'pytest_result.xml'
-                    }
+                withVenv() {
+                  toolsEnv(TOOLS_PATH) {
+                    sh 'python -m pip install -e ../xtagctl -e .'
+                    sh 'python -m test_end_to_end.py --junitxml=pytest_result.xml -s'
                   }
                 }
               }
@@ -88,17 +81,6 @@ pipeline {
                     toolsEnv(TOOLS_PATH) {
                       // sh 'xsim test_isr.xe'
                     }          
-                  }
-                }
-              }
-            }
-            stage('timing test'){
-              steps {
-                dir('tests/test_timing') {
-                  withVenv() {
-                    toolsEnv(TOOLS_PATH) {
-                      // sh 'xsim test_timing.xe'
-                    }
                   }
                 }
               }
