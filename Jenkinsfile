@@ -58,8 +58,13 @@ pipeline {
           stages{
             stage('Cleanup xtagctl'){
               steps {
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
-                sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                withVenv() {
+                  toolsEnv(TOOLS_PATH) {
+                    sh 'pip install xtagctl'
+                    sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+                    sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                  }
+                }
               }
             }
             stage('Transfer test'){
