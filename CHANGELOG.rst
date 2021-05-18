@@ -1,6 +1,11 @@
 xscope_fileo
 ============
 
+0.3.0
+-----
+  * ADDED: Jenkins driven file transfer test
+  * ADDED: Note in API about maximum fread of 64kB on Linux hosts
+
 0.2.0
 -----
 
