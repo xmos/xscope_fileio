@@ -49,7 +49,7 @@ void xscope_io_init(chanend_t xscope_end);
 xscope_file_t xscope_open_file(const char* filename, char* attributes);
 
 /******************************************************************************
- * xscope_fread
+ * xscope_fread   NOTE MAXIMUM n_bytes_to_read of 64kB on Linux, bugzillaid=18528
  *
  * Reads a number of bytes into the buffer provided by the application.
  * It sends a command to the host app which responds with an upload of the
