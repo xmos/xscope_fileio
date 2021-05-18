@@ -24,9 +24,8 @@ def run_features():
         with open("features_ref.bin", "wb") as ref_file:
             ref_file.write(ref_text)
 
-        with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as adapter_id:
-            firmware_xe = test_dir + "/../../examples/fileio_features_xc/bin/fileio_features_xc.xe"
-            xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=True)
+        firmware_xe = test_dir + "/../../examples/fileio_features_xc/bin/fileio_features_xc.xe"
+        xscope_fileio.run_on_target(None, firmware_xe, use_xsim=True)
 
 
         with open("features_dut.bin", "rb") as dut_file:
