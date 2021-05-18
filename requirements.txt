@@ -1,0 +1,13 @@
+# python_version 3.7
+
+# dependencies
+numpy
+flake8==3.8.3
+pylint==2.5.3
+pytest==6.0.0
+pytest-xdist==1.34.0
+
+# self-install
+-e ./
+-e xtagctl/
+

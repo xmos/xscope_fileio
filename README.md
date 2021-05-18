@@ -49,6 +49,7 @@ void xscope_io_init(chanend_t xscope_end);
 
 xscope_file_t xscope_open_file(char* filename, char* attributes);
 
+//NOTE MAXIMUM n_bytes_to_read of 64kB on Linux http://bugzilla/show_bug.cgi?id=18528
 size_t xscope_fread(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_read);
 
 void xscope_fwrite(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_write);

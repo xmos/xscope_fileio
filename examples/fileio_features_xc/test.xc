@@ -8,7 +8,7 @@ extern "C"{
 #include <assert.h>
 
 void test(void){
-    const char ref_file_name[] = "ref.bin";
+    const char ref_file_name[] = "features_ref.bin";
     const char ref_array[] = "Evolution is change in the heritable characteristics of biological populations over successive generations.";
 
     xscope_file_t read_xscope_file = xscope_open_file(ref_file_name, "rb");
@@ -47,12 +47,12 @@ void test(void){
     printf("Full sentence (%u): %s\n", num_bytes, buffer);
 
     //Copy it out to dut for comparing
-    const char dut_file_name[] = "dut.bin";
+    const char dut_file_name[] = "features_dut.bin";
     xscope_file_t write_xscope_file = xscope_open_file(dut_file_name, "wb");
     xscope_fwrite(&write_xscope_file, buffer, sizeof(ref_array));
 
     //Test fseek on write file
-    const char dut_mod_file_name[] = "dut_mod.bin";
+    const char dut_mod_file_name[] = "features_dut_mod.bin";
     xscope_file_t write_xscope_fil_mod = xscope_open_file(dut_mod_file_name, "wb");
     xscope_fwrite(&write_xscope_fil_mod, buffer, sizeof(ref_array));
     xscope_fseek(&write_xscope_fil_mod, 10, SEEK_SET);  
