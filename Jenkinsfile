@@ -84,7 +84,7 @@ pipeline {
               steps {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
-                      // sh 'xsim test_isr.xe'
+                    sh 'python tests/test_features.py'
                   }
                 }
               }
