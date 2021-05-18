@@ -5,6 +5,7 @@ xscope_fileo
 -----
   * ADDED: Jenkins driven file transfer test
   * ADDED: Note in API about maximum fread of 64kB on Linux hosts
+  * FIXED: Duplicate printing of [DEVICE] on long lines
 
 0.2.0
 -----
