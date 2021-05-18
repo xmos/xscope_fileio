@@ -71,8 +71,7 @@ pipeline {
               steps {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
-                    sh 'tree'
-                    sh 'python tests/test_throughput.py 1' //Pass size in MB
+                    sh 'python tests/test_throughput.py 16' //Pass size in MB
                   }
                 }
               }
