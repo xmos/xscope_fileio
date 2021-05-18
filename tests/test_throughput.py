@@ -26,7 +26,6 @@ def run_throughput(size_mb):
 
         with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as adapter_id:
             firmware_xe = test_dir + "/../../examples/throughput_c/fileio_test.xe"
-            print(firmware_xe)
             xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
 
         dut = np.fromfile("throughput_dut.bin", dtype=np.uint8)
