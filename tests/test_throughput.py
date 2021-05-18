@@ -5,6 +5,7 @@ import os, sys
 import xtagctl
 import contextlib
 import random, string
+from compare_bins import analyse_error_rate
 
 
 @contextlib.contextmanager
@@ -30,7 +31,11 @@ def run_throughput(size_mb):
 
         dut = np.fromfile("throughput_dut.bin", dtype=np.uint8)
 
-        assert np.array_equal(ref, dut)
+        equal = np.array_equal(ref, dut)
+        if not equal:
+            analyse_error_rate(ref, dut)
+            assert 0
+
     print("PASS")
 
 if __name__ == "__main__":
