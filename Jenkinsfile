@@ -67,7 +67,7 @@ pipeline {
       parallel {
         stage('Hardware tests') {
           stages{
-            stage('Transfer test'){
+            stage('Transfer test single large'){
               steps {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
@@ -80,11 +80,14 @@ pipeline {
         }
         stage('Hardware tests #2 (in parallel)') {
           stages{
-            stage('Transfer test'){
+            stage('Transfer test multiple small'){
               steps {
                 withVenv() {
                   toolsEnv(TOOLS_PATH) {
-                    sh 'python tests/test_throughput.py 64' //Pass size in MB
+                    sh 'python tests/test_throughput.py 5' //Pass size in MB
+                    sh 'python tests/test_throughput.py 5' //Pass size in MB
+                    sh 'python tests/test_throughput.py 5' //Pass size in MB
+                    sh 'python tests/test_throughput.py 5' //Pass size in MB
                   }
                 }
               }
