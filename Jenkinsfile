@@ -52,21 +52,21 @@ pipeline {
         }
       }
     }
+    stage('Cleanup xtagctl'){
+      steps {
+        withVenv() {
+          toolsEnv(TOOLS_PATH) {
+            sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+            sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+          }
+        }
+      }
+    }
     stage('Tests'){
       failFast false
       parallel {
         stage('Hardware tests') {
           stages{
-            stage('Cleanup xtagctl'){
-              steps {
-                withVenv() {
-                  toolsEnv(TOOLS_PATH) {
-                    sh 'xtagctl reset_all XCORE-AI-EXPLORER'
-                    sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
-                  }
-                }
-              }
-            }
             stage('Transfer test'){
               steps {
                 withVenv() {
