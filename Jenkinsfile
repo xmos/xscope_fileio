@@ -78,6 +78,19 @@ pipeline {
             }
           }
         }
+        stage('Hardware tests #2 (in parallel)') {
+          stages{
+            stage('Transfer test'){
+              steps {
+                withVenv() {
+                  toolsEnv(TOOLS_PATH) {
+                    sh 'python tests/test_throughput.py 64' //Pass size in MB
+                  }
+                }
+              }
+            }
+          }
+        }
         stage('xsim tests'){
           stages{
             stage('feature test'){
