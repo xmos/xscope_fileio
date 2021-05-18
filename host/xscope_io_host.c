@@ -22,15 +22,25 @@ xscope_host_file_t host_files[MAX_FILES_OPEN] = {0};
 const char end_sting[] = END_MARKER_STRING;
 static unsigned running = 1;
 
+int device_print_newline = 1; //Used to keep track of newlines for [DEVICE] print prefix
+
 void xscope_print(
   unsigned long long timestamp,
   unsigned int length,
   unsigned char *data)
 {
   if (length) {
-    printf("[DEVICE] ");
-    for (int i = 0; i < length; i++)
-      printf("%c", *(&data[i]));
+    if (device_print_newline){
+      printf("[DEVICE] ");
+      device_print_newline = 0;
+    }
+    for (int i = 0; i < length; i++){
+      char character = *(&data[i]); 
+      printf("%c", character);
+      if (character == '\n'){
+        device_print_newline = 1;
+      }
+    }
   }
 }
 
