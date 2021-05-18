@@ -23,7 +23,7 @@ void do_test(void){
     xscope_file_t read_xscope_file = xscope_open_file(IN_FILE_NAME, "rb");
     xscope_file_t write_xscope_file = xscope_open_file(OUT_FILE_NAME, "wb");
 
-    uint8_t buffer[64*1024] = {0};
+    uint8_t buffer[128*1024] = {0};
 
     xscope_fseek(&read_xscope_file, 0, SEEK_END);
     unsigned fsize = xscope_ftell(&read_xscope_file);
