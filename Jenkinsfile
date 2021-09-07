@@ -114,7 +114,9 @@ pipeline {
         expression { return currentBuild.currentResult == "SUCCESS" }
       }
       steps {
-        updateViewfiles()
+        withEnv(["SAVED_GIT_URL=$GIT_URL","SAVED_GIT_COMMIT=GIT_COMMIT"] {
+          updateViewfiles()
+        }
       }
     }
   }
