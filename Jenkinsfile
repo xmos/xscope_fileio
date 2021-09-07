@@ -114,9 +114,14 @@ pipeline {
         expression { return currentBuild.currentResult == "SUCCESS" }
       }
       steps {
-        withEnv(["SAVED_GIT_URL=$GIT_URL","SAVED_GIT_COMMIT=GIT_COMMIT"]) {
-          updateViewfiles()
+        script {
+          dir("${repo}") {
+            current_scm = checkout scm
+            env.SAVED_GIT_URL = current_scm.GIT_URL
+            env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
+          }
         }
+        updateViewfiles()
       }
     }
   }
