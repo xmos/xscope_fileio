@@ -115,11 +115,9 @@ pipeline {
       }
       steps {
         script {
-          dir("${repo}") {
-            current_scm = checkout scm
-            env.SAVED_GIT_URL = current_scm.GIT_URL
-            env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
-          }
+          current_scm = checkout scm
+          env.SAVED_GIT_URL = current_scm.GIT_URL
+          env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
         }
         updateViewfiles()
       }
