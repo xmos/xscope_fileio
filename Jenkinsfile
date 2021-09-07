@@ -108,13 +108,13 @@ pipeline {
           }
         }
       }
-      stage('Update view files') {
-        when {
-          expression { return currentBuild.currentResult == "SUCCESS" }
-        }
-        steps {
-          updateViewfiles()
-        }
+    }
+    stage('Update view files') {
+      when {
+        expression { return currentBuild.currentResult == "SUCCESS" }
+      }
+      steps {
+        updateViewfiles()
       }
     }
   }
