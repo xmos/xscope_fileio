@@ -1,6 +1,11 @@
 xscope_fileo
 ============
 
+0.3.1
+-----
+
+  * ADDED: Jenkins stage to update view files automatically
+
 0.3.0
 -----
   * ADDED: Jenkins driven file transfer test
