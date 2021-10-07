@@ -1,5 +1,10 @@
-xscope_fileo
-============
+xscope fileio change log
+========================
+
+0.3.2
+-----
+
+  * FIXED: changelog title
 
 0.3.1
 -----
