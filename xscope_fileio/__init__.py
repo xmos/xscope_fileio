@@ -6,7 +6,8 @@ import socket
 import sys
 import time
 
-import sh
+import subprocess
+import threading, queue
 
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
@@ -75,6 +76,31 @@ class _XrunExitHandler:
             # sys.stderr.write(dump.stdout.decode())
             self.host_process.terminate()
 
+def popenAndCall(onExit, *popenArgs, **popenKWArgs):
+    """
+    Runs a subprocess.Popen, and then calls the function onExit when the
+    subprocess completes.
+
+    Use it exactly the way you'd normally use subprocess.Popen, except include a
+    callable to execute as the first argument. onExit is a callable object, and
+    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
+    """
+    def runInThread(onExit, popenArgs, popenKWArgs, q):
+        proc = subprocess.Popen(*popenArgs, **popenKWArgs)
+        q.put(proc)
+        out,err = proc.communicate()
+        proc.wait()
+        onExit(proc.args, proc.returncode == 0, proc.returncode)
+        assert proc.returncode == 0, f'\nERROR: xrun exited with error code {proc.returncode}\n STDOUT: {out}\n\n STDERR: {err}'
+        return
+
+    q = queue.Queue()
+    thread = threading.Thread(target=runInThread,
+                              args=(onExit, popenArgs, popenKWArgs, q))
+    thread.start()
+
+    return q.get() # returns immediately after the thread starts
+
 
 def run_on_target(adapter_id, firmware_xe, use_xsim=False):
     port = _get_open_port()
@@ -89,17 +115,10 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False):
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         print(xsim_cmd)
-        xrun_proc = sh.xsim(xsim_cmd, _bg=True)
+        xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
     else:
         print(xrun_cmd)
-        xrun_proc = sh.xrun(
-            xrun_cmd.split(),
-            _bg=True,
-            _bg_exc=False,
-            _out=sh_print,
-            _done=exit_handler.xcore_done,
-            _err=sys.stderr,
-        )
+        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split())
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
@@ -107,7 +126,7 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False):
         print(".", end="", flush=True)
         time.sleep(0.1)
         if time.time() > timeout:
-            xrun_proc.kill_group()
+            xrun_proc.kill()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
@@ -116,8 +135,12 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False):
 
     host_exe = _get_host_exe()
     host_args = f"{port}"
-    host_proc = sh.Command(host_exe)(host_args.split(), _bg=True, _out=sh_print)
+    host_proc = subprocess.Popen([host_exe] + host_args.split())
     exit_handler.set_host_process(host_proc)
+    out,err = host_proc.communicate()
     host_proc.wait()
 
+    assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n STDOUT: {out}\n\n STDERR: {err}'
     print("Running on target finished")
+
+    return host_proc.returncode

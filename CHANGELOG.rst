@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+0.3.3
+-----
+
+  * CHANGED: Python code to use subprocess instead of sh
+
 0.3.2
 -----
 
