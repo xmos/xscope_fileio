@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.16.2') _
+@Library('xmos_jenkins_shared_library@v0.17.0') _
 
 getApproval()
 
@@ -13,10 +13,6 @@ pipeline {
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
-  environment {
-    // '/XMOS/tools' from get_tools.py and rest from tools installers
-    TOOLS_PATH = "/XMOS/tools/${params.TOOLS_VERSION}/XMOS/XTC/${params.TOOLS_VERSION}"
-  }
   options {
     skipDefaultCheckout()
   }
@@ -29,8 +25,7 @@ pipeline {
     }
     stage('Install Dependencies') {
       steps {
-        sh '/XMOS/get_tools.py ' + params.TOOLS_VERSION
-        toolsEnv(TOOLS_PATH) {
+        withTools(params.TOOLS_VERSION) {
           installDependencies()
         }
       }
@@ -45,7 +40,7 @@ pipeline {
     }
     stage('Build') {
       steps {
-        toolsEnv(TOOLS_PATH) {  // load xmos tools
+        withTools(params.TOOLS_VERSION) {
           sh 'tree'
           sh 'cd examples/throughput_c && make'
           sh 'cd examples/fileio_features_xc && xmake'
@@ -55,7 +50,7 @@ pipeline {
     stage('Cleanup xtagctl'){
       steps {
         withVenv() {
-          toolsEnv(TOOLS_PATH) {
+          withTools(params.TOOLS_VERSION) {
             sh 'xtagctl reset_all XCORE-AI-EXPLORER'
             sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
           }
@@ -70,7 +65,7 @@ pipeline {
             stage('Transfer test single large'){
               steps {
                 withVenv() {
-                  toolsEnv(TOOLS_PATH) {
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_throughput.py 64' //Pass size in MB
                   }
                 }
@@ -83,7 +78,7 @@ pipeline {
             stage('Transfer test multiple small'){
               steps {
                 withVenv() {
-                  toolsEnv(TOOLS_PATH) {
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
@@ -99,7 +94,7 @@ pipeline {
             stage('feature test'){
               steps {
                 withVenv() {
-                  toolsEnv(TOOLS_PATH) {
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_features.py'
                   }
                 }
