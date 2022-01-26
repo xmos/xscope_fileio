@@ -88,10 +88,9 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     def runInThread(onExit, popenArgs, popenKWArgs, q):
         proc = subprocess.Popen(*popenArgs, **popenKWArgs)
         q.put(proc)
-        out,err = proc.communicate()
         proc.wait()
         onExit(proc.args, proc.returncode == 0, proc.returncode)
-        assert proc.returncode == 0, f'\nERROR: xrun exited with error code {proc.returncode}\n STDOUT: {out}\n\n STDERR: {err}'
+        assert proc.returncode == 0, f'\nERROR: xrun exited with error code {proc.returncode}\n'
         return
 
     q = queue.Queue()
@@ -102,7 +101,7 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     return q.get() # returns immediately after the thread starts
 
 
-def run_on_target(adapter_id, firmware_xe, use_xsim=False):
+def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     port = _get_open_port()
     xrun_cmd = (
         f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
@@ -118,7 +117,7 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False):
         xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
     else:
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split())
+        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
@@ -135,12 +134,11 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False):
 
     host_exe = _get_host_exe()
     host_args = f"{port}"
-    host_proc = subprocess.Popen([host_exe] + host_args.split())
+    host_proc = subprocess.Popen([host_exe] + host_args.split(), **kwargs)
     exit_handler.set_host_process(host_proc)
-    out,err = host_proc.communicate()
     host_proc.wait()
 
-    assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n STDOUT: {out}\n\n STDERR: {err}'
+    assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
     print("Running on target finished")
 
     return host_proc.returncode
