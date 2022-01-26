@@ -40,7 +40,7 @@ pipeline {
     }
     stage('Build') {
       steps {
-        withTools(params.TOOLS_VERSION)
+        withTools(params.TOOLS_VERSION) {
           sh 'tree'
           sh 'cd examples/throughput_c && make'
           sh 'cd examples/fileio_features_xc && xmake'
@@ -50,7 +50,7 @@ pipeline {
     stage('Cleanup xtagctl'){
       steps {
         withVenv() {
-          withTools(params.TOOLS_VERSION)
+          withTools(params.TOOLS_VERSION) {
             sh 'xtagctl reset_all XCORE-AI-EXPLORER'
             sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
           }
@@ -65,7 +65,7 @@ pipeline {
             stage('Transfer test single large'){
               steps {
                 withVenv() {
-                  withTools(params.TOOLS_VERSION)
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_throughput.py 64' //Pass size in MB
                   }
                 }
@@ -78,7 +78,7 @@ pipeline {
             stage('Transfer test multiple small'){
               steps {
                 withVenv() {
-                  withTools(params.TOOLS_VERSION)
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
                     sh 'python tests/test_throughput.py 5' //Pass size in MB
@@ -94,7 +94,7 @@ pipeline {
             stage('feature test'){
               steps {
                 withVenv() {
-                  withTools(params.TOOLS_VERSION)
+                  withTools(params.TOOLS_VERSION) {
                     sh 'python tests/test_features.py'
                   }
                 }
