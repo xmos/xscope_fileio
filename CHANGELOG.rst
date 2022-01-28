@@ -1,10 +1,13 @@
 xscope fileio change log
 ========================
 
-0.3.3
+0.4.0
 -----
 
   * CHANGED: Python code to use subprocess instead of sh
+  * REMOVED: Contextlib support for capturing stout/stderr
+  * ADDED: run_on_target() method returns stdout/err as list of lines
+  * ADDED: optional verbose kwarg in run_on_target()to reduce verbosity
 
 0.3.2
 -----
