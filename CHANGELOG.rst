@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+0.4.1
+-----
+
+  * ADDED: XMOS public V1 license
+
 0.4.0
 -----
 
