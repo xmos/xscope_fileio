@@ -5,6 +5,7 @@ from pathlib import Path
 import socket
 import sys
 import time
+import platform
 
 import subprocess
 import threading, queue
@@ -20,7 +21,10 @@ HOST_PATH = (Path(__file__).parent / "../host")
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
-    return HOST_PATH / "xscope_host_endpoint"
+    if platform.system() == 'Windows':
+        return str(HOST_PATH / "xscope_host_endpoint.exe")
+    else:
+        return HOST_PATH / "xscope_host_endpoint"
 
 
 @contextlib.contextmanager
