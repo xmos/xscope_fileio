@@ -46,7 +46,7 @@ def _print_output(x, verbose):
 
 def _get_open_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", 0))
+    s.bind(("localhost", 0))
     s.listen(1)
     port = s.getsockname()[1]
     s.close()
@@ -57,7 +57,7 @@ def _test_port_is_open(port):
     port_open = True
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.bind(("", port))
+        s.bind(("localhost", port))
     except OSError:
         port_open = False
     s.close()
