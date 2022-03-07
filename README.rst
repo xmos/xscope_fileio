@@ -1,4 +1,5 @@
-# Xscope FileIO
+Xscope FileIO
+=============
 
 This library allows a program on the xCore to access binary files on the host machine
 via xscope.
@@ -15,7 +16,8 @@ Currently it supports:
 
 This compares to around 2kBytes/s for fileio over JTAG supported using `xrun --io`.
 
-## Installation
+Installation
+************
 
 `pip install -e .` or `pip install .`
 
@@ -29,42 +31,46 @@ on your build system, but you can use `cmake` to generate build files for your b
 option, eg. `cmake -G"NMake Makefiles" .`
 
 
-## Host side API
+Host side API
+-------------
 
 The host-side interface is written in Python. To run an xcore binary with access to
 xscope fileIO,
 use:
-```python
-xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
-```
+
+::
+
+    xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
+
 This can be combined with xtagctl e.g.:
 
-```python
-with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
-    xscope_fileio.run_on_target(adapter_id, device_xe)
-```
+::
+
+    with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
+        xscope_fileio.run_on_target(adapter_id, device_xe)
 
 
-## Device side API
+Device side API
+---------------
 
 Source and header files for device code are found in `src_xcore`
 
-```c
-void xscope_io_init(chanend_t xscope_end);
+::
 
-xscope_file_t xscope_open_file(char* filename, char* attributes);
+    void xscope_io_init(chanend_t xscope_end);
 
-//NOTE MAXIMUM n_bytes_to_read of 64kB on Linux http://bugzilla/show_bug.cgi?id=18528
-size_t xscope_fread(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_read);
+    xscope_file_t xscope_open_file(char* filename, char* attributes);
 
-void xscope_fwrite(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_write);
+    //NOTE MAXIMUM n_bytes_to_read of 64kB on Linux http://bugzilla/show_bug.cgi?id=18528
+    size_t xscope_fread(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_read);
 
-void xscope_fseek(xscope_file_t *xscope_io_handle, int offset, int whence);
+    void xscope_fwrite(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_write);
 
-int xscope_ftell(xscope_file_t *xscope_file);  
+    void xscope_fseek(xscope_file_t *xscope_io_handle, int offset, int whence);
 
-void xscope_close_all_files(void);
-```
+    int xscope_ftell(xscope_file_t *xscope_file);  
+
+    void xscope_close_all_files(void);
 
 The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
 to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
@@ -75,11 +81,13 @@ can find a copy in `xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`
 
 Note currently missing from fileio api:
 
-```
-fprintf,  fscanf
-```
+::
 
-## System Architecture
+    fprintf,  fscanf
+
+
+System Architecture
+-------------------
 
 The `run_on_target` function calls `xrun --xscope-port` with the binary and specified target adapter,
 and simultaneously launches a host application to communicate xscope data to/from 
@@ -88,4 +96,5 @@ in the firmware code, reading/writing to the host file system.
 
 The call to `run_on_target` returns when the firmware exits.
 
-![System Architecture](arch.png "System Architecture")
+.. image:: arch.png
+    :alt: System Architecture
