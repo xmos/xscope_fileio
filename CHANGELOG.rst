@@ -5,6 +5,9 @@ xscope fileio change log
 -----
 
   * ADDED: XMOS public V1 license
+  * ADDED: support for run_on_target() to optionally redirect stdout to file
+  * REMOVED:run_on_target() method returns stdout/err as list of lines 
+  * REMOVED: optional verbose kwarg in run_on_target()to reduce verbosity
 
 0.4.0
 -----
