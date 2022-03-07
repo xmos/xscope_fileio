@@ -19,16 +19,16 @@ This compares to around 2kBytes/s for fileio over JTAG supported using ``xrun --
 Installation
 ************
 
-`pip install -e .` or `pip install .`
+``pip install -e .`` or ``pip install .``
 
-To compile firmware code, add `src_xcore` to your source dirs and include dirs.
+To compile firmware code, add ``src_xcore`` to your source dirs and include dirs.
 
-**Ensure you use the `config.xscope` included in `src_xcore`.**
+**Ensure you use the ``config.xscope`` included in ``src_xcore``.**
 
 If running on a Windows host, you will have to build the host endpoint yourself; the resulting executable
-`xscope_host_endpoint.exe` must be placed in the `host` directory. The specific commands will vary depending
+``xscope_host_endpoint.exe`` must be placed in the ``host`` directory. The specific commands will vary depending
 on your build system, but you can use `cmake` to generate build files for your build system using the `-G`
-option, eg. `cmake -G"NMake Makefiles" .`
+option, eg. ``cmake -G"NMake Makefiles" .``
 
 
 Host side API
