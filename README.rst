@@ -23,7 +23,7 @@ Installation
 
 To compile firmware code, add ``src_xcore`` to your source dirs and include dirs.
 
-**Ensure you use the ``config.xscope`` included in ``src_xcore``.**
+**Ensure you use the config.xscope included in src_xcore.**
 
 If running on a Windows host, you will have to build the host endpoint yourself; the resulting executable
 ``xscope_host_endpoint.exe`` must be placed in the ``host`` directory. The specific commands will vary depending
