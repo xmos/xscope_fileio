@@ -76,17 +76,17 @@ class _XrunExitHandler:
             # sys.stderr.write(dump.stdout.decode())
             self.host_process.terminate()
 
-def popenAndCall(onExit, *popenArgs):
+def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     """
     Runs a subprocess.Popen, and then calls the function onExit when the
     subprocess completes.
 
     Use it exactly the way you'd normally use subprocess.Popen, except include a
     callable to execute as the first argument. onExit is a callable object, and
-    *popenArgs are simply passed up to subprocess.Popen.
+    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
     """
-    def runInThread(onExit, popenArgs, q):
-        proc = subprocess.Popen(*popenArgs)
+    def runInThread(onExit, popenArgs, popenKWArgs, q):
+        proc = subprocess.Popen(*popenArgs, **popenKWArgs)
         q.put(proc)
         proc.wait()
         onExit(proc.args, proc.returncode == 0, proc.returncode)
@@ -95,13 +95,13 @@ def popenAndCall(onExit, *popenArgs):
 
     q = queue.Queue()
     thread = threading.Thread(target=runInThread,
-                              args=(onExit, popenArgs, q))
+                              args=(onExit, popenArgs, popenKWArgs, q))
     thread.start()
 
     return q.get() # returns immediately after the thread starts
 
 
-def run_on_target(adapter_id, firmware_xe, use_xsim=False, verbose=True):
+def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     port = _get_open_port()
     xrun_cmd = (
         f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
@@ -117,41 +117,28 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, verbose=True):
         xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
     else:
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split())
+        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
 
-    if verbose:
-        print("Waiting for xrun", end="")
+    print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
     while _test_port_is_open(port):
-        if verbose:
-            print(".", end="", flush=True)
+        print(".", end="", flush=True)
         time.sleep(0.1)
         if time.time() > timeout:
             xrun_proc.kill()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
-    if verbose:
-        print()
-        print("Starting host app...", end="\n")
+    print()
+
+    print("Starting host app...", end="\n")
 
     host_exe = _get_host_exe()
     host_args = f"{port}"
-
-    stdout = []
-    with subprocess.Popen([host_exe] + host_args.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, \
-        close_fds=True) as host_proc:
-        exit_handler.set_host_process(host_proc)
-
-        for line in host_proc.stdout: # b'\n'-separated lines
-            if verbose:
-                sys.stdout.buffer.write(line) # pass bytes as is to console
-                sys.stdout.flush()
-            stdout.append(line.decode('utf-8').strip())
- 
+    host_proc = subprocess.Popen([host_exe] + host_args.split(), **kwargs)
+    exit_handler.set_host_process(host_proc)
     host_proc.wait()
 
     assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
-    if verbose:
-        print("Running on target finished")
+    print("Running on target finished")
 
-    return stdout
+    return host_proc.returncode
