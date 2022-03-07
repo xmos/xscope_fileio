@@ -4,6 +4,7 @@ import os
 import setuptools
 import subprocess
 import contextlib
+import platform
 
 
 @contextlib.contextmanager
@@ -20,9 +21,12 @@ class CustomBuildCommand(build):
     """Customized distutils build command """
 
     def run(self):
-        # Make the host binary
-        with pushd("host/"):
-            subprocess.check_output("make")
+        # Can't assume a specific build command for Windows, so just build for Linux and Mac
+        if platform.system() in ['Darwin', 'Linux']:
+            # Make the host binary
+            with pushd("host/"):
+                subprocess.check_output(["cmake", "."])
+                subprocess.check_output(["make"])
         build.run(self)
 
 
@@ -30,9 +34,12 @@ class CustomDevelopCommand(develop):
     """Customized setuptools develop command """
 
     def run(self):
-        # Make the host binary
-        with pushd("host/"):
-            subprocess.check_output("make")
+        # Can't assume a specific build command for Windows, so just build for Linux and Mac
+        if platform.system() in ['Darwin', 'Linux']:
+            # Make the host binary
+            with pushd("host/"):
+                subprocess.check_output(["cmake", "."])
+                subprocess.check_output(["make"])
         develop.run(self)
 
 

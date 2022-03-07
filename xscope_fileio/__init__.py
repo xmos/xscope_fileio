@@ -5,6 +5,7 @@ from pathlib import Path
 import socket
 import sys
 import time
+import platform
 
 import subprocess
 import threading, queue
@@ -20,7 +21,10 @@ HOST_PATH = (Path(__file__).parent / "../host")
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
-    return HOST_PATH / "xscope_host_endpoint"
+    if platform.system() == 'Windows':
+        return str(HOST_PATH / "xscope_host_endpoint.exe")
+    else:
+        return HOST_PATH / "xscope_host_endpoint"
 
 
 @contextlib.contextmanager
@@ -42,7 +46,7 @@ def _print_output(x, verbose):
 
 def _get_open_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", 0))
+    s.bind(("localhost", 0))
     s.listen(1)
     port = s.getsockname()[1]
     s.close()
@@ -53,7 +57,7 @@ def _test_port_is_open(port):
     port_open = True
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.bind(("", port))
+        s.bind(("localhost", port))
     except OSError:
         port_open = False
     s.close()

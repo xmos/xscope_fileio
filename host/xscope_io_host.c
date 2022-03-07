@@ -1,11 +1,17 @@
-// Copyright (c) 2020, XMOS Ltd, All rights reserved
+// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include "windows.h"
+#else
 #include <pthread.h>
 #include <unistd.h>
+#endif
+
 #include "xscope_endpoint.h"
 #include "xscope_io_common.h"
 
@@ -247,12 +253,21 @@ int main(int argc, char *argv[])
     }
 
     while(running){
-        usleep(10000); //Back off for 10ms to reduce processor usage during poll
+        //Back off for 10ms to reduce processor usage during poll
+#if _WIN32
+        Sleep(10);
+#else
+        usleep(10000);
+#endif
     }
 
     if(VERBOSE) printf("[HOST] Exit received\n");
     //Wait another 100ms to allow any remaining outs from the device to arrive before we terminate
+#if _WIN32
+    Sleep(100);
+#else
     usleep(100000);
+#endif
     for(unsigned idx = 0; idx < MAX_FILES_OPEN; idx++){
         if(host_files[idx].fp != NULL){
             fclose(host_files[idx].fp);
