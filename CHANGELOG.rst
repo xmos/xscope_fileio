@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+1.0.0
+-----
+
+ * ADDED: support for building and running the host endpoint on Windows
+
 0.4.1
 -----
 
