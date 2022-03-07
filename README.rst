@@ -14,7 +14,7 @@ Currently it supports:
 
   * Up to 1MBytes/s Host to Device speed (on tools 15.0.4)
 
-This compares to around 2kBytes/s for fileio over JTAG supported using `xrun --io`.
+This compares to around 2kBytes/s for fileio over JTAG supported using ``xrun --io``.
 
 Installation
 ************
