@@ -1,4 +1,10 @@
 // Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
+
+// Suppress some unwanted warnings in the Windows build
+#ifdef _WIN32
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
@@ -40,7 +46,7 @@ void xscope_print(
       printf("[DEVICE] ");
       device_print_newline = 0;
     }
-    for (int i = 0; i < length; i++){
+    for (unsigned i = 0; i < length; i++){
       char character = *(&data[i]); 
       printf("%c", character);
       if (character == '\n'){
@@ -174,14 +180,14 @@ void xscope_record(
         case XSCOPE_ID_WRITE_BYTES:
         {
             if(VERBOSE) printf("[HOST] write idx: %u bytes transfer length: %u\n", write_file_idx, length);
+            if(length > write_size){
+                printf("[HOST] Error - write will overrun by %d bytes.", length - write_size);
+                assert(0);
+            }
             fwrite(databytes, 1, length, host_files[write_file_idx].fp);
             write_size -= length;
             if(write_size == 0){
                 if(VERBOSE) printf("[HOST] Normal end of write transfer\n");
-            }
-            else if(write_size < 0){
-                printf("[HOST] Error - write overran by %d bytes.", -write_size);
-                assert(0);
             }
             else{
                 //Still going
