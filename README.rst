@@ -27,7 +27,7 @@ To compile firmware code, add ``src_xcore`` to your source dirs and include dirs
 
 If running on a Windows host, you will have to build the host endpoint yourself; the resulting executable
 ``xscope_host_endpoint.exe`` must be placed in the ``host`` directory. The specific commands will vary depending
-on your build system, but you can use `cmake` to generate build files for your build system using the `-G`
+on your build system, but you can use ``cmake`` to generate build files for your build system using the ``-G``
 option, eg. ``cmake -G"NMake Makefiles" .``
 
 
@@ -53,7 +53,7 @@ This can be combined with xtagctl e.g.:
 Device side API
 ---------------
 
-Source and header files for device code are found in `src_xcore`
+Source and header files for device code are found in ``src_xcore``
 
 ::
 
@@ -75,9 +75,9 @@ Source and header files for device code are found in `src_xcore`
 The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
 to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
 
-You will also need a copy of `config.xscope` in your firmware directory. This
+You will also need a copy of ``config.xscope`` in your firmware directory. This
 enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You 
-can find a copy in `xscope_fileio/config.xscope xscope_fileio/config.xscope.txt` which you should rename to `config.xscope`.
+can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`` which you should rename to ``config.xscope``.
 
 Note currently missing from fileio api:
 
@@ -89,12 +89,12 @@ Note currently missing from fileio api:
 System Architecture
 -------------------
 
-The `run_on_target` function calls `xrun --xscope-port` with the binary and specified target adapter,
+The ``run_on_target`` function calls ``xrun --xscope-port`` with the binary and specified target adapter,
 and simultaneously launches a host application to communicate xscope data to/from 
-the xrun process via sockets. The host application responds to `xscope_fileio` API calls
+the xrun process via sockets. The host application responds to ``xscope_fileio`` API calls
 in the firmware code, reading/writing to the host file system.
 
-The call to `run_on_target` returns when the firmware exits.
+The call to ``run_on_target`` returns when the firmware exits.
 
 .. image:: arch.png
     :alt: System Architecture
