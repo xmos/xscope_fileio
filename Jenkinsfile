@@ -141,7 +141,7 @@ pipeline {
     }
     stage('Update view files') {
       agent {
-        label 'x86_64&&brew'
+        label 'x86_64'
       }
       when {
         expression { return currentBuild.currentResult == "SUCCESS" }
