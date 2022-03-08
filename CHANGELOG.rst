@@ -4,11 +4,7 @@ xscope fileio change log
 1.0.0
 -----
 
- * ADDED: support for building and running the host endpoint on Windows
-
-0.4.1
------
-
+  * ADDED: support for building and running the host endpoint on Windows
   * ADDED: XMOS public V1 license
   * ADDED: support for run_on_target() to optionally redirect stdout to file
   * REMOVED:run_on_target() method returns stdout/err as list of lines 
