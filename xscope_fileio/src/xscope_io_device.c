@@ -12,21 +12,36 @@
 
 #define VERBOSE                 0
 
-
 //Global chanend so we don't need to keep passing it in for read operations
 chanend_t c_xscope = 0;
 unsigned file_idx = 0;
 lock_t file_access_lock;
 
-void xscope_io_init(chanend_t xscope_end){
+__attribute__((weak))
+void xscope_fileio_lock_alloc(void) {
     file_access_lock = lock_alloc();
+    xassert(file_access_lock != 0);
+}
+
+__attribute__((weak))
+void xscope_fileio_lock_acquire(void) {
+    lock_acquire(file_access_lock);
+}
+
+__attribute__((weak))
+void xscope_fileio_lock_release(void) {
+    lock_release(file_access_lock);
+}
+
+void xscope_io_init(chanend_t xscope_end){
+    xscope_fileio_lock_alloc();
     xscope_mode_lossless();
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
 }
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
-    lock_acquire(file_access_lock);
+    xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);
     char packet[1 + MAX_FILENAME_LEN + 1];
@@ -53,7 +68,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     xscope_file.index = file_idx;
     xscope_bytes(XSCOPE_ID_OPEN_FILE, length, (const unsigned char *)packet);
     file_idx++;
-    lock_release(file_access_lock);
+    xscope_fileio_lock_release();
     if(file_idx == MAX_FILES_OPEN){
         printf("Maximum number of files open exceeded (%u)", MAX_FILES_OPEN);
     }
@@ -63,7 +78,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
 }
 
 size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_read){
-    lock_acquire(file_access_lock);
+    xscope_fileio_lock_acquire();
     xassert(xscope_file->mode == XSCOPE_IO_READ_BINARY || xscope_file->mode == XSCOPE_IO_READ_TEXT);
 
     unsigned end_marker_found = 0;
@@ -103,12 +118,12 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
     } while(!chunk_complete);
     if(VERBOSE) printf("Received: %u bytes\n", n_bytes_read);
 
-    lock_release(file_access_lock);
+    xscope_fileio_lock_release();
     return n_bytes_read;
 }
 
 void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_write){
-    lock_acquire(file_access_lock);
+    xscope_fileio_lock_acquire();
     xassert(xscope_file->mode == XSCOPE_IO_WRITE_BINARY || xscope_file->mode == XSCOPE_IO_WRITE_TEXT);
 
     unsigned char packet[1 + sizeof(unsigned)];
@@ -133,13 +148,13 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
         // Not needed with tools 15.0.1
     }
     while (sent_so_far < n_bytes_to_write);
-    
+
     if(VERBOSE) printf("Sent %u bytes\n", n_bytes_to_write);
-    lock_release(file_access_lock);
+    xscope_fileio_lock_release();
 }
 
 void xscope_fseek(xscope_file_t *xscope_file, int offset, int whence){
-    lock_acquire(file_access_lock);
+    xscope_fileio_lock_acquire();
     xassert(whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END);
     unsigned char packet[1 + 1 + sizeof(offset)];
     packet[0] = xscope_file->index + '0';
@@ -147,18 +162,18 @@ void xscope_fseek(xscope_file_t *xscope_file, int offset, int whence){
     memcpy(&packet[2], &offset, sizeof(offset));
     xscope_bytes(XSCOPE_ID_SEEK, sizeof(packet), packet);
     if(VERBOSE) printf("Seeking file id: %u whence %d offset %d\n", xscope_file->index, whence, offset);
-    lock_release(file_access_lock);
+    xscope_fileio_lock_release();
 }
 
 int xscope_ftell(xscope_file_t *xscope_file){
-    lock_acquire(file_access_lock);
+    xscope_fileio_lock_acquire();
     const unsigned char idx = xscope_file->index + '0';
     xscope_bytes(XSCOPE_ID_TELL, 1, &idx);
     int offset, bytes_read = 0;
     xscope_data_from_host(c_xscope, (char *)&offset, &bytes_read);
     xassert(bytes_read = sizeof(offset));
     if(VERBOSE) printf("Tell file id: %u offset %d\n", xscope_file->index, offset);
-    lock_release(file_access_lock);
+    xscope_fileio_lock_release();
     return offset;
 }
 
