@@ -9,6 +9,7 @@
 #include <string.h>
 #include <xscope.h>
 #include <stdio.h>
+#include <xs1.h>
 
 #define VERBOSE                 0
 
