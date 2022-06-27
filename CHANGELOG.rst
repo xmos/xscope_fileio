@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+1.0.1
+-----
+
+  * ADDED: 0.1 ms delay in xscope_fread() to work-around Windows race condition
+
 1.0.0
 -----
 
