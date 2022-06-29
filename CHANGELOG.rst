@@ -1,9 +1,10 @@
 xscope fileio change log
 ========================
 
-1.0.1
+1.1.0
 -----
 
+  * ADDED: ability to use alternate mutex methods
   * ADDED: 0.1 ms delay in xscope_fread() to work-around Windows race condition
 
 1.0.0
