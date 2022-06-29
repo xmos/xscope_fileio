@@ -1,4 +1,4 @@
-// Copyright (c) 2020, XMOS Ltd, All rights reserved
+// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
 #include "xscope_io_device.h"
 #include <xcore/chanend.h>
 #include <xcore/hwtimer.h>
@@ -92,6 +92,16 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
     memcpy(&packet[1], &n_bytes_to_read, sizeof(n_bytes_to_read));
 
     xscope_bytes(XSCOPE_ID_READ_BYTES, sizeof(packet), packet);
+
+    // Add a delay to avoid a race condition seen only on Windows
+    // See issue 30
+    #define XSCOPE_FREAD_RACE_CONDITION_DELAY ( XS1_TIMER_MHZ * 100 )
+
+    // Define the timeafter macro until it becomes available in C source files via xs1.h
+    #define timeafter(A, B) ((int)((B) - (A)) < 0)
+
+    uint32_t time_delay = get_reference_time() + XSCOPE_FREAD_RACE_CONDITION_DELAY;
+    while(timeafter(time_delay, get_reference_time()));
 
     do
     {
