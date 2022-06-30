@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.17.0') _
+@Library('xmos_jenkins_shared_library@v0.19.0') _
 
 getApproval()
 
@@ -141,7 +141,7 @@ pipeline {
     }
     stage('Update view files') {
       agent {
-        label 'x86_64&&brew'
+        label 'x86_64 && linux'
       }
       when {
         expression { return currentBuild.currentResult == "SUCCESS" }
