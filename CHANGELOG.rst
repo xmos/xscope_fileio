@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+1.1.1
+-----
+
+  * CHANGED: increase xscope_fread() delay for Windows work-around to 0.5 ms
+
 1.1.0
 -----
 
