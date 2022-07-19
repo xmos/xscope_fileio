@@ -16,6 +16,7 @@
 chanend_t c_xscope = 0;
 unsigned file_idx = 0;
 lock_t file_access_lock;
+volatile unsigned xscope_io_init_flag = 0;
 
 __attribute__((weak))
 void xscope_fileio_lock_alloc(void) {
@@ -33,11 +34,16 @@ void xscope_fileio_lock_release(void) {
     lock_release(file_access_lock);
 }
 
+unsigned xscope_fileio_is_initialized(void) {
+    return xscope_io_init_flag;
+}
+
 void xscope_io_init(chanend_t xscope_end){
     xscope_fileio_lock_alloc();
     xscope_mode_lossless();
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
+    xscope_io_init_flag = 1;
 }
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
