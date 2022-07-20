@@ -47,6 +47,10 @@ void xscope_io_init(chanend_t xscope_end){
 }
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
+    /* Wait until xscope_fileio is initialized */
+    while(xscope_fileio_is_initialized() == 0) {
+        delay_ticks(1);
+    }
     xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);
