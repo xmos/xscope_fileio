@@ -103,16 +103,6 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
 
     xscope_bytes(XSCOPE_ID_READ_BYTES, sizeof(packet), packet);
 
-    // Add a delay to avoid a race condition seen only on Windows
-    // See issue 30
-    #define XSCOPE_FREAD_RACE_CONDITION_DELAY ( XS1_TIMER_MHZ * 500 )
-
-    // Define the timeafter macro until it becomes available in C source files via xs1.h
-    #define timeafter(A, B) ((int)((B) - (A)) < 0)
-
-    uint32_t time_delay = get_reference_time() + XSCOPE_FREAD_RACE_CONDITION_DELAY;
-    while(timeafter(time_delay, get_reference_time()));
-
     do
     {
         int bytes_read = 0;

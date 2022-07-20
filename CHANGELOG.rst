@@ -1,6 +1,13 @@
 xscope fileio change log
 ========================
 
+1.1.2
+-----
+
+  * REMOVED: xscope_fread() delay for Windows work-around to 0.5 ms
+  * ADDED: checks that xscope_io_init() has completed before allowing a file to be opened
+
+
 1.1.1
 -----
 
@@ -18,7 +25,7 @@ xscope fileio change log
   * ADDED: support for building and running the host endpoint on Windows
   * ADDED: XMOS public V1 license
   * ADDED: support for run_on_target() to optionally redirect stdout to file
-  * REMOVED:run_on_target() method returns stdout/err as list of lines 
+  * REMOVED:run_on_target() method returns stdout/err as list of lines
   * REMOVED: optional verbose kwarg in run_on_target()to reduce verbosity
 
 0.4.0
