@@ -59,6 +59,8 @@ Source and header files for device code are found in ``src_xcore``
 
     void xscope_io_init(chanend_t xscope_end);
 
+    unsigned xscope_fileio_is_initialized(void);
+
     xscope_file_t xscope_open_file(char* filename, char* attributes);
 
     //NOTE MAXIMUM n_bytes_to_read of 64kB on Linux http://bugzilla/show_bug.cgi?id=18528
@@ -68,7 +70,7 @@ Source and header files for device code are found in ``src_xcore``
 
     void xscope_fseek(xscope_file_t *xscope_io_handle, int offset, int whence);
 
-    int xscope_ftell(xscope_file_t *xscope_file);  
+    int xscope_ftell(xscope_file_t *xscope_file);
 
     void xscope_close_all_files(void);
 
@@ -76,7 +78,7 @@ The device side application requires a multi-tile main since it uses the xscope_
 to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
 
 You will also need a copy of ``config.xscope`` in your firmware directory. This
-enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You 
+enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You
 can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`` which you should rename to ``config.xscope``.
 
 Note currently missing from fileio api:
@@ -90,7 +92,7 @@ System Architecture
 -------------------
 
 The ``run_on_target`` function calls ``xrun --xscope-port`` with the binary and specified target adapter,
-and simultaneously launches a host application to communicate xscope data to/from 
+and simultaneously launches a host application to communicate xscope data to/from
 the xrun process via sockets. The host application responds to ``xscope_fileio`` API calls
 in the firmware code, reading/writing to the host file system.
 

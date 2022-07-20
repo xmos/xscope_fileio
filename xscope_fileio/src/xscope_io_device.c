@@ -16,6 +16,7 @@
 chanend_t c_xscope = 0;
 unsigned file_idx = 0;
 lock_t file_access_lock;
+volatile unsigned xscope_io_init_flag = 0;
 
 __attribute__((weak))
 void xscope_fileio_lock_alloc(void) {
@@ -33,14 +34,23 @@ void xscope_fileio_lock_release(void) {
     lock_release(file_access_lock);
 }
 
+unsigned xscope_fileio_is_initialized(void) {
+    return xscope_io_init_flag;
+}
+
 void xscope_io_init(chanend_t xscope_end){
     xscope_fileio_lock_alloc();
     xscope_mode_lossless();
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
+    xscope_io_init_flag = 1;
 }
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
+    /* Wait until xscope_fileio is initialized */
+    while(xscope_fileio_is_initialized() == 0) {
+        delay_ticks(1);
+    }
     xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);
@@ -92,16 +102,6 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
     memcpy(&packet[1], &n_bytes_to_read, sizeof(n_bytes_to_read));
 
     xscope_bytes(XSCOPE_ID_READ_BYTES, sizeof(packet), packet);
-
-    // Add a delay to avoid a race condition seen only on Windows
-    // See issue 30
-    #define XSCOPE_FREAD_RACE_CONDITION_DELAY ( XS1_TIMER_MHZ * 500 )
-
-    // Define the timeafter macro until it becomes available in C source files via xs1.h
-    #define timeafter(A, B) ((int)((B) - (A)) < 0)
-
-    uint32_t time_delay = get_reference_time() + XSCOPE_FREAD_RACE_CONDITION_DELAY;
-    while(timeafter(time_delay, get_reference_time()));
 
     do
     {
