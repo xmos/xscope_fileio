@@ -1,17 +1,12 @@
 xscope fileio change log
 ========================
 
-1.1.2
------
-
-  * REMOVED: xscope_fread() delay for Windows work-around to 0.5 ms
-  * ADDED: checks that xscope_io_init() has completed before allowing a file to be opened
-  * ADDED: adds helper function, xscope_fileio_is_initialized(), to allow application to check if the host connection has been established
-
 1.1.1
 -----
 
-  * CHANGED: increase xscope_fread() delay for Windows work-around to 0.5 ms
+  * REMOVED: xscope_fread() delay for Windows race condition
+  * ADDED: checks that xscope_io_init() has completed before allowing a file to be opened
+  * ADDED: adds helper function, xscope_fileio_is_initialized(), to allow application to check if the host connection has been established
 
 1.1.0
 -----
