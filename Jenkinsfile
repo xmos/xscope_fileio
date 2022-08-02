@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.0.5',
+      defaultValue: '15.1.4',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
