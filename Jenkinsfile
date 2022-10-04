@@ -36,8 +36,10 @@ pipeline {
         stage('Static analysis') {
           steps {
             withVenv() {
-              sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-              recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              warnError("Flake") {
+                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              }
             }
           }
         }
