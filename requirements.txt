@@ -7,6 +7,9 @@ pylint==2.5.3
 pytest==6.0.0
 pytest-xdist==1.34.0
 
+# Pin importlib-metadata to <5 due to https://github.com/python/importlib_metadata/issues/409.
+importlib-metadata==4.13.0
+
 # self-install
 -e ./
 -e xtagctl/
