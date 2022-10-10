@@ -1,6 +1,13 @@
 xscope fileio change log
 ========================
 
+1.1.2
+-----
+
+  * CHANGED: Update tools version in Jenkinsfile to 15.1.4
+  * CHANGED: Update flake8 python linting to warn instead of error on Jenkins
+  * CHNAGED: Pin importlib-meta python package to 4.13.0
+
 1.1.1
 -----
 
