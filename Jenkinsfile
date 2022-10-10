@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.0.5',
+      defaultValue: '15.1.4',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
@@ -36,8 +36,10 @@ pipeline {
         stage('Static analysis') {
           steps {
             withVenv() {
-              sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-              recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              warnError("Flake") {
+                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              }
             }
           }
         }
