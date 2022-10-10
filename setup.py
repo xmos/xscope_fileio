@@ -45,7 +45,7 @@ class CustomDevelopCommand(develop):
 
 setuptools.setup(
     name="xscope_fileio",
-    version="0.1.0",
+    version="1.1.2",
     cmdclass={"build": CustomBuildCommand, "develop": CustomDevelopCommand,},
     # Note for anyone trying to copy this pattern:
     # package_data keys are NAMES OF PACKAGES, not dirs
