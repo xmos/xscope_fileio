@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.19.0') _
+@Library('xmos_jenkins_shared_library@v0.20.0') _
 
 getApproval()
 
@@ -115,7 +115,7 @@ pipeline {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
         }
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
     }
@@ -137,7 +137,7 @@ pipeline {
       }
       post {
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
     }
