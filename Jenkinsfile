@@ -48,7 +48,9 @@ pipeline {
             withTools(params.TOOLS_VERSION) {
               sh 'tree'
               sh 'cd examples/throughput_c && make'
-              sh 'cd examples/fileio_features_xc && xmake'
+              withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
+                sh 'cd examples/fileio_features_xc && xmake'
+              }
             }
           }
         }
