@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.20.0') _
+@Library('xmos_jenkins_shared_library@v0.24.0') _
 
 getApproval()
 
@@ -130,8 +130,10 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            runVS('cmake -G"NMake Makefiles" .')
-            runVS('nmake')
+            withVS("vcvars32.bat") {
+              sh 'cmake -G"NMake Makefiles" .'
+              sh 'nmake'
+            }
 
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
           }
