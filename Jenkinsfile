@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.20.0') _
+@Library('xmos_jenkins_shared_library@v0.24.0') _
 
 getApproval()
 
@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
+      defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
@@ -130,9 +130,10 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            runVS('cmake -G"NMake Makefiles" .')
-            runVS('nmake')
-
+            withVs {
+              sh 'cmake -G"NMake Makefiles" .'
+              sh 'nmake'
+            }
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
           }
         }
