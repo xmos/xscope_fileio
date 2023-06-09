@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.11)
 # Compile for x86_64 on Mac as we can't support the M1 ARM architecture yet
 set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE INTERNAL "")
 
+set(CMAKE_BUILD_TYPE "Release")
+
 project(xscope_fileio)
 
 add_executable(xscope_host_endpoint xscope_io_host.c)
