@@ -131,8 +131,8 @@ pipeline {
         withTools(params.TOOLS_VERSION) {
           dir('host') {
             withVS("vcvars32.bat") {
-              sh 'cmake -G"NMake Makefiles" .'
-              sh 'nmake'
+              sh 'cmake -G "Ninja" .'
+              sh 'ninja'
             }
 
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
