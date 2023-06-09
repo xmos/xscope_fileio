@@ -131,7 +131,7 @@ pipeline {
         withTools(params.TOOLS_VERSION) {
           dir('host') {
             withVS("vcvars32.bat") {
-              sh 'cmake -G"NMake Makefiles" .'
+              sh 'cmake -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .'
               sh 'nmake'
             }
 
