@@ -159,3 +159,5 @@ examples/fileio_features_xc/.build
 .ninja_log
 build.ninja
 *.exe
+.ilk
+.pdb
