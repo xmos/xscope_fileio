@@ -13,6 +13,10 @@ pipeline {
   }
   options {
     skipDefaultCheckout()
+    buildDiscarder(logRotator(
+        numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '50' : '',
+        artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '50' : ''
+    ))
   }
   stages {
     stage('xcore.ai') {
