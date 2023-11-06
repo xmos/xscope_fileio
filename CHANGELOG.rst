@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+UNRELEASED
+----------
+
+  * ADDED:   Support for XCommon CMake build system
+
 1.1.2
 -----
 
