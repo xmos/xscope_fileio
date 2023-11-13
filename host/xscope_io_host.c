@@ -75,16 +75,7 @@ void xscope_register(
 int send_file_chunk(unsigned file_idx, unsigned req_size)
 {
     unsigned char *buf = malloc(req_size);
-    unsigned n_bytes_read = 0;
-
-    n_bytes_read = fread(buf, 1, req_size, host_files[file_idx].fp);
-
-    if(n_bytes_read < req_size){
-        if(VERBOSE) printf("[HOST] Unexpected end of file, device requested: %u available: %u sent: 0\n", req_size, n_bytes_read);
-        xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
-        free(buf);
-        return(-1);
-    }
+    unsigned n_bytes_read = fread(buf, 1, req_size, host_files[file_idx].fp);
 
     for(unsigned idx = 0; idx < n_bytes_read / MAX_XSCOPE_SIZE_BYTES; idx++){
         xscope_ep_request_upload(MAX_XSCOPE_SIZE_BYTES, &buf[idx * MAX_XSCOPE_SIZE_BYTES]);
