@@ -87,7 +87,8 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
 
     if(VERBOSE) printf("[HOST] sent block %u\n", n_bytes_read);
 
-    if(feof(host_files[file_idx].fp)){
+    if(feof(host_files[file_idx].fp) 
+       || ferror(host_files[file_idx].fp)){
         if(VERBOSE) printf("[HOST] End of file\n");
         xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
     }

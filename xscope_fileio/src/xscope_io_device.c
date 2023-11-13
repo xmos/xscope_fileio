@@ -110,8 +110,8 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
         {
         read_host_data:
             {
-                // need a buffer big enough to hold max read length, user provided
-                // buffer probably isn't that size.
+                // Need a buffer big enough to hold max read length.
+                // User provided buffer may be smaller than that.
                 char local_buffer[MAX_XSCOPE_SIZE_BYTES];
                 xscope_data_from_host(c_xscope, local_buffer, &bytes_read);
                 end_marker_found = ((bytes_read == END_MARKER_LEN) && !memcmp(local_buffer, END_MARKER_STRING, END_MARKER_LEN)) ? 1 : 0;
