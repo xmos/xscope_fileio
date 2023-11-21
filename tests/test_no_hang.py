@@ -15,6 +15,12 @@ def read_non_existsing_file():
 
 
 if __name__ == '__main__':
+    """
+    This test intentionally tries to open an invalid read file which used to cause
+    a hang in run_on_target(). This is now fixed but the test remains in case of 
+    a regression
+    """
+    
     my_test = Process(target=read_non_existsing_file)
     my_test.start()
     my_test.join(timeout=10) # 10s enough time to launch and complete if working, even with empty XTAG firmware

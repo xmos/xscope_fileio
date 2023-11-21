@@ -99,7 +99,7 @@ pipeline {
                     }
                   }
                 }
-                stage('Check for no hanging on missing read file'){
+                stage('Test for no hanging on missing read file'){
                   steps {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
