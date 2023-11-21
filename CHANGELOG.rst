@@ -4,7 +4,8 @@ xscope fileio change log
 UNRELEASED
 ----------
 
-  * ADDED:   Support for XCommon CMake build system
+  * ADDED: Support for XCommon CMake build system
+  * FIXED: Hang in run_on_target when invalid file was opened for reading
 
 1.1.2
 -----
