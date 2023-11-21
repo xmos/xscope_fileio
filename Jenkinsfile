@@ -52,6 +52,7 @@ pipeline {
             withTools(params.TOOLS_VERSION) {
               sh 'tree'
               sh 'cd examples/throughput_c && make'
+              sh 'cd tests/no_hang && . make.sh'
               withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
                 sh 'cd examples/fileio_features_xc && xmake'
               }
@@ -98,8 +99,18 @@ pipeline {
                     }
                   }
                 }
+                stage('Check for no hanging on missing read file'){
+                  steps {
+                    withVenv() {
+                      withTools(params.TOOLS_VERSION) {
+                        sh 'python tests/test_no_hang.py'
+                      }
+                    }
+                  }
+                }
               }
             }
+
             stage('xsim tests'){
               stages{
                 stage('feature test'){
