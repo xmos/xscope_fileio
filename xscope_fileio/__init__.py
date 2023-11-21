@@ -129,7 +129,7 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
         print(".", end="", flush=True)
         time.sleep(0.1)
         if time.time() > timeout:
-            xrun_proc.kill()
+            xrun_proc.terminate()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
