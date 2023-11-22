@@ -63,8 +63,8 @@ pipeline {
           steps {
             withVenv() {
               withTools(params.TOOLS_VERSION) {
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
               }
             }
           }
