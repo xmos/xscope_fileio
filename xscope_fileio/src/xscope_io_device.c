@@ -110,18 +110,21 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
         {
         read_host_data:
             {
-                xscope_data_from_host(c_xscope, (char *)buffer_ptr, &bytes_read);
-                // printf("rx %u bytes\n", bytes_read);
-                end_marker_found = ((bytes_read == END_MARKER_LEN) && !memcmp(buffer_ptr, END_MARKER_STRING, END_MARKER_LEN)) ? 1 : 0;
+                // Need a buffer big enough to hold max read length.
+                // User provided buffer may be smaller than that.
+                char local_buffer[MAX_XSCOPE_SIZE_BYTES];
+                xscope_data_from_host(c_xscope, local_buffer, &bytes_read);
+                end_marker_found = ((bytes_read == END_MARKER_LEN) && !memcmp(local_buffer, END_MARKER_STRING, END_MARKER_LEN)) ? 1 : 0;
                 if(end_marker_found){
-                    // printf("end_marker_found\n");
                     break;
                 }
+                memcpy(buffer_ptr, local_buffer, bytes_read);
                 buffer_ptr += bytes_read;
                 n_bytes_read += bytes_read;
                 break;
             }
         }
+        xassert(n_bytes_read <= n_bytes_to_read);
         if((n_bytes_read == n_bytes_to_read) || end_marker_found){
             chunk_complete = 1;
         }

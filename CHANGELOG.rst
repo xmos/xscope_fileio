@@ -6,6 +6,8 @@ UNRELEASED
 
   * ADDED: Support for XCommon CMake build system
   * FIXED: Hang in run_on_target when invalid file was opened for reading
+  * FIXED: fread no longer can cause buffer overflow
+  * FIXED: fread always returns the end of the file if eof is reached
 
 1.1.2
 -----
