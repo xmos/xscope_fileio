@@ -12,6 +12,11 @@
 
 #define VERBOSE                 0
 
+// Delay between messages from different probes,
+// as xscope only maintains the order the messages with the same probe ID.
+// This values has been chosen after some testing.
+#define INTER_PROBE_DELAY_TICKS 10000
+
 //Global chanend so we don't need to keep passing it in for read operations
 chanend_t c_xscope = 0;
 unsigned file_idx = 0;
@@ -83,6 +88,10 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
         printf("Maximum number of files open exceeded (%u)", MAX_FILES_OPEN);
     }
 
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
+
     //Pass a copy of the struct back to the caller
     return xscope_file;
 }
@@ -129,6 +138,11 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
     if(VERBOSE) printf("Received: %u bytes\n", n_bytes_read);
 
     xscope_fileio_lock_release();
+
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
+
     return n_bytes_read;
 }
 
@@ -141,6 +155,9 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
     memcpy(&packet[1], &n_bytes_to_write, sizeof(n_bytes_to_write));
 
     xscope_bytes(XSCOPE_ID_WRITE_SETUP, sizeof(packet), packet);
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
 
     // Chunk it up as seems more reliable although should be OK with tools 15.0.1
     // Tx is around 10x faster anyhow so a little extra overhead not an issue
@@ -159,6 +176,10 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
     }
     while (sent_so_far < n_bytes_to_write);
 
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
+
     if(VERBOSE) printf("Sent %u bytes\n", n_bytes_to_write);
     xscope_fileio_lock_release();
 }
@@ -173,6 +194,10 @@ void xscope_fseek(xscope_file_t *xscope_file, int offset, int whence){
     xscope_bytes(XSCOPE_ID_SEEK, sizeof(packet), packet);
     if(VERBOSE) printf("Seeking file id: %u whence %d offset %d\n", xscope_file->index, whence, offset);
     xscope_fileio_lock_release();
+
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
 }
 
 int xscope_ftell(xscope_file_t *xscope_file){
@@ -184,6 +209,11 @@ int xscope_ftell(xscope_file_t *xscope_file){
     xassert(bytes_read = sizeof(offset));
     if(VERBOSE) printf("Tell file id: %u offset %d\n", xscope_file->index, offset);
     xscope_fileio_lock_release();
+
+    // add a delay between messages from different probes,
+    // as xscope only maintains the order the messages with the same probe ID.
+    delay_ticks(INTER_PROBE_DELAY_TICKS);
+
     return offset;
 }
 

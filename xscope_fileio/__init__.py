@@ -117,10 +117,10 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     # Start and run in background
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
-        print(xsim_cmd)
+        print("xsim" + xsim_cmd)
         xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
     else:
-        print(xrun_cmd)
+        print("xrun" + xrun_cmd)
         xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
 
     print("Waiting for xrun", end="")
