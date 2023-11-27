@@ -8,7 +8,7 @@ UNRELEASED
   * FIXED: Hang in run_on_target when invalid file was opened for reading
   * FIXED: fread no longer can cause buffer overflow
   * FIXED: fread always returns the end of the file if eof is reached
-  * FIXED: added delay to avoid receiving message from different probes out of order
+  * FIXED: added delay to avoid receiving messages from different probes out of order
 
 1.1.2
 -----
