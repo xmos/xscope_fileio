@@ -129,7 +129,7 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
         print(".", end="", flush=True)
         time.sleep(0.1)
         if time.time() > timeout:
-            xrun_proc.kill()
+            xrun_proc.terminate()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
@@ -142,7 +142,10 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
 
-    assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
+    if host_proc.returncode != 0:
+        xrun_proc.terminate() # The host app won't have stopped xrun so kill it here
+        assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
+
     print("Running on target finished")
 
     return host_proc.returncode

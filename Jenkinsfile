@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.19.0') _
+@Library('xmos_jenkins_shared_library@v0.24.0') _
 
 getApproval()
 
@@ -7,12 +7,16 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.0.5',
+      defaultValue: '15.1.4',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
   options {
     skipDefaultCheckout()
+    buildDiscarder(logRotator(
+        numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '50' : '',
+        artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '50' : ''
+    ))
   }
   stages {
     stage('xcore.ai') {
@@ -36,8 +40,10 @@ pipeline {
         stage('Static analysis') {
           steps {
             withVenv() {
-              sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-              recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              warnError("Flake") {
+                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+              }
             }
           }
         }
@@ -46,7 +52,10 @@ pipeline {
             withTools(params.TOOLS_VERSION) {
               sh 'tree'
               sh 'cd examples/throughput_c && make'
-              sh 'cd examples/fileio_features_xc && xmake'
+              sh 'cd tests/no_hang && . make.sh'
+              withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
+                sh 'cd examples/fileio_features_xc && xmake'
+              }
             }
           }
         }
@@ -54,8 +63,8 @@ pipeline {
           steps {
             withVenv() {
               withTools(params.TOOLS_VERSION) {
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
               }
             }
           }
@@ -90,8 +99,18 @@ pipeline {
                     }
                   }
                 }
+                stage('Test for no hanging on missing read file'){
+                  steps {
+                    withVenv() {
+                      withTools(params.TOOLS_VERSION) {
+                        sh 'python tests/test_no_hang.py'
+                      }
+                    }
+                  }
+                }
               }
             }
+
             stage('xsim tests'){
               stages{
                 stage('feature test'){
@@ -113,7 +132,7 @@ pipeline {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
         }
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
     }
@@ -126,8 +145,10 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            runVS('cmake -G"NMake Makefiles" .')
-            runVS('nmake')
+            withVS("vcvars32.bat") {
+              sh 'cmake -G "Ninja" .'
+              sh 'ninja'
+            }
 
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
           }
@@ -135,7 +156,7 @@ pipeline {
       }
       post {
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
     }

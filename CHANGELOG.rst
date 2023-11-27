@@ -1,6 +1,21 @@
 xscope fileio change log
 ========================
 
+UNRELEASED
+----------
+
+  * ADDED: Support for XCommon CMake build system
+  * FIXED: Hang in run_on_target when invalid file was opened for reading
+  * FIXED: fread no longer can cause buffer overflow
+  * FIXED: fread always returns the end of the file if eof is reached
+
+1.1.2
+-----
+
+  * CHANGED: Update tools version in Jenkinsfile to 15.1.4
+  * CHANGED: Update flake8 python linting to warn instead of error on Jenkins
+  * CHANGED: Pin importlib-meta python package to 4.13.0
+
 1.1.1
 -----
 
