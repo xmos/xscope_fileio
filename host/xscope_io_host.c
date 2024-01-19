@@ -225,6 +225,20 @@ void xscope_record(
             return;
         }
         break;
+                
+        case XSCOPE_ID_HOST_CLOSE:
+        {
+            assert(length == 1 && "length shall be equal to 1");
+            unsigned file_idx = databytes[0] - '0';
+            if(VERBOSE) printf("[HOST] closing file idx: %u\n", file_idx);
+            if(host_files[file_idx].fp != NULL)
+            {
+                fclose(host_files[file_idx].fp);
+                host_files[file_idx].fp = NULL;
+            }
+        }
+        break;
+        
 
         default:
         {
@@ -274,4 +288,3 @@ int main(int argc, char *argv[])
 
     return(0);
 }
-

@@ -117,6 +117,18 @@ int xscope_ftell(xscope_file_t *xscope_file);
  ******************************************************************************/
 void xscope_close_all_files(void);
 
+
+/******************************************************************************
+ * xscope_fclose
+ *
+ * Closes a single file on the host.
+ * It can be called at any time to close a file.
+ *
+ * @param   handle of file to operate on
+ * @return  void
+ ******************************************************************************/
+void xscope_fclose(xscope_file_t *xscope_file);
+
 #ifdef __XC__
 }
 #endif
