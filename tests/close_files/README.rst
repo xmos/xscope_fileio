@@ -19,13 +19,13 @@ Running example
 .. warning::
 
   Make sure ``xscope_fileio`` is installed.
-  Also make sure the adapter id is set up correctly in ``run_example.py``.
+  
 
-Run the following command from the current directory:
+Run the following command from top-level directory:
 
 .. code-block:: console
 
-  python run_example.py
+  python tests/test_close_files.py --adapter-id "your-adapter-id"
 
 
 Output

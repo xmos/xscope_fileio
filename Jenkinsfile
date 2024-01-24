@@ -56,6 +56,12 @@ pipeline {
               withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
                 sh 'cd examples/fileio_features_xc && xmake'
               }
+              // xcommon cmake
+              sh 'git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake'
+              // build close files test
+              def test_dir = 'tests/close_files'
+              sh 'cmake -G "Unix Makefiles" -S ${test_dir} -B ${test_dir}/build'
+              sh 'xmake -C ${test_dir}/build -j4'
             }
           }
         }
@@ -106,8 +112,17 @@ pipeline {
                         sh 'python tests/test_no_hang.py'
                       }
                     }
-                  }
-                }
+                  } 
+                } // stage 'Test for no hanging on missing read file'
+                stage('Test closing files'){
+                  steps {
+                    withVenv() {
+                      withTools(params.TOOLS_VERSION) {
+                        sh 'python tests/test_close_files.py'
+                      }
+                    } // withVenv
+                  } // steps
+                } // stage 'Test closing files'
               }
             }
 

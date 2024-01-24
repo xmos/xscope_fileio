@@ -217,5 +217,6 @@ void xscope_fclose(xscope_file_t *xscope_file){
         printf("Sent close file id: %d\n", xscope_file->index);
     }
     reset_available_file_idx(xscope_file->index);
+    delay_ticks(10); // sanity time to close file
     xscope_fileio_lock_release();
 }

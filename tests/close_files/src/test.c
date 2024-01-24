@@ -10,7 +10,7 @@
 // This test will open and close some files in different order.
 // then it will reclose all files.
 static
-void do_test1(chanend_t xscope_chan)
+void test_close_unordered(chanend_t xscope_chan)
 {
     xscope_file_t fp[5];
 
@@ -31,14 +31,14 @@ void do_test1(chanend_t xscope_chan)
 }
 
 
-// This test will create a large number of files and write some data to them.
+// This test will create a large number of files (N_FILES) and write some data to them.
 // It will reuse the same file pointer.
 static
-void do_test2(chanend_t xscope_chan){
+void test_open_close_continously(chanend_t xscope_chan){
     
     const unsigned N_FILES = 240;       // number of files that will be created
-    const unsigned BUFF_SIZE = 1024;    // size of data buffer to write to each file
 
+    const unsigned BUFF_SIZE = 1024;    // size of data buffer to write to each file
     uint8_t data[BUFF_SIZE] = {0};
 
     for (unsigned file_n = 0; file_n < N_FILES; file_n++){
@@ -55,10 +55,31 @@ void do_test2(chanend_t xscope_chan){
 }
 
 
+// This test 
+static
+void test_open_a_closed_file(chanend_t xscope_chan){
+    const char *filename = "output/test_open_a_closed_file.out";
+    const unsigned BUFF_SIZE = 1024;    // size of data buffer to write to each file
+    uint8_t data[BUFF_SIZE] = {0};
+
+    // create a file and write some data to it
+    xscope_file_t fp = xscope_open_file(filename, "wb");
+    memset(data, 0, BUFF_SIZE);
+    xscope_fwrite(&fp, data, BUFF_SIZE);
+    xscope_fclose(&fp);
+
+    xscope_open_file(filename, "wb");
+    memset(data, 1, BUFF_SIZE);
+    xscope_fwrite(&fp, data, BUFF_SIZE);
+    xscope_fclose(&fp);
+}
+
+
 void main_tile0(chanend_t xscope_chan)
 {
     xscope_io_init(xscope_chan);
-    do_test1(xscope_chan);
-    do_test2(xscope_chan);
+    test_close_unordered(xscope_chan);
+    test_open_close_continously(xscope_chan);
+    test_open_a_closed_file(xscope_chan);
     xscope_close_all_files();
 }
