@@ -59,9 +59,8 @@ pipeline {
               // xcommon cmake
               sh 'git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake'
               // build close files test
-              def test_dir = 'tests/close_files'
-              sh 'cmake -G "Unix Makefiles" -S ${test_dir} -B ${test_dir}/build'
-              sh 'xmake -C ${test_dir}/build -j4'
+              sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
+              sh 'xmake -C tests/close_files/build -j4'
             }
           }
         }
@@ -123,8 +122,8 @@ pipeline {
                     } // withVenv
                   } // steps
                 } // stage 'Test closing files'
-              }
-            }
+              } // stages
+            } // Hardware tests #2
 
             stage('xsim tests'){
               stages{
