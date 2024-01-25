@@ -48,8 +48,8 @@ pipeline {
           }
         }
         stage('Build') {
-          dir('xscope_fileio') {
-            steps {
+          steps {
+            dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
                 sh 'tree'
                 sh 'cd examples/throughput_c && make'
@@ -65,8 +65,8 @@ pipeline {
                   sh 'xmake -C tests/close_files/build -j4'
                 } // withEnv
               } // withTools
-            } // steps
-          } // dir
+            } // dir
+          } // steps
         } // stage 'Build'
         stage('Cleanup xtagctl'){
           steps {
