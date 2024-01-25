@@ -48,24 +48,26 @@ pipeline {
           }
         }
         stage('Build') {
-          steps {
-            withTools(params.TOOLS_VERSION) {
-              sh 'tree'
-              sh 'cd examples/throughput_c && make'
-              sh 'cd tests/no_hang && . make.sh'
-              withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
-                sh 'cd examples/fileio_features_xc && xmake'
-              }
-              // xcommon cmake
-              sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
-              withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                // build close files test
-                sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
-                sh 'xmake -C tests/close_files/build -j4'
-              }
-            }
-          }
-        }
+          dir('xscope_fileio') {
+            steps {
+              withTools(params.TOOLS_VERSION) {
+                sh 'tree'
+                sh 'cd examples/throughput_c && make'
+                sh 'cd tests/no_hang && . make.sh'
+                withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
+                  sh 'cd examples/fileio_features_xc && xmake'
+                }
+                // xcommon cmake
+                sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
+                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
+                  // build close files test
+                  sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
+                  sh 'xmake -C tests/close_files/build -j4'
+                } // withEnv
+              } // withTools
+            } // steps
+          } // dir
+        } // stage 'Build'
         stage('Cleanup xtagctl'){
           steps {
             withVenv() {
