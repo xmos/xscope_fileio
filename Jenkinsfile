@@ -57,10 +57,12 @@ pipeline {
                 sh 'cd examples/fileio_features_xc && xmake'
               }
               // xcommon cmake
-              sh 'git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake'
-              // build close files test
-              sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
-              sh 'xmake -C tests/close_files/build -j4'
+              sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
+              withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
+                // build close files test
+                sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
+                sh 'xmake -C tests/close_files/build -j4'
+              }
             }
           }
         }

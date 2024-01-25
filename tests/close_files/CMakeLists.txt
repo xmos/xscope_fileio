@@ -3,7 +3,8 @@ include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
 project(xscope_fileio_close)
 
 # sandbox
-set(XMOS_SANDBOX_DIR ../../../)
+set(XMOS_SANDBOX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+message("XMOS_SANDBOX_DIR: ${XMOS_SANDBOX_DIR}")
 
 # target
 set(APP_HW_TARGET XCORE-AI-EXPLORER)
