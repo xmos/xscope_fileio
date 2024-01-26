@@ -31,9 +31,8 @@ def fn_close_files(adapter_id: str = None):
     print("Output folder: ", output_folder)
 
     if adapter_id is None:
-        print("Acquiring adapter_id...")
         with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as adapter_id:
-            print("Adapter ID: ", adapter_id)
+            print(f"Found adapter_id: {adapter_id}")
             rtrn_code = xscope_fileio.run_on_target(
                 adapter_id, firmware_xe, use_xsim=False
             )
@@ -43,8 +42,8 @@ def fn_close_files(adapter_id: str = None):
     assert rtrn_code == 0, "xscope_fileio.run_on_target() failed"
 
 
-def test_close_files():
-    pr = Process(target=fn_close_files)
+def test_close_files(adapter_id: str = None):
+    pr = Process(target=fn_close_files, args=(adapter_id,))
     pr.start()
     pr.join(timeout=60)
     pr.terminate()
@@ -55,4 +54,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
     parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
     args = parser.parse_args()
-    fn_close_files(adapter_id=args.adapter_id)
+
+    test_close_files(args.adapter_id)
