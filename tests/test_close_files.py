@@ -5,13 +5,16 @@ from pathlib import Path
 import xtagctl
 import xscope_fileio
 
-firmware_xe = (Path(__file__).parent / "close_files" / "bin" / "xscope_fileio_close.xe").absolute()
-output_folder = (Path.cwd() / "output").absolute()  # output folder will be created in the same directory as this script
+firmware_xe = (Path(__file__).parent /
+"close_files" / "bin" / "xscope_fileio_close.xe").absolute()
+output_folder = (Path.cwd() / "output").absolute()
+# output folder will be created in the same directory as this script
 
 
-def test_close_files(adapter_id: str = None) -> None:
+def test_close_files(adapter_id: str = None):
     """This test perform several opening and closing of files on the device.
-    It is intended to test the robustness of the file system and the xscope_fclose function.
+    It is intended to test the robustness of the file system and 
+    the xscope_fclose function.
 
     Args:
         adapter_id (str, optional): _description_. Defaults to None.

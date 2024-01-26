@@ -34,17 +34,21 @@ pipeline {
         }
         stage('Install Dependencies') {
           steps {
-            withTools(params.TOOLS_VERSION) {
-              installDependencies()
+            dir('xscope_fileio') {
+              withTools(params.TOOLS_VERSION) {
+                installDependencies()
+              }
             }
           }
         }
         stage('Static analysis') {
           steps {
-            withVenv() {
-              warnError("Flake") {
-                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+            dir('xscope_fileio') {
+              withVenv() {
+                warnError("Flake") {
+                  sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                  recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+                }
               }
             }
           }
@@ -72,10 +76,12 @@ pipeline {
         } // stage 'Build'
         stage('Cleanup xtagctl'){
           steps {
-            withVenv() {
-              withTools(params.TOOLS_VERSION) {
-                sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+            dir('xscope_fileio') {
+              withVenv() {
+                withTools(params.TOOLS_VERSION) {
+                  sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                  sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+                }
               }
             }
           }
@@ -87,9 +93,11 @@ pipeline {
               stages{
                 stage('Transfer test single large'){
                   steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_throughput.py 64' //Pass size in MB
+                    dir('xscope_fileio') {
+                      withVenv() {
+                        withTools(params.TOOLS_VERSION) {
+                          sh 'python tests/test_throughput.py 64' //Pass size in MB
+                        }
                       }
                     }
                   }
@@ -99,7 +107,7 @@ pipeline {
             stage('Hardware tests #2 (in parallel)') {
               stages{
                 stage('Transfer test multiple small'){
-                  steps {
+                  steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
                         sh 'python tests/test_throughput.py 5' //Pass size in MB
@@ -108,25 +116,25 @@ pipeline {
                         sh 'python tests/test_throughput.py 5' //Pass size in MB
                       }
                     }
-                  }
+                  }}
                 }
                 stage('Test for no hanging on missing read file'){
-                  steps {
+                  steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
                         sh 'python tests/test_no_hang.py'
                       }
-                    }
+                    }}
                   } 
                 } // stage 'Test for no hanging on missing read file'
                 stage('Test closing files'){
-                  steps {
+                  steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
                         sh 'python tests/test_close_files.py'
                       }
                     } // withVenv
-                  } // steps
+                  }} // steps
                 } // stage 'Test closing files'
               } // stages
             } // Hardware tests #2
@@ -135,9 +143,11 @@ pipeline {
               stages{
                 stage('feature test'){
                   steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_features.py'
+                    dir('xscope_fileio') {
+                      withVenv() {
+                        withTools(params.TOOLS_VERSION) {
+                          sh 'python tests/test_features.py'
+                        }
                       }
                     }
                   }
