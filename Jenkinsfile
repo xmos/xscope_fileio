@@ -131,7 +131,7 @@ pipeline {
                   steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_close_files.py'
+                        sh 'pytest -s tests/test_close_files.py'
                       }
                     } // withVenv
                   }} // steps
