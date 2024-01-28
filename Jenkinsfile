@@ -118,15 +118,6 @@ pipeline {
                     }
                   }}
                 }
-                stage('Test for no hanging on missing read file'){
-                  steps { dir('xscope_fileio') {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_no_hang.py'
-                      }
-                    }}
-                  } 
-                } // stage 'Test for no hanging on missing read file'
                 stage('Test closing files'){
                   steps { dir('xscope_fileio') {
                     withVenv() {
@@ -136,6 +127,16 @@ pipeline {
                     } // withVenv
                   }} // steps
                 } // stage 'Test closing files'
+
+                stage('Test for no hanging on missing read file'){
+                  steps { dir('xscope_fileio') {
+                    withVenv() {
+                      withTools(params.TOOLS_VERSION) {
+                        sh 'python tests/test_no_hang.py'
+                      }
+                    }}
+                  }
+                } // stage 'Test for no hanging on missing read file'
               } // stages
             } // Hardware tests #2
 

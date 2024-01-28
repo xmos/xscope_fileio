@@ -2,8 +2,9 @@ import argparse
 import shutil
 from pathlib import Path
 
-import xtagctl
 import xscope_fileio
+import xtagctl
+
 from multiprocessing import Process
 
 firmware_xe = (Path(__file__).parent /
@@ -43,11 +44,18 @@ def fn_close_files(adapter_id: str = None):
 
 
 def test_close_files(adapter_id: str = None):
+    """
+    This function is just a wrapper to control 
+    time of execution of the close files test in case of hang
+    """
     pr = Process(target=fn_close_files, args=(adapter_id,))
     pr.start()
-    pr.join(timeout=60)
+    pr.join(timeout=30)
+    return_code = pr.exitcode
     pr.terminate()
+    assert return_code == 0, "ERROR: test_close_files failed"
     assert not pr.is_alive(), "ERROR: xscope_fileio process did not quit"
+    
 
 
 if __name__ == "__main__":
