@@ -74,6 +74,8 @@ pipeline {
             } // dir
           } // steps
         } // stage 'Build'
+
+        /*
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
@@ -86,6 +88,8 @@ pipeline {
             }
           }
         }
+        */
+        
         stage('Tests'){
           failFast false
           parallel {
