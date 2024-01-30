@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
+      defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
@@ -21,7 +21,7 @@ pipeline {
   stages {
     stage('xcore.ai') {
       agent {
-        label 'xcore.ai'
+        label 'xcore.ai' // xcore.ai machines have 2 devices, so parallel HW jobs can be run
       }
       stages {
         stage('Checkout') {
