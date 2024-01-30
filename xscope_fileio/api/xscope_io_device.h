@@ -123,7 +123,8 @@ void xscope_close_all_files(void);
  *
  * Closes a single file on the host.
  * It can be called at any time to close a file.
- *
+ * @note xscope_close_all_files() must still be called 
+ * at the end of device application
  * @param   handle of file to operate on
  * @return  void
  ******************************************************************************/

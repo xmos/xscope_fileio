@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
+      defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
@@ -21,7 +21,7 @@ pipeline {
   stages {
     stage('xcore.ai') {
       agent {
-        label 'xcore.ai'
+        label 'xcore.ai' // label xcore.ai has 2 nodes atached
       }
       stages {
         stage('Checkout') {
@@ -75,7 +75,8 @@ pipeline {
           } // steps
         } // stage 'Build'
 
-        /*
+        /* xtagctl reset_all can cause disconnection of a device
+        this block will be removed once xtagctl is fixed
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
