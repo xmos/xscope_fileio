@@ -75,20 +75,18 @@ pipeline {
           } // steps
         } // stage 'Build'
 
-        /*
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
               withVenv() {
                 withTools(params.TOOLS_VERSION) {
-                  sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                  // sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired' // not needed
                   sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 }
               }
             }
           }
         }
-        */
         
         stage('Tests'){
           failFast false
