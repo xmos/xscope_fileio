@@ -21,7 +21,7 @@ pipeline {
   stages {
     stage('xcore.ai') {
       agent {
-        label 'xcore.ai' // xcore.ai machines have 2 devices, so parallel HW jobs can be run
+        label 'xcore.ai' // xcore.ai nodes have 2 devices atatched, allowing parallel HW test
       }
       stages {
         stage('Checkout') {
