@@ -1,0 +1,12 @@
+---
+project: xscope_fileio
+title: xscope_fileio
+version: 0.2.1
+
+documentation:
+  doxygen_projects:
+    xscope_fileio:
+      doxyfile_path: doc/Doxyfile.inc
+      doxy_overrides: |
+        GENERATE_HTML = yes
+        GENERATE_LATEX = yes

@@ -98,5 +98,5 @@ in the firmware code, reading/writing to the host file system.
 
 The call to ``run_on_target`` returns when the firmware exits.
 
-.. image:: arch.png
+.. image:: docs/imgs/arch.png
     :alt: System Architecture
