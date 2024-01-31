@@ -23,6 +23,7 @@ enum{
     XSCOPE_ID_SEEK          = 4,
     XSCOPE_ID_TELL          = 5,
     XSCOPE_ID_HOST_QUIT     = 6, 
+    XSCOPE_ID_HOST_CLOSE    = 7,   
 };
 
 #endif

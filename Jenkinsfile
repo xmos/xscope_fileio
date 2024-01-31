@@ -7,7 +7,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
+      defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   }
@@ -21,54 +21,73 @@ pipeline {
   stages {
     stage('xcore.ai') {
       agent {
-        label 'xcore.ai'
+        label 'xcore.ai' // xcore.ai nodes have 2 devices atatched, allowing parallel HW test
       }
       stages {
         stage('Checkout') {
           steps {
-            checkout scm
-            sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
+            dir('xscope_fileio') {
+              checkout scm
+              sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
+            }
           }
         }
         stage('Install Dependencies') {
           steps {
-            withTools(params.TOOLS_VERSION) {
-              installDependencies()
+            dir('xscope_fileio') {
+              withTools(params.TOOLS_VERSION) {
+                installDependencies()
+              }
             }
           }
         }
         stage('Static analysis') {
           steps {
-            withVenv() {
-              warnError("Flake") {
-                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+            dir('xscope_fileio') {
+              withVenv() {
+                warnError("Flake") {
+                  sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                  recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+                }
               }
             }
           }
         }
         stage('Build') {
           steps {
-            withTools(params.TOOLS_VERSION) {
-              sh 'tree'
-              sh 'cd examples/throughput_c && make'
-              sh 'cd tests/no_hang && . make.sh'
-              withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
-                sh 'cd examples/fileio_features_xc && xmake'
-              }
-            }
-          }
-        }
+            dir('xscope_fileio') {
+              withTools(params.TOOLS_VERSION) {
+                sh 'tree'
+                sh 'cd examples/throughput_c && make'
+                sh 'cd tests/no_hang && . make.sh'
+                withEnv(["XMOS_MODULE_PATH=${WORKSPACE}", "XCOMMON_DISABLE_AUTO_MODULE_SEARCH=1"]) {
+                  sh 'cd examples/fileio_features_xc && xmake'
+                }
+                // xcommon cmake
+                sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
+                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
+                  // build close files test
+                  sh 'cmake -G "Unix Makefiles" -S tests/close_files -B tests/close_files/build'
+                  sh 'xmake -C tests/close_files/build -j4'
+                } // withEnv
+              } // withTools
+            } // dir
+          } // steps
+        } // stage 'Build'
+
         stage('Cleanup xtagctl'){
           steps {
-            withVenv() {
-              withTools(params.TOOLS_VERSION) {
-                sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+            dir('xscope_fileio') {
+              withVenv() {
+                withTools(params.TOOLS_VERSION) {
+                  // sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired' // not needed
+                  sh 'xtagctl reset_all XCORE-AI-EXPLORER'
+                }
               }
             }
           }
         }
+        
         stage('Tests'){
           failFast false
           parallel {
@@ -76,9 +95,11 @@ pipeline {
               stages{
                 stage('Transfer test single large'){
                   steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_throughput.py 64' //Pass size in MB
+                    dir('xscope_fileio') {
+                      withVenv() {
+                        withTools(params.TOOLS_VERSION) {
+                          sh 'python tests/test_throughput.py 64' //Pass size in MB
+                        }
                       }
                     }
                   }
@@ -88,7 +109,7 @@ pipeline {
             stage('Hardware tests #2 (in parallel)') {
               stages{
                 stage('Transfer test multiple small'){
-                  steps {
+                  steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
                         sh 'python tests/test_throughput.py 5' //Pass size in MB
@@ -97,27 +118,39 @@ pipeline {
                         sh 'python tests/test_throughput.py 5' //Pass size in MB
                       }
                     }
-                  }
+                  }}
                 }
+                stage('Test closing files'){
+                  steps { dir('xscope_fileio') {
+                    withVenv() {
+                      withTools(params.TOOLS_VERSION) {
+                        sh 'python tests/test_close_files.py'
+                      }
+                    } // withVenv
+                  }} // steps
+                } // stage 'Test closing files'
+
                 stage('Test for no hanging on missing read file'){
-                  steps {
+                  steps { dir('xscope_fileio') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
                         sh 'python tests/test_no_hang.py'
                       }
-                    }
+                    }}
                   }
-                }
-              }
-            }
+                } // stage 'Test for no hanging on missing read file'
+              } // stages
+            } // Hardware tests #2
 
             stage('xsim tests'){
               stages{
                 stage('feature test'){
                   steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_features.py'
+                    dir('xscope_fileio') {
+                      withVenv() {
+                        withTools(params.TOOLS_VERSION) {
+                          sh 'python tests/test_features.py'
+                        }
                       }
                     }
                   }
