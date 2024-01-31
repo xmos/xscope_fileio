@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+bin/
 develop-eggs/
 dist/
 downloads/
@@ -112,6 +113,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.vscode
+.venv*
 
 # Spyder project settings
 .spyderproject
@@ -161,3 +164,6 @@ build.ninja
 *.exe
 *.ilk
 *.pdb
+
+# tmp files
+*.out
