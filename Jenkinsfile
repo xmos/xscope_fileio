@@ -60,19 +60,20 @@ pipeline {
               withTools(params.TOOLS_VERSION) {
                 withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
                   script {
-                      [ "examples/fileio_features_xc",
-                        "examples/throughput_c",
-                        "tests/no_hang",
-                        "tests/close_files",
-                      ].each { app ->
-                          sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-                          sh "xmake -C ${app}/build -j\$(nproc)"
+                    [ "examples/fileio_features_xc",
+                      "examples/throughput_c",
+                      "tests/no_hang",
+                      "tests/close_files",
+                    ].each { app ->
+                        sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
+                        sh "xmake -C ${app}/build -j\$(nproc)"
+                    } // each
+                  }  // script
                 } // withEnv
               } // withTools
             } // dir
           } // steps
         } // stage 'Build'
-
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
@@ -85,7 +86,6 @@ pipeline {
             }
           }
         }
-        
         stage('Tests'){
           failFast false
           parallel {
@@ -125,7 +125,7 @@ pipeline {
               } // stages
             } // Hardware tests #2
 
-            stage('xsim tests'){
+            stage('xsim tests (in parallel)'){
               stages{
                 stage('feature test'){
                   steps {
@@ -133,16 +133,16 @@ pipeline {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
                           sh 'python tests/test_features.py'
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                        } // withTools
+                      } // withVenv
+                    } // dir
+                  } // steps
+                } // stage
+              } // stages
+            } // stage xsim tests
+          } // parallel
+        } // Tests
+      } // stages
       post {
         always {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
@@ -151,7 +151,7 @@ pipeline {
           xcoreCleanSandbox()
         }
       }
-    }
+    } // stage: xcore.ai
     stage('Windows build') {
       agent {
         label 'x86_64&&windows'
@@ -175,7 +175,7 @@ pipeline {
           xcoreCleanSandbox()
         }
       }
-    }
+    } // stage: Windows build
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
@@ -196,6 +196,6 @@ pipeline {
           cleanWs()
         }
       }
-    }
-  }
+    } // stage: Update view files
+  } // stages
 }
