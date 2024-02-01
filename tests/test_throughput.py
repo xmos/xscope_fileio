@@ -7,7 +7,7 @@ import numpy as np
 from pathlib import Path
 from multiprocessing import Process
 from compare_bins import analyse_error_rate
-
+import subprocess
 import xscope_fileio
 import xtagctl
 
@@ -18,6 +18,8 @@ test_sizes_hw1 = [64]
 test_sizes_hw2 = [5, 10, 7] # in MB
 
 def fn_run_throughput(size_mb, adapter_id: str = None):
+    # run xrun -l to see adapters
+    subprocess.run(["xrun", "-l"], check=True)
     
     # create tmp folder and random file
     tmpdir = Path(tempfile.mkdtemp(prefix='tmp_throughput_', dir=file_dir))
@@ -43,17 +45,19 @@ def fn_run_throughput(size_mb, adapter_id: str = None):
         analyse_error_rate(ref, dut)
         assert 0, "ERROR: throughput test failed"
 
-def run_throughput(test_size=10):
+def run_throughput(test_size=10, timeout=30):
     print(f"Running throughput test with {test_size} MB")
     pr = Process(target=fn_run_throughput, args=(test_size,))
     pr.start()
-    pr.join(timeout=30)
+    pr.join(timeout=timeout)
+    return_code = pr.exitcode
     pr.terminate()
+    assert return_code == 0, "ERROR: xscope_fileio process failed"
     assert not pr.is_alive(), "ERROR: xscope_fileio process did not quit"
 
 @pytest.mark.parametrize("test_size", test_sizes_hw1)
 def test_throughput_1(test_size):
-    run_throughput(test_size)
+    run_throughput(test_size, timeout=60)
 
 @pytest.mark.parametrize("test_size", test_sizes_hw2)
 def test_throughput_2(test_size):
