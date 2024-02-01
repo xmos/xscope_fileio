@@ -4,16 +4,20 @@ import pytest
 import tempfile
 import argparse
 import numpy as np
-import xscope_fileio
-import xtagctl
 from pathlib import Path
 from multiprocessing import Process
 from compare_bins import analyse_error_rate
 
+import xscope_fileio
+import xtagctl
+
 file_dir = Path(__file__).parent.absolute()
 root_dir = Path(__file__).parent.parent.absolute()
 
-def run_throughput(size_mb, adapter_id: str = None):
+test_sizes_hw1 = [64]
+test_sizes_hw2 = [5, 10, 7] # in MB
+
+def fn_run_throughput(size_mb, adapter_id: str = None):
     
     # create tmp folder and random file
     tmpdir = Path(tempfile.mkdtemp(prefix='tmp_throughput_', dir=file_dir))
@@ -39,14 +43,21 @@ def run_throughput(size_mb, adapter_id: str = None):
         analyse_error_rate(ref, dut)
         assert 0, "ERROR: throughput test failed"
 
-def test_run_throughput(test_size=10):
+def run_throughput(test_size=10):
     print(f"Running throughput test with {test_size} MB")
-    pr = Process(target=run_throughput, args=(test_size,))
+    pr = Process(target=fn_run_throughput, args=(test_size,))
     pr.start()
     pr.join(timeout=30)
     pr.terminate()
     assert not pr.is_alive(), "ERROR: xscope_fileio process did not quit"
 
+@pytest.mark.parametrize("test_size", test_sizes_hw1)
+def test_throughput_1(test_size):
+    run_throughput(test_size)
+
+@pytest.mark.parametrize("test_size", test_sizes_hw2)
+def test_throughput_2(test_size):
+    run_throughput(test_size)
     
 if __name__ == "__main__":
     """This test uses the throughput_c example to test the throughput of the fileio library.
@@ -55,4 +66,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
     parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
     args = parser.parse_args()
-    run_throughput(3, args.adapter_id)
+    fn_run_throughput(3, args.adapter_id)

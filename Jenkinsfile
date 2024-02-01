@@ -100,7 +100,7 @@ pipeline {
                     dir('xscope_fileio/tests') {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
-                          sh 'pytest -c pytest.ini -k test_throughput.1'
+                          sh 'pytest test_throughput.py -k test_throughput_1'
                         } // withTools
                       } // withVenv
                     } // dir
@@ -115,12 +115,9 @@ pipeline {
                   steps { dir('xscope_fileio/tests') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
-                        sh 'pytest -c pytest.ini -k test_throughput.2'
-                        sh 'pytest -c pytest.ini -k test_throughput.3'
-                        sh 'pytest -c pytest.ini -k test_throughput.4'
-                        sh 'pytest -c pytest.ini -k test_throughput.5'
-                        sh 'pytest -c pytest.ini -k test_close_files'
-                        sh 'pytest -c pytest.ini -k test_no_hang'
+                        sh 'pytest test_throughput.py -k test_throughput_2'
+                        sh 'pytest test_close_files.py'
+                        sh 'pytest test_no_hang.py'
                       }
                     }
                   }}
@@ -132,10 +129,10 @@ pipeline {
               stages{
                 stage('feature test'){
                   steps {
-                    dir('xscope_fileio') {
+                    dir('xscope_fileio/tests') {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
-                          sh 'python tests/test_features.py'
+                          sh 'pytest test_features_xc_sim.py'
                         } // withTools
                       } // withVenv
                     } // dir
