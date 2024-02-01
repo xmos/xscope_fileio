@@ -1,4 +1,10 @@
-#We assume that the Xscope FileIO Python library has been installed via pip beforehand and is available to import. Please see readme for instuctions.
+"""
+This test uses the throughput_c example to test the throughput of the fileio library.
+It can be used passing an adapter id or run by pytest so xtagctl will acquire() one. 
+
+We assume that the Xscope FileIO Python library has been installed via pip beforehand and is available to import. 
+Please see readme for instuctions.
+"""
 import os
 import pytest
 import tempfile
@@ -43,7 +49,7 @@ def fn_run_throughput(size_mb, adapter_id: str = None):
     equal = np.array_equal(ref, dut)
     if not equal:
         analyse_error_rate(ref, dut)
-        assert 0, "ERROR: throughput test failed"
+        raise ValueError("ERROR: throughput test failed")
 
 def run_throughput(test_size=10, timeout=30):
     print(f"Running throughput test with {test_size} MB")
@@ -64,9 +70,6 @@ def test_throughput_2(test_size):
     run_throughput(test_size)
     
 if __name__ == "__main__":
-    """This test uses the throughput_c example to test the throughput of the fileio library.
-    It can be used passing an adapter id or run by pytest so xtagctl will acquire() one. 
-    """
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
     parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
     args = parser.parse_args()
