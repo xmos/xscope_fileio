@@ -1,4 +1,5 @@
 #We assume that the Xscope FileIO Python library has been installed via pip beforehand and is available to import. Please see readme for instuctions.
+import pytest
 import argparse
 
 import xscope_fileio
@@ -10,15 +11,15 @@ from multiprocessing import Process
 
 def read_non_existsing_file(adapter_id: str = None):
     firmware_xe = (Path(__file__).parent / "no_hang" / "bin" / "no_hang.xe").absolute()
-    print(f"Using firmware: {firmware_xe}")
     if adapter_id is None:
         with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as xtag_id:
             adapter_id = xtag_id
-            
-    print(f"Using adapter_id: {adapter_id}")
+
+    print(f"Firmware: {firmware_xe}")
+    print(f"Adapter_id: {adapter_id}")
     try:
         xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
-    except AssertionError as e:
+    except AssertionError:
         print("Expected error, exisitng app...")
         exit(0) # expeted error
     

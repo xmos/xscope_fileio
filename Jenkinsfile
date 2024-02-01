@@ -63,7 +63,7 @@ pipeline {
                       [ "examples/fileio_features_xc",
                         "examples/throughput_c",
                         "tests/no_hang",
-                        //"tests/close_files", //TODO waiting PR merge
+                        "tests/close_files",
                       ].each { app ->
                           sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
                           sh "xmake -C ${app}/build -j\$(nproc)"
@@ -89,58 +89,39 @@ pipeline {
         stage('Tests'){
           failFast false
           parallel {
-            stage('Hardware tests') {
+
+            stage('Hardware tests #1 (in parallel)') {
               stages{
                 stage('Transfer test single large'){
                   steps {
-                    dir('xscope_fileio') {
+                    dir('xscope_fileio/tests') {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
-                          sh 'python tests/test_throughput.py 64' //Pass size in MB
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+                          sh 'pytest -c pytest.ini -k test_throughput.1'
+                        } // withTools
+                      } // withVenv
+                    } // dir
+                  } // steps
+                } // stage
+              }// stages
+            } // Hardware tests #1
+            
             stage('Hardware tests #2 (in parallel)') {
               stages{
-                stage('Transfer test multiple small'){
-                  steps { dir('xscope_fileio') {
+                stage('Perform pytest tests'){
+                  steps { dir('xscope_fileio/tests') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
+                        sh 'pytest -c pytest.ini -k test_throughput.2'
+                        sh 'pytest -c pytest.ini -k test_throughput.3'
+                        sh 'pytest -c pytest.ini -k test_throughput.4'
+                        sh 'pytest -c pytest.ini -k test_throughput.5'
+                        sh 'pytest -c pytest.ini -k test_close_files'
+                        sh 'pytest -c pytest.ini -k test_no_hang'
                       }
                     }
                   }}
                 }
-
-                //TODO waiting PR merge
-                /*
-                stage('Test closing files'){
-                  steps { dir('xscope_fileio') {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_close_files.py'
-                      }
-                    } // withVenv
-                  }} // steps
-                } // stage 'Test closing files'
-                */
-
-                stage('Test for no hanging on missing read file'){
-                  steps { dir('xscope_fileio') {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_no_hang.py'
-                      }
-                    }}
-                  }
-                } // stage 'Test for no hanging on missing read file'
               } // stages
             } // Hardware tests #2
 
