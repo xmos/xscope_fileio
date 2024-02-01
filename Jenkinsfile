@@ -1,5 +1,12 @@
 @Library('xmos_jenkins_shared_library@v0.24.0') _
 
+def buildApps(appList) {
+  appList.each { app ->
+    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
+    sh "xmake -C ${app}/build -j\$(nproc)"
+  }
+}
+
 getApproval()
 
 pipeline {
@@ -59,16 +66,12 @@ pipeline {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
                 withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                  script {
-                    [ "examples/fileio_features_xc",
-                      "examples/throughput_c",
-                      "tests/no_hang",
-                      "tests/close_files",
-                    ].each { app ->
-                        sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-                        sh "xmake -C ${app}/build -j\$(nproc)"
-                    } // each
-                  }  // script
+                  buildApps([
+                    "examples/fileio_features_xc",
+                    "examples/throughput_c",
+                    "tests/no_hang",
+                    "tests/close_files",
+                  ]) // buildApps
                 } // withEnv
               } // withTools
             } // dir
