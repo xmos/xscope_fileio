@@ -137,7 +137,8 @@ pipeline {
                     dir('xscope_fileio/tests') {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
-                          sh 'pytest test_features_xc_sim.py'
+                          sh 'pytest test_features_xc_sim.py \
+                              --junitxml=reports/test_features_xc_sim.xml'
                         } // withTools
                       } // withVenv
                     } // dir
