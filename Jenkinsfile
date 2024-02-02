@@ -89,32 +89,17 @@ pipeline {
             }
           }
         }
-        stage('Tests'){
-          failFast false
-          parallel {
-
-            stage('Hardware tests') {
-              stages{
-                stage('Tests: throughput, close files, no hang'){
-                  steps { dir('xscope_fileio/tests') {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'pytest test_throughput.py \
-                            --junitxml=reports/test_throughput.xml'
-                        sh 'pytest test_close_files.py \
-                            --junitxml=reports/test_close_files.xml'
-                        sh 'pytest test_no_hang.py \
-                            --junitxml=reports/test_no_hang.xml'
-                        sh 'pytest test_features_xc_sim.py \
-                            --junitxml=reports/test_features_xc_sim.xml'
-                      }
-                    }
-                  }}
-                }
-              } // stages
-            } // Hardware tests
-          } // parallel
-        } // Tests
+        stage('Tests') {
+          steps { 
+            dir('xscope_fileio/tests') {
+              withVenv() {
+                withTools(params.TOOLS_VERSION) {
+                  sh 'pytest  --junitxml=reports/test_junit.xml'
+                } // withTools
+              } // withVenv
+            } // dir
+          } // steps
+        } // Hardware tests
       } // stages
       post {
         always {
