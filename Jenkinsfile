@@ -100,7 +100,9 @@ pipeline {
                     dir('xscope_fileio/tests') {
                       withVenv() {
                         withTools(params.TOOLS_VERSION) {
-                          sh 'pytest test_throughput.py -k test_throughput_1'
+                          sh 'pytest test_throughput.py \
+                              -k test_throughput_1 \
+                              --junitxml=reports/test_throughput_1.xml'
                         } // withTools
                       } // withVenv
                     } // dir
@@ -115,9 +117,12 @@ pipeline {
                   steps { dir('xscope_fileio/tests') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
-                        sh 'pytest test_throughput.py -k test_throughput_2'
-                        sh 'pytest test_close_files.py'
-                        sh 'pytest test_no_hang.py'
+                        sh 'pytest test_throughput.py -k test_throughput_2 \
+                            --junitxml=reports/test_throughput_2.xml'
+                        sh 'pytest test_close_files.py \
+                            --junitxml=reports/test_close_files.xml'
+                        sh 'pytest test_no_hang.py \
+                            --junitxml=reports/test_no_hang.xml'
                       }
                     }
                   }}
@@ -146,6 +151,7 @@ pipeline {
       post {
         always {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
+          junit 'tests/reports/*.xml'
         }
         cleanup {
           xcoreCleanSandbox()
@@ -165,7 +171,6 @@ pipeline {
               sh 'cmake -G "Ninja" .'
               sh 'ninja'
             }
-
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
           }
         }

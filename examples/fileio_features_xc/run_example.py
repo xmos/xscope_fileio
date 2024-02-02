@@ -22,5 +22,4 @@ ref_mod_text = ref_text[0:10] + b"IS" + ref_text[12:]
 assert dut_text == ref_text
 print(dut_mod_text, ref_mod_text)
 assert dut_mod_text == ref_mod_text
-
-print("PASS")
+print("Example run successfully!")

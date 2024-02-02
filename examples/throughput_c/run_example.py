@@ -25,5 +25,4 @@ xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
 dut = np.fromfile("throughput_dut.bin", dtype=np.uint8)
 
 assert np.array_equal(ref, dut)
-
-print("PASS")
+print("Example run successfully!")
