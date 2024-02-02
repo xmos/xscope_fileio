@@ -152,7 +152,7 @@ pipeline {
       post {
         always {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
-          junit 'tests/reports/*.xml'
+          junit '**/reports/*.xml'
         }
         cleanup {
           xcoreCleanSandbox()
