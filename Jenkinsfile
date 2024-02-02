@@ -93,59 +93,26 @@ pipeline {
           failFast false
           parallel {
 
-            stage('Hardware tests #1 (in parallel)') {
+            stage('Hardware tests') {
               stages{
-                stage('Transfer test single large'){
-                  steps {
-                    dir('xscope_fileio/tests') {
-                      withVenv() {
-                        withTools(params.TOOLS_VERSION) {
-                          sh 'pytest test_throughput.py \
-                              -k test_throughput_1 \
-                              --junitxml=reports/test_throughput_1.xml'
-                        } // withTools
-                      } // withVenv
-                    } // dir
-                  } // steps
-                } // stage
-              }// stages
-            } // Hardware tests #1
-            
-            stage('Hardware tests #2 (in parallel)') {
-              stages{
-                stage('Perform pytest tests'){
+                stage('Tests: throughput, close files, no hang'){
                   steps { dir('xscope_fileio/tests') {
                     withVenv() {
                       withTools(params.TOOLS_VERSION) {
-                        sh 'pytest test_throughput.py -k test_throughput_2 \
-                            --junitxml=reports/test_throughput_2.xml'
+                        sh 'pytest test_throughput.py \
+                            --junitxml=reports/test_throughput.xml'
                         sh 'pytest test_close_files.py \
                             --junitxml=reports/test_close_files.xml'
                         sh 'pytest test_no_hang.py \
                             --junitxml=reports/test_no_hang.xml'
+                        sh 'pytest test_features_xc_sim.py \
+                            --junitxml=reports/test_features_xc_sim.xml'
                       }
                     }
                   }}
                 }
               } // stages
-            } // Hardware tests #2
-
-            stage('xsim tests (in parallel)'){
-              stages{
-                stage('feature test'){
-                  steps {
-                    dir('xscope_fileio/tests') {
-                      withVenv() {
-                        withTools(params.TOOLS_VERSION) {
-                          sh 'pytest test_features_xc_sim.py \
-                              --junitxml=reports/test_features_xc_sim.xml'
-                        } // withTools
-                      } // withVenv
-                    } // dir
-                  } // steps
-                } // stage
-              } // stages
-            } // stage xsim tests
+            } // Hardware tests
           } // parallel
         } // Tests
       } // stages

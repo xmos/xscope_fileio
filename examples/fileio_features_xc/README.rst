@@ -19,7 +19,7 @@ Running example
 .. warning::
 
   Make sure ``xscope_fileio`` host application is installed.
-  Make sure ``XCOMMON_CMAKE_PATH`` environement variable is set to the directory where ``xcommon_cmake`` is located.
+  Make sure ``XCOMMON_CMAKE_PATH`` environment variable is set to the directory where ``xcommon_cmake`` is located.
   
 Run the following command from top-level directory:
 

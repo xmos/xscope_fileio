@@ -4,7 +4,6 @@ project(fileio_test)
 
 # sandbox
 set(XMOS_SANDBOX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
-message(STATUS "XMOS_SANDBOX_DIR: ${XMOS_SANDBOX_DIR}")
 
 # target ans srcs
 set(APP_HW_TARGET XCORE-AI-EXPLORER)
