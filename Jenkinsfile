@@ -94,7 +94,7 @@ pipeline {
             dir('xscope_fileio/tests') {
               withVenv() {
                 withTools(params.TOOLS_VERSION) {
-                  sh 'pytest  --junitxml=reports/test_junit.xml'
+                  sh 'pytest' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
