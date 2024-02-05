@@ -33,9 +33,9 @@ extern "C" {
 
 
 /**
- * @brief Initializes XScope I/O
+ * @brief initialises XScope I/O
  *
- * This function opens the input and output files on the host and also initializes
+ * This function opens the input and output files on the host and also initialises
  * the channel end for use later when reading data from host to device. This must
  * be called before attempting to read or write.
  *
@@ -56,7 +56,7 @@ unsigned xscope_fileio_is_initialized(void);
 /**
  * @brief Opens an XScope file
  *
- * This opens the input and output files on the host and also initializes the
+ * This opens the input and output files on the host and also initialises the
  * channel end for use later when reading data from host to device.
  * This must be called before attempting to read or write.
  *
