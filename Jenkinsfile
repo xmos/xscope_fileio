@@ -82,7 +82,7 @@ pipeline {
             dir('xscope_fileio') {
               withVenv() {
                 withTools(params.TOOLS_VERSION) {
-                  sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired' // not needed
+                  sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
                   sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 }
               }
