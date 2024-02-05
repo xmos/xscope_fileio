@@ -6,6 +6,11 @@ This example show the basics functionality of xscope fileio using ``XC`` as the 
 Build example (using xcommon_cmake)
 -----------------------------------
 
+.. warning::
+
+  Make sure ``xscope_fileio`` host application is installed.
+  Make sure ``XCOMMON_CMAKE_PATH`` environment variable is set to the directory where ``xcommon_cmake`` is located.
+
 Run the following command from the current directory: 
 
 .. code-block:: console
@@ -16,11 +21,6 @@ Run the following command from the current directory:
 Running example
 ---------------
 
-.. warning::
-
-  Make sure ``xscope_fileio`` host application is installed.
-  Make sure ``XCOMMON_CMAKE_PATH`` environment variable is set to the directory where ``xcommon_cmake`` is located.
-  
 Run the following command from top-level directory:
 
 .. code-block:: console
