@@ -38,13 +38,13 @@ The host-side interface is written in Python. To run an xcore binary with access
 xscope fileIO,
 use:
 
-::
+.. code-block:: console
 
     xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
 
 This can be combined with xtagctl e.g.:
 
-::
+.. code-block:: console
 
     with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
         xscope_fileio.run_on_target(adapter_id, device_xe)
@@ -53,26 +53,7 @@ This can be combined with xtagctl e.g.:
 Device side API
 ---------------
 
-Source and header files for device code are found in ``src_xcore``
-
-::
-
-    void xscope_io_init(chanend_t xscope_end);
-
-    unsigned xscope_fileio_is_initialized(void);
-
-    xscope_file_t xscope_open_file(char* filename, char* attributes);
-
-    //NOTE MAXIMUM n_bytes_to_read of 64kB on Linux http://bugzilla/show_bug.cgi?id=18528
-    size_t xscope_fread(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_read);
-
-    void xscope_fwrite(xscope_file_t *xscope_io_handle, uint8_t *buffer, size_t n_bytes_to_write);
-
-    void xscope_fseek(xscope_file_t *xscope_io_handle, int offset, int whence);
-
-    int xscope_ftell(xscope_file_t *xscope_file);
-
-    void xscope_close_all_files(void);
+Source and header files for device code are found in the ``xscope_fileio`` directory.
 
 The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
 to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
@@ -81,12 +62,9 @@ You will also need a copy of ``config.xscope`` in your firmware directory. This
 enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You
 can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`` which you should rename to ``config.xscope``.
 
-Note currently missing from fileio api:
+.. note::
 
-::
-
-    fprintf,  fscanf
-
+    Note currently missing from fileio api: ``fprintf`` ,  ``fscanf``
 
 System Architecture
 -------------------

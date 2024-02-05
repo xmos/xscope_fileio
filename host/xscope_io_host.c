@@ -33,9 +33,21 @@ xscope_host_file_t host_files[MAX_FILES_OPEN] = {0};
 
 const char end_sting[] = END_MARKER_STRING;
 static unsigned running = 1;
-
 int device_print_newline = 1; //Used to keep track of newlines for [DEVICE] print prefix
 
+
+/**
+ * @defgroup xscope_fileio_host_c     Doxygen group for XScope file I/O host API
+ */
+
+/**
+ * @brief Console print formatting function for xscope data
+ * 
+ * @param timestamp timestamp of the data
+ * @param length  length of the data
+ * @param data data to be printed
+ * @ingroup xscope_fileio_host_c
+ */
 void xscope_print(
   unsigned long long timestamp,
   unsigned int length,
@@ -57,7 +69,6 @@ void xscope_print(
 }
 
 
-
 void xscope_register(
   unsigned int id,
   unsigned int type,
@@ -72,6 +83,14 @@ void xscope_register(
   if(VERBOSE) printf("[HOST] xSCOPE register event (id [%d] name [%s])\n", id, name);
 }
 
+/**
+ * @brief Send file data to the device
+ * 
+ * @param file_idx file index
+ * @param req_size size of the data to be sent
+ * @return int 0 on success
+ * @ingroup xscope_fileio_host_c
+ */
 int send_file_chunk(unsigned file_idx, unsigned req_size)
 {
     unsigned char *buf = malloc(req_size);
@@ -97,6 +116,16 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
     return(0);
 }
 
+/**
+ * @brief Record xscope data
+ * 
+ * @param id id of the data
+ * @param timestamp timestamp of the data
+ * @param length length of the data
+ * @param dataval data value
+ * @param databytes data bytes
+ * @ingroup xscope_fileio_host_c
+ */
 void xscope_record(
   unsigned int id,
   unsigned long long timestamp,

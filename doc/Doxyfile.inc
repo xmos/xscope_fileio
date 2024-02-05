@@ -4,6 +4,7 @@ PROJECT_BRIEF = "fielio interface for xscope"
 
 # Camera module
 INPUT = ../xscope_fileio/api
+INPUT += ../host
 PREDEFINED             = C_API= EXTERN_C= DWORD_ALIGNED=
 USE_MATHJAX            = YES
 MATHJAX_FORMAT         = HTML-CSS

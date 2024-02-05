@@ -13,7 +13,7 @@
 #include "xscope_io_common.h"
 
 /**
- * @defgroup xscope_fileio_device     List of things to go in the quick reference section
+ * @defgroup xscope_fileio_device     Doxygen group for XScope file I/O device API
  */
 
 

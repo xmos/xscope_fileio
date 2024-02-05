@@ -4,6 +4,7 @@ title: xscope_fileio
 version: 0.2.1
 
 documentation:
+  exclude_patterns_path: doc/exclude_patterns.inc
   doxygen_projects:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc

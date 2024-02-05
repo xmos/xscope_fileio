@@ -105,7 +105,51 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     return q.get() # returns immediately after the thread starts
 
 
+
 def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
+    """
+    Run a target application using xrun or xsim along with a host application.
+
+    Parameters
+    ----------
+    adapter_id : int
+        The adapter ID for the target application.
+    firmware_xe : str
+        The path to the firmware executable.
+    use_xsim : bool, optional
+        If True, use xsim; otherwise, use xrun. Default is False.
+    **kwargs
+        Additional keyword arguments to be passed to subprocess.Popen.
+
+    Returns
+    -------
+    int
+        The return code of the host process.
+
+    Raises
+    ------
+    AssertionError
+        If xrun times out or if the host app exits with a non-zero return code.
+
+    Notes
+    -----
+    This function starts the target application using xrun or xsim, and a host application
+    to communicate with the target. The host application runs in a separate process.
+
+    The function monitors the status of xrun to ensure it starts within a specified timeout.
+    If xrun takes longer than the timeout, the function terminates the process.
+
+    If the host application exits with a non-zero return code, the function terminates
+    the xrun process and raises an AssertionError.
+
+    Examples
+    --------
+    To run the target application using xrun:
+    >>> run_on_target(adapter_id, 'firmware.xe')
+
+    To run the target application using xsim:
+    >>> run_on_target(None, 'firmware.xe', use_xsim=True)
+    """
     port = _get_open_port()
     xrun_cmd = (
         f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
