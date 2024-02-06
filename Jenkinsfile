@@ -7,6 +7,11 @@ def buildApps(appList) {
   }
 }
 
+def runningOn(machine) {
+  println "Stage running on:"
+  println machine
+}
+
 getApproval()
 
 pipeline {
