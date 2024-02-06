@@ -216,7 +216,7 @@ pipeline {
     }
     stage ('Build Documentation') {
       agent {
-        label 'docker'
+        label 'linux&&x86_64'
       }
       environment { XMOSDOC_VERSION = "v5.1.1" }
       stages {        
