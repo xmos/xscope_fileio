@@ -218,13 +218,12 @@ pipeline {
       agent {
         label 'docker'
       }
-      environment { XMOSDOC_VERSION = "v4.0" }
+      environment { XMOSDOC_VERSION = "v5.1.1" }
       stages {        
         stage('Build Docs') {
           steps {
             runningOn(env.NODE_NAME)
             checkout scm
-            sh "docker pull ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION"
             sh """docker run -u "\$(id -u):\$(id -g)" \
                     --rm \
                     -v ${WORKSPACE}:/build \
