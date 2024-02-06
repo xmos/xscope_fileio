@@ -227,6 +227,7 @@ pipeline {
             sh """docker run -u "\$(id -u):\$(id -g)" \
                     --rm \
                     -v ${WORKSPACE}:/build \
+                    --entrypoint /build/doc/build_docs.sh \
                     ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v"""
             // create zip file 
             script {
