@@ -37,11 +37,13 @@ pipeline {
       stages {
 
         stage('Checkout') {
-          runningOn(env.NODE_NAME)
-          dir('xscope_fileio') {
-              checkout scm
-              sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
-          } // dir
+          steps {
+            runningOn(env.NODE_NAME)
+            dir('xscope_fileio') {
+                checkout scm
+                sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
+            } // dir
+          } // steps
         } // stage 'Checkout'
 
         stage('Install Dependencies') {
