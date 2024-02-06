@@ -1,4 +1,9 @@
-@Library('xmos_jenkins_shared_library@v0.27.0')
+@Library('xmos_jenkins_shared_library@v0.28.0')
+
+def runningOn(machine) {
+  println "Stage running on:"
+  println machine
+}
 
 def buildApps(appList) {
   appList.each { app ->
@@ -7,10 +12,16 @@ def buildApps(appList) {
   }
 }
 
-def runningOn(machine) {
-  println "Stage running on:"
-  println machine
+def buildDocs(){
+  sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
+  sh 'xmosdoc html latex'
+  script {
+    def doc_version = sh(script: "cat settings.yml | awk '/version:/ {print \$2}'", returnStdout: true).trim()
+    def zipFileName = "docs_xscope_fileio_v${doc_version}.zip"
+    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
+  } // script
 }
+
 
 getApproval()
 
@@ -22,12 +33,12 @@ pipeline {
       defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
-  }
+  } // parameters
   options {
     skipDefaultCheckout()
     timestamps()
     buildDiscarder(xmosDiscardBuildSettings(onlyArtifacts=false))
-  }
+  } // options
   stages {
     stage('xcore.ai') {
       agent {
@@ -50,7 +61,10 @@ pipeline {
           steps {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                installDependencies()
+                createVenv("requirements.txt")
+                withVenv {
+                  sh "pip install -r requirements.txt"
+                 }
               }
             }
           }
@@ -58,7 +72,7 @@ pipeline {
         stage('Static analysis') {
           steps {
             dir('xscope_fileio') {
-              withVenv() {
+              withVenv {
                 warnError("Flake") {
                   sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
                   recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
@@ -87,7 +101,7 @@ pipeline {
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
-              withVenv() {
+              withVenv {
                 withTools(params.TOOLS_VERSION) {
                   sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
                   sh 'xtagctl reset_all XCORE-AI-EXPLORER'
@@ -99,14 +113,14 @@ pipeline {
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
-              withVenv() {
+              withVenv {
                 withTools(params.TOOLS_VERSION) {
                   sh 'pytest' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
           } // steps
-        } // Hardware tests
+        } // Tests
       } // stages
       post {
         always {
@@ -162,36 +176,24 @@ pipeline {
         }
       }
     }
-    stage ('Build Documentation') {
+
+    stage('Docs') {
       agent {
-        label 'linux&&x86_64'
+        label 'documentation'
       }
-      environment { XMOSDOC_VERSION = "v5.1.1" }
-      stages {        
-        stage('Build Docs') {
-          steps {
-            runningOn(env.NODE_NAME)
-            checkout scm
-            sh """docker run -u "\$(id -u):\$(id -g)" \
-                    --rm \
-                    -v ${WORKSPACE}:/build \
-                    --entrypoint /build/doc/build_docs.sh \
-                    ghcr.io/xmos/xmosdoc:$XMOSDOC_VERSION -v"""
-            // create zip file 
-            script {
-              def doc_version = sh(script: "cat settings.yml | awk '/version:/ {print \$2}'", returnStdout: true).trim()
-              def zipFileName = "docs_xscope_fileio_v${doc_version}.zip"
-              zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-            } // script
-          } // steps
-        } // stage('Build Docs')
-      } // stages
-      
-      post {
-        cleanup {
-          cleanWs()
+      steps {
+        runningOn(env.NODE_NAME)
+        dir('xscope_fileio') {
+          checkout scm
+          createVenv("requirements.txt")
+          withTools(params.TOOLS_VERSION) {
+            withVenv {
+              buildDocs()  
+            }
+          }
         }
       }
-    } // stage ('Build Documentation')
-  }
-}
+    } // stage: Docs
+
+  } // stages
+} // pipeline
