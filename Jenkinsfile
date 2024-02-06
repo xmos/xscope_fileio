@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.24.0') _
+@Library('xmos_jenkins_shared_library@v0.27.0')
 
 def buildApps(appList) {
   appList.each { app ->
@@ -25,10 +25,8 @@ pipeline {
   }
   options {
     skipDefaultCheckout()
-    buildDiscarder(logRotator(
-        numToKeepStr:         env.BRANCH_NAME ==~ /develop/ ? '50' : '',
-        artifactNumToKeepStr: env.BRANCH_NAME ==~ /develop/ ? '50' : ''
-    ))
+    timestamps()
+    buildDiscarder(xmosDiscardBuildSettings(onlyArtifacts=false))
   }
   stages {
     stage('xcore.ai') {
