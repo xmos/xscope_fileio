@@ -30,11 +30,13 @@ pipeline {
       agent {
         label 'xcore.ai' // xcore.ai nodes have 2 devices atatched, allowing parallel HW test
       }
+      
       stages {
+
         stage('Checkout') {
+          runningOn(env.NODE_NAME)
           steps {
             dir('xscope_fileio') {
-              runningOn(env.NODE_NAME)
               checkout scm
               sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
             }
