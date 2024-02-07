@@ -2,33 +2,33 @@ Xscope FileIO
 =============
 
 This library allows a program on the xCore to access binary files on the host machine
-via xscope.
+via xscope. 
 
-Currently it supports:
+Features:
 
-  * Arbitrary number (32 currently) of **read or write** files (not read/write)
-
-  * “wb” or “rb” file access mode only
-
-  * 6-8MBytes/s Device to Host speed
-
-  * Up to 1MBytes/s Host to Device speed (on tools 15.0.4)
-
-This compares to around 2kBytes/s for fileio over JTAG supported using ``xrun --io``.
+#. Read and write binary files on the host machine from the xCore.
+#. “wb” or “rb” file access mode only
+#. 6-8MBytes/s Device to Host speed (compared to 2kBytes/s for standard fielio).
+#. Up to 1MBytes/s Host to Device speed.
 
 Installation
 ************
 
-``pip install -e .`` or ``pip install .``
+Xscope fileio module consist of two parts: 
 
-To compile firmware code, add ``src_xcore`` to your source dirs and include dirs.
+#. A python module: launches the device application and simultaneously launches the host application to communicate xscope data to/from.
+#. A host application: an executable that runs on the host machine and communicates with the device application.
 
-**Ensure you use the config.xscope included in src_xcore.**
+To install the xscope fileio python module, simply run:
 
-If running on a Windows host, you will have to build the host endpoint yourself; the resulting executable
-``xscope_host_endpoint.exe`` must be placed in the ``host`` directory. The specific commands will vary depending
-on your build system, but you can use ``cmake`` to generate build files for your build system using the ``-G``
-option, eg. ``cmake -G"NMake Makefiles" .``
+.. code-block:: console
+    
+    ``pip install .``
+
+For linux and Mac, the host application is installed alongside the python module. 
+For windows, you will have to build the host application yourself. 
+For more information for building the host app in windows see 
+`host/README <./host/README.rst>`_.
 
 
 Host side API
