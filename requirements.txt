@@ -11,4 +11,3 @@ importlib-metadata==4.13.0
 
 # self-install
 -e ./
--e xtagctl/
