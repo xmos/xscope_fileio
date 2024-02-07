@@ -51,7 +51,7 @@ void test(void){
     num_bytes = xscope_fread(&read_xscope_file, buffer, sizeof(buffer));
     printf("Should be %d: %d\n", num_bytes, sizeof(ref_array));
     if(num_bytes != sizeof(ref_array)) {
-        // failed
+        printf("num_bytes != sizeof(ref_array)\n");
         return;
     }
     if(buffer[sizeof(ref_array)] != 0xaa) {

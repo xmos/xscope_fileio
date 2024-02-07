@@ -1,5 +1,5 @@
 TARGET_FLAG ?= -target=XCORE-AI-EXPLORER
-TARGET_EXEC ?= fileio_test.xe
+TARGET_EXEC ?= bin/fileio_test.xe
 
 XCC ?= xcc
 
