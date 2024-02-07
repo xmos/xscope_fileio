@@ -193,6 +193,11 @@ pipeline {
           }
         }
       }
+      post {
+        cleanup {
+          cleanWs()
+        }
+      }
     } // stage: Docs
 
   } // stages
