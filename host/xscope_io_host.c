@@ -122,8 +122,8 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
  * @param id id of the data
  * @param timestamp timestamp of the data
  * @param length length of the data
- * @param dataval data value
- * @param databytes data bytes
+ * @param dataval single data value
+ * @param databytes data buffer 
  * @ingroup xscope_fileio_host_c
  */
 void xscope_record(

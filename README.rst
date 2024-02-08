@@ -25,8 +25,8 @@ To install the xscope fileio python module, simply run:
     
     pip install .
 
-For linux and Mac, the host application is installed alongside the python module. 
-For windows, you will have to build the host application yourself. 
+For Linux and Mac, the host application is installed alongside the python module. 
+For Windows, you will have to build the host application yourself. 
 For more information for building the host app in windows see 
 `host/README <./host/README.rst>`_.
 

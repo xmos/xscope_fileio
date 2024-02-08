@@ -63,7 +63,7 @@ pipeline {
               withTools(params.TOOLS_VERSION) {
                 createVenv("requirements.txt")
                 withVenv {
-                  sh "pip install -e xtagctl/" // xtagctl before requirements.txt
+                  sh "pip install -e xtagctl/"
                   sh "pip install -r requirements.txt"
                  }
               }

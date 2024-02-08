@@ -2,12 +2,9 @@
 # pip_version 23.*
 
 # dependencies
-numpy
+numpy==1.26.4
 flake8==6.1.0
 pytest==8.0.0
-
-# Pin importlib-metadata to <5 due to https://github.com/python/importlib_metadata/issues/409.
-importlib-metadata==4.13.0
 
 # self-install
 -e ./
