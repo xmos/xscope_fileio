@@ -1,6 +1,6 @@
 ---
 project: xscope_fileio
-title: xscope_fileio
+title: Xscope Fileio
 version: 0.2.1
 
 documentation:
@@ -8,6 +8,9 @@ documentation:
   doxygen_projects:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc
-      doxy_overrides: |
-        GENERATE_HTML = yes
-        GENERATE_LATEX = yes
+  pdfs:
+    pdf_title: "{{title}} - device documentation"
+    pdf_filename: "{{project}}_device_doc_v{{version}}"
+  pdfs:
+    pdf_title: "{{title}} - host documentation"
+    pdf_filename: "{{project}}_host_doc_v{{version}}"

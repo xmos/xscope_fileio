@@ -12,14 +12,12 @@ def buildApps(appList) {
   }
 }
 
-def buildDocs(){
-  sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
-  sh 'xmosdoc html latex'
-  script {
-    def doc_version = sh(script: "cat settings.yml | awk '/version:/ {print \$2}'", returnStdout: true).trim()
-    def zipFileName = "docs_xscope_fileio_v${doc_version}.zip"
+def buildDocs(String zipFileName) {
+  withVenv {
+    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
+    sh 'xmosdoc'
     zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-  } // script
+  }
 }
 
 
@@ -188,9 +186,7 @@ pipeline {
           checkout scm
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
-            withVenv {
-              buildDocs()  
-            }
+            buildDocs("xscope_fileio.zip")
           }
         }
       }
