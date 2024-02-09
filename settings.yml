@@ -9,8 +9,9 @@ documentation:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc
   pdfs:
-    pdf_title: "{{title}} - device documentation"
-    pdf_filename: "{{project}}_device_doc_v{{version}}"
-  pdfs:
-    pdf_title: "{{title}} - host documentation"
-    pdf_filename: "{{project}}_host_doc_v{{version}}"
+    doc/01_device:
+      pdf_title: "{{title}} - device documentation"
+      pdf_filename: "{{project}}_device_doc_v{{version}}"
+    doc/02_host:
+      pdf_title: "{{title}} - host documentation"
+      pdf_filename: "{{project}}_host_doc_v{{version}}"

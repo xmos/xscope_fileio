@@ -82,12 +82,21 @@ class _XrunExitHandler:
 
 def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     """
-    Runs a subprocess.Popen, and then calls the function onExit when the
-    subprocess completes.
+    Asynchronously runs a subprocess and executes a callback function upon completion.
 
-    Use it exactly the way you'd normally use subprocess.Popen, except include a
-    callable to execute as the first argument. onExit is a callable object, and
-    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
+    Parameters
+    ----------
+    onExit : callable
+        Function to execute when the subprocess completes.
+    *popenArgs : 
+        Positional arguments passed to subprocess.Popen.
+    **popenKWArgs : 
+        Keyword arguments passed to subprocess.Popen.
+
+    Returns
+    -------
+    subprocess.Popen
+        Object representing the subprocess, returned immediately after thread starts.
     """
     def runInThread(onExit, popenArgs, popenKWArgs, q):
         proc = subprocess.Popen(*popenArgs, **popenKWArgs)
