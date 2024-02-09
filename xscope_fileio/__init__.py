@@ -29,6 +29,9 @@ def _get_host_exe():
 
 @contextlib.contextmanager
 def pushd(new_dir):
+    """
+    Context manager to temporarily change the current working directory.
+    """
     previous_dir = os.getcwd()
     os.chdir(new_dir)
     try:
