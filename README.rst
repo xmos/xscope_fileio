@@ -76,5 +76,5 @@ in the firmware code, reading/writing to the host file system.
 
 The call to ``run_on_target`` returns when the firmware exits.
 
-.. image:: docs/imgs/arch.png
+.. image:: doc/imgs/arch.png
     :alt: System Architecture
