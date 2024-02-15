@@ -4,6 +4,11 @@ xscope fileio change log
 1.2.0
 -----
 
+  * ADDED: XCommon CMake for tests and example integration.
+  * FIXED: Adapter ID can now be passed to examples.
+  * CHANGED: Improved documentation formatting and updates.
+  * ADDED: Pytest support.
+  * ADDED: xscope_fclose function for single file.
   * ADDED: Support for XCommon CMake build system
   * FIXED: Hang in run_on_target when invalid file was opened for reading
   * FIXED: fread no longer can cause buffer overflow
