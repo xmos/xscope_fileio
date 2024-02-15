@@ -1,4 +1,9 @@
-@Library('xmos_jenkins_shared_library@v0.27.0')
+@Library('xmos_jenkins_shared_library@v0.28.0')
+
+def runningOn(machine) {
+  println "Stage running on:"
+  println machine
+}
 
 def buildApps(appList) {
   appList.each { app ->
@@ -7,10 +12,14 @@ def buildApps(appList) {
   }
 }
 
-def runningOn(machine) {
-  println "Stage running on:"
-  println machine
+def buildDocs(String zipFileName) {
+  withVenv {
+    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
+    sh 'xmosdoc'
+    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
+  }
 }
+
 
 getApproval()
 
@@ -22,12 +31,12 @@ pipeline {
       defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
-  }
+  } // parameters
   options {
     skipDefaultCheckout()
     timestamps()
     buildDiscarder(xmosDiscardBuildSettings(onlyArtifacts=false))
-  }
+  } // options
   stages {
     stage('xcore.ai') {
       agent {
@@ -50,7 +59,11 @@ pipeline {
           steps {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                installDependencies()
+                createVenv("requirements.txt")
+                withVenv {
+                  sh "pip install -e xtagctl/"
+                  sh "pip install -r requirements.txt"
+                 }
               }
             }
           }
@@ -58,7 +71,7 @@ pipeline {
         stage('Static analysis') {
           steps {
             dir('xscope_fileio') {
-              withVenv() {
+              withVenv {
                 warnError("Flake") {
                   sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
                   recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
@@ -87,7 +100,7 @@ pipeline {
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
-              withVenv() {
+              withVenv {
                 withTools(params.TOOLS_VERSION) {
                   sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
                   sh 'xtagctl reset_all XCORE-AI-EXPLORER'
@@ -99,14 +112,14 @@ pipeline {
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
-              withVenv() {
+              withVenv {
                 withTools(params.TOOLS_VERSION) {
                   sh 'pytest' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
           } // steps
-        } // Hardware tests
+        } // Tests
       } // stages
       post {
         always {
@@ -161,6 +174,28 @@ pipeline {
           cleanWs()
         }
       }
-    } // stage: Update view files
+    }
+
+    stage('Docs') {
+      agent {
+        label 'documentation'
+      }
+      steps {
+        runningOn(env.NODE_NAME)
+        dir('xscope_fileio') {
+          checkout scm
+          createVenv("requirements.txt")
+          withTools(params.TOOLS_VERSION) {
+            buildDocs("xscope_fileio.zip")
+          }
+        }
+      }
+      post {
+        cleanup {
+          cleanWs()
+        }
+      }
+    } // stage: Docs
+
   } // stages
-}
+} // pipeline
