@@ -1,4 +1,5 @@
-// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
+// Copyright 2020-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include "xscope_io_device.h"
 #include <xcore/chanend.h>
 #include <xcore/hwtimer.h>

@@ -1,3 +1,5 @@
+# Copyright 2021-2024 XMOS LIMITED.
+# This Software is subject to the terms of the XMOS Public Licence: Version 1.
 """
 This test uses the throughput_c example to test the throughput of the fileio library.
 It can be used passing an adapter id or run by pytest so xtagctl will acquire() one. 
