@@ -5,7 +5,7 @@
 #define MAX_XSCOPE_SIZE_BYTES   256
 #define END_MARKER_STRING       "finally_the_end!!" //17 * 8 = 136 bits of unlikely data 
 #define END_MARKER_LEN          (sizeof(END_MARKER_STRING) - 1)
-#define MAX_FILENAME_LEN        64
+#define MAX_FILENAME_LEN        128
 #define MAX_FILES_OPEN          32
 
 typedef enum{
