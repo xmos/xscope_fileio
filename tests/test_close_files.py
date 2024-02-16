@@ -14,7 +14,7 @@ output_folder = (Path.cwd() / "output").absolute()
 
 
 def fn_close_files(adapter_id: str = None):
-    """This test performs several opening and closing of files on the device.
+    """This test performs several openings and closings of files on the device.
     It is intended to test the robustness of the file system and 
     the xscope_fclose function.
 
