@@ -1,4 +1,25 @@
-@Library('xmos_jenkins_shared_library@v0.19.0') _
+@Library('xmos_jenkins_shared_library@v0.28.0')
+
+def runningOn(machine) {
+  println "Stage running on:"
+  println machine
+}
+
+def buildApps(appList) {
+  appList.each { app ->
+    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
+    sh "xmake -C ${app}/build -j\$(nproc)"
+  }
+}
+
+def buildDocs(String zipFileName) {
+  withVenv {
+    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
+    sh 'xmosdoc'
+    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
+  }
+}
+
 
 getApproval()
 
@@ -7,118 +28,109 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.1.4',
+      defaultValue: '15.2.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
-  }
+  } // parameters
   options {
     skipDefaultCheckout()
-  }
+    timestamps()
+    buildDiscarder(xmosDiscardBuildSettings(onlyArtifacts=false))
+  } // options
   stages {
     stage('xcore.ai') {
       agent {
-        label 'xcore.ai'
+        label 'xcore.ai' // xcore.ai nodes have 2 devices atatched, allowing parallel HW test
       }
+
       stages {
+
         stage('Checkout') {
           steps {
-            checkout scm
-            sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
-          }
-        }
+            runningOn(env.NODE_NAME)
+            dir('xscope_fileio') {
+                checkout scm
+                sh "git clone git@github0.xmos.com:xmos-int/xtagctl.git"
+            } // dir
+          } // steps
+        } // stage 'Checkout'
+
         stage('Install Dependencies') {
           steps {
-            withTools(params.TOOLS_VERSION) {
-              installDependencies()
+            dir('xscope_fileio') {
+              withTools(params.TOOLS_VERSION) {
+                createVenv("requirements.txt")
+                withVenv {
+                  sh "pip install -e xtagctl/"
+                  sh "pip install -r requirements.txt"
+                 }
+              }
             }
           }
         }
         stage('Static analysis') {
           steps {
-            withVenv() {
-              warnError("Flake") {
-                sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
-                recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+            dir('xscope_fileio') {
+              withVenv {
+                warnError("Flake") {
+                  sh "flake8 --exit-zero --output-file=flake8.xml xscope_fileio"
+                  recordIssues enabledForFailure: true, tool: flake8(pattern: 'flake8.xml')
+                }
               }
             }
           }
         }
         stage('Build') {
           steps {
-            withTools(params.TOOLS_VERSION) {
-              sh 'tree'
-              sh 'cd examples/throughput_c && make'
-              sh 'cd examples/fileio_features_xc && xmake'
-            }
-          }
-        }
+            sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
+            dir('xscope_fileio') {
+              withTools(params.TOOLS_VERSION) {
+                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
+                  buildApps([
+                    "examples/fileio_features_xc",
+                    "examples/throughput_c",
+                    "tests/no_hang",
+                    "tests/close_files",
+                  ]) // buildApps
+                } // withEnv
+              } // withTools
+            } // dir
+          } // steps
+        } // stage 'Build'
         stage('Cleanup xtagctl'){
           steps {
-            withVenv() {
-              withTools(params.TOOLS_VERSION) {
-                sh 'xtagctl reset_all XCORE-AI-EXPLORER'
-                sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
-              }
-            }
-          }
-        }
-        stage('Tests'){
-          failFast false
-          parallel {
-            stage('Hardware tests') {
-              stages{
-                stage('Transfer test single large'){
-                  steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_throughput.py 64' //Pass size in MB
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            stage('Hardware tests #2 (in parallel)') {
-              stages{
-                stage('Transfer test multiple small'){
-                  steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                        sh 'python tests/test_throughput.py 5' //Pass size in MB
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            stage('xsim tests'){
-              stages{
-                stage('feature test'){
-                  steps {
-                    withVenv() {
-                      withTools(params.TOOLS_VERSION) {
-                        sh 'python tests/test_features.py'
-                      }
-                    }
-                  }
+            dir('xscope_fileio') {
+              withVenv {
+                withTools(params.TOOLS_VERSION) {
+                  sh 'rm -f ~/.xtag/status.lock ~/.xtag/acquired'
+                  sh 'xtagctl reset_all XCORE-AI-EXPLORER'
                 }
               }
             }
           }
         }
-      }
+        stage('Tests') {
+          steps { 
+            dir('xscope_fileio/tests') {
+              withVenv {
+                withTools(params.TOOLS_VERSION) {
+                  sh 'pytest' // info: configuration opts in pytest.ini
+                } // withTools
+              } // withVenv
+            } // dir
+          } // steps
+        } // Tests
+      } // stages
       post {
         always {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
+          junit '**/reports/*.xml'
         }
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
-    }
+    } // stage: xcore.ai
     stage('Windows build') {
       agent {
         label 'x86_64&&windows'
@@ -128,19 +140,20 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            runVS('cmake -G"NMake Makefiles" .')
-            runVS('nmake')
-
+            withVS("vcvars32.bat") {
+              sh 'cmake -G "Ninja" .'
+              sh 'ninja'
+            }
             archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
           }
         }
       }
       post {
         cleanup {
-          cleanWs()
+          xcoreCleanSandbox()
         }
       }
-    }
+    } // stage: Windows build
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
@@ -162,5 +175,27 @@ pipeline {
         }
       }
     }
-  }
-}
+
+    stage('Docs') {
+      agent {
+        label 'documentation'
+      }
+      steps {
+        runningOn(env.NODE_NAME)
+        dir('xscope_fileio') {
+          checkout scm
+          createVenv("requirements.txt")
+          withTools(params.TOOLS_VERSION) {
+            buildDocs("xscope_fileio.zip")
+          }
+        }
+      }
+      post {
+        cleanup {
+          cleanWs()
+        }
+      }
+    } // stage: Docs
+
+  } // stages
+} // pipeline

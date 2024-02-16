@@ -1,4 +1,5 @@
-// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
+// Copyright 2020-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include "xscope_io_device.h"
 #include <xcore/chanend.h>
 #include <xcore/hwtimer.h>
@@ -14,7 +15,7 @@
 
 //Global chanend so we don't need to keep passing it in for read operations
 chanend_t c_xscope = 0;
-unsigned file_idx = 0;
+uint8_t available_files[MAX_FILES_OPEN] = {0}; // 0 = available, 1 = in use
 lock_t file_access_lock;
 volatile unsigned xscope_io_init_flag = 0;
 
@@ -33,6 +34,22 @@ __attribute__((weak))
 void xscope_fileio_lock_release(void) {
     lock_release(file_access_lock);
 }
+
+
+static int get_available_file_idx(){
+    for (unsigned idx = 0; idx < MAX_FILES_OPEN; idx++){
+        if (available_files[idx] == 0){
+            available_files[idx] = 1;
+            if(VERBOSE){printf("Allocated file index: %u\n", idx);}
+            return idx;
+        }
+    }
+    return -1;
+}
+static inline void reset_available_file_idx(unsigned idx){
+    available_files[idx] = 0;
+}
+
 
 unsigned xscope_fileio_is_initialized(void) {
     return xscope_io_init_flag;
@@ -57,7 +74,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     char packet[1 + MAX_FILENAME_LEN + 1];
     unsigned length = 1 + 1 + strlen(xscope_file.filename) + 1;
     xassert(length <= 1 + 1 + MAX_FILENAME_LEN + 1);
-    packet[0] = '0' + file_idx;
+    
     if(!strcmp(attributes, "rb")){
         xscope_file.mode = XSCOPE_IO_READ_BINARY;
     }
@@ -73,18 +90,15 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     else{
         printf("Unknown file attribytes: %s. Please specify from: rb, rt, wb, wt\n", attributes);
     }
+    unsigned file_idx = get_available_file_idx();
+    xassert(file_idx != -1 && "Maximum number of files open exceeded");
+    packet[0] = '0' + file_idx;
     packet[1] = '0' + xscope_file.mode;
     strcpy(&packet[2], xscope_file.filename);
     xscope_file.index = file_idx;
     xscope_bytes(XSCOPE_ID_OPEN_FILE, length, (const unsigned char *)packet);
-    file_idx++;
     xscope_fileio_lock_release();
-    if(file_idx == MAX_FILES_OPEN){
-        printf("Maximum number of files open exceeded (%u)", MAX_FILES_OPEN);
-    }
-
-    //Pass a copy of the struct back to the caller
-    return xscope_file;
+    return xscope_file; //Pass a copy of the struct back to the caller
 }
 
 size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_read){
@@ -110,18 +124,21 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
         {
         read_host_data:
             {
-                xscope_data_from_host(c_xscope, (char *)buffer_ptr, &bytes_read);
-                // printf("rx %u bytes\n", bytes_read);
-                end_marker_found = ((bytes_read == END_MARKER_LEN) && !memcmp(buffer_ptr, END_MARKER_STRING, END_MARKER_LEN)) ? 1 : 0;
+                // Need a buffer big enough to hold max read length.
+                // User provided buffer may be smaller than that.
+                char local_buffer[MAX_XSCOPE_SIZE_BYTES];
+                xscope_data_from_host(c_xscope, local_buffer, &bytes_read);
+                end_marker_found = ((bytes_read == END_MARKER_LEN) && !memcmp(local_buffer, END_MARKER_STRING, END_MARKER_LEN)) ? 1 : 0;
                 if(end_marker_found){
-                    // printf("end_marker_found\n");
                     break;
                 }
+                memcpy(buffer_ptr, local_buffer, bytes_read);
                 buffer_ptr += bytes_read;
                 n_bytes_read += bytes_read;
                 break;
             }
         }
+        xassert(n_bytes_read <= n_bytes_to_read);
         if((n_bytes_read == n_bytes_to_read) || end_marker_found){
             chunk_complete = 1;
         }
@@ -191,4 +208,16 @@ void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
     hwtimer_t t = hwtimer_alloc(); hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
+}
+
+void xscope_fclose(xscope_file_t *xscope_file){
+    xscope_fileio_lock_acquire();
+    const unsigned char idx = xscope_file->index + '0';
+    xscope_bytes(XSCOPE_ID_HOST_CLOSE, 1, &idx);
+    if(VERBOSE) {
+        printf("Sent close file id: %d\n", xscope_file->index);
+    }
+    reset_available_file_idx(xscope_file->index);
+    delay_ticks(10); // sanity time to close file
+    xscope_fileio_lock_release();
 }

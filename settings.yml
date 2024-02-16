@@ -1,0 +1,17 @@
+---
+project: xscope_fileio
+title: Xscope Fileio
+version: 1.2.0
+
+documentation:
+  exclude_patterns_path: doc/exclude_patterns.inc
+  doxygen_projects:
+    xscope_fileio:
+      doxyfile_path: doc/Doxyfile.inc
+  pdfs:
+    doc/01_device:
+      pdf_title: "{{title}} - device documentation"
+      pdf_filename: "{{project}}_device_doc_v{{version}}"
+    doc/02_host:
+      pdf_title: "{{title}} - host documentation"
+      pdf_filename: "{{project}}_host_doc_v{{version}}"

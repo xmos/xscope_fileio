@@ -1,6 +1,9 @@
+// Copyright 2021-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include <platform.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <xscope.h>
 extern "C"{
 #include "xscope_io_device.h"
@@ -43,7 +46,20 @@ void test(void){
     //Load in full ref again
     xscope_fseek(&read_xscope_file, 0, SEEK_SET);
     printf("Should say 0: %d\n", xscope_ftell(&read_xscope_file));
-    num_bytes = xscope_fread(&read_xscope_file, buffer, sizeof(ref_array));
+    // read beyond the end of file to check fread returns correct amount
+    // Checks that buffer overflow doesn't occur by writing 
+    // known data to expected location after the end of the file
+    buffer[sizeof(ref_array)] = 0xaa;
+    num_bytes = xscope_fread(&read_xscope_file, buffer, sizeof(buffer));
+    printf("Should be %d: %d\n", num_bytes, sizeof(ref_array));
+    if(num_bytes != sizeof(ref_array)) {
+        printf("num_bytes != sizeof(ref_array)\n");
+        return;
+    }
+    if(buffer[sizeof(ref_array)] != 0xaa) {
+        printf("buffer overflow\n");
+        return;
+    }
     printf("Full sentence (%u): %s\n", num_bytes, buffer);
 
     //Copy it out to dut for comparing
@@ -60,7 +76,6 @@ void test(void){
     xscope_fwrite(&write_xscope_fil_mod, "IS", 2);
     printf("Should say 12: %d\n", xscope_ftell(&write_xscope_fil_mod));
 
-    xscope_close_all_files();
 }
 
 int main(void){
@@ -70,6 +85,7 @@ int main(void){
         on tile[0]:{
                 xscope_io_init(xscope_chan);
                 test();
+                xscope_close_all_files();
         }
     }
     return 0;

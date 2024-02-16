@@ -1,4 +1,5 @@
-# Copyright (c) 2020, XMOS Ltd, All rights reserved
+# Copyright 2020-2024 XMOS LIMITED.
+# This Software is subject to the terms of the XMOS Public Licence: Version 1.
 import contextlib
 import os
 from pathlib import Path
@@ -29,6 +30,9 @@ def _get_host_exe():
 
 @contextlib.contextmanager
 def pushd(new_dir):
+    """
+    Context manager to temporarily change the current working directory.
+    """
     previous_dir = os.getcwd()
     os.chdir(new_dir)
     try:
@@ -82,12 +86,21 @@ class _XrunExitHandler:
 
 def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     """
-    Runs a subprocess.Popen, and then calls the function onExit when the
-    subprocess completes.
+    Asynchronously runs a subprocess and executes a callback function upon completion.
 
-    Use it exactly the way you'd normally use subprocess.Popen, except include a
-    callable to execute as the first argument. onExit is a callable object, and
-    *popenArgs and **popenKWArgs are simply passed up to subprocess.Popen.
+    Parameters
+    ----------
+    onExit : callable
+        Function to execute when the subprocess completes.
+    *popenArgs : 
+        Positional arguments passed to subprocess.Popen.
+    **popenKWArgs : 
+        Keyword arguments passed to subprocess.Popen.
+
+    Returns
+    -------
+    subprocess.Popen
+        Object representing the subprocess, returned immediately after thread starts.
     """
     def runInThread(onExit, popenArgs, popenKWArgs, q):
         proc = subprocess.Popen(*popenArgs, **popenKWArgs)
@@ -105,7 +118,51 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
     return q.get() # returns immediately after the thread starts
 
 
+
 def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
+    """
+    Run a target application using xrun or xsim along with a host application.
+
+    Parameters
+    ----------
+    adapter_id : int
+        The adapter ID for the target application.
+    firmware_xe : str
+        The path to the firmware executable.
+    use_xsim : bool, optional
+        If True, use xsim; otherwise, use xrun. Default is False.
+    **kwargs
+        Additional keyword arguments to be passed to subprocess.Popen.
+
+    Returns
+    -------
+    int
+        The return code of the host process.
+
+    Raises
+    ------
+    AssertionError
+        If xrun times out or if the host app exits with a non-zero return code.
+
+    Notes
+    -----
+    This function starts the target application using xrun or xsim, and a host application
+    to communicate with the target. The host application runs in a separate process.
+
+    The function monitors the status of xrun to ensure it starts within a specified timeout.
+    If xrun takes longer than the timeout, the function terminates the process.
+
+    If the host application exits with a non-zero return code, the function terminates
+    the xrun process and raises an AssertionError.
+
+    Examples
+    --------
+    To run the target application using xrun:
+    >>> run_on_target(adapter_id, 'firmware.xe')
+
+    To run the target application using xsim:
+    >>> run_on_target(None, 'firmware.xe', use_xsim=True)
+    """
     port = _get_open_port()
     xrun_cmd = (
         f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
@@ -129,7 +186,7 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
         print(".", end="", flush=True)
         time.sleep(0.1)
         if time.time() > timeout:
-            xrun_proc.kill()
+            xrun_proc.terminate()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
@@ -142,7 +199,10 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
 
-    assert host_proc.returncode == 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
+    if host_proc.returncode != 0:
+        xrun_proc.terminate() # The host app won't have stopped xrun so kill it here
+        assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
+
     print("Running on target finished")
 
     return host_proc.returncode

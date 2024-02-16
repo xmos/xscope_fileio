@@ -9,6 +9,9 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+**/_build/
+**/build_*/
+bin/
 develop-eggs/
 dist/
 downloads/
@@ -50,6 +53,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+tests/reports/*.xml
 
 # Translations
 *.mo
@@ -112,6 +116,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.vscode
+.venv*
 
 # Spyder project settings
 .spyderproject
@@ -153,3 +159,14 @@ xscope_fileio/host/xscope_host_endpoint
 *.bin
 *.o
 examples/fileio_features_xc/.build
+
+# ninja 
+.ninja_deps
+.ninja_log
+build.ninja
+*.exe
+*.ilk
+*.pdb
+
+# tmp files
+*.out

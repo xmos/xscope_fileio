@@ -1,4 +1,5 @@
-// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
+// Copyright 2020-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 // Suppress some unwanted warnings in the Windows build
 #ifdef _WIN32
@@ -33,9 +34,21 @@ xscope_host_file_t host_files[MAX_FILES_OPEN] = {0};
 
 const char end_sting[] = END_MARKER_STRING;
 static unsigned running = 1;
-
 int device_print_newline = 1; //Used to keep track of newlines for [DEVICE] print prefix
 
+
+/**
+ * @defgroup xscope_fileio_host_c     Doxygen group for XScope file I/O host API
+ */
+
+/**
+ * @brief Console print formatting function for xscope data
+ * 
+ * @param timestamp timestamp of the data
+ * @param length  length of the data
+ * @param data data to be printed
+ * @ingroup xscope_fileio_host_c
+ */
 void xscope_print(
   unsigned long long timestamp,
   unsigned int length,
@@ -57,7 +70,6 @@ void xscope_print(
 }
 
 
-
 void xscope_register(
   unsigned int id,
   unsigned int type,
@@ -72,19 +84,18 @@ void xscope_register(
   if(VERBOSE) printf("[HOST] xSCOPE register event (id [%d] name [%s])\n", id, name);
 }
 
+/**
+ * @brief Send file data to the device
+ * 
+ * @param file_idx file index
+ * @param req_size size of the data to be sent
+ * @return int 0 on success
+ * @ingroup xscope_fileio_host_c
+ */
 int send_file_chunk(unsigned file_idx, unsigned req_size)
 {
     unsigned char *buf = malloc(req_size);
-    unsigned n_bytes_read = 0;
-
-    n_bytes_read = fread(buf, 1, req_size, host_files[file_idx].fp);
-
-    if(n_bytes_read < req_size){
-        if(VERBOSE) printf("[HOST] Unexpected end of file, device requested: %u available: %u sent: 0\n", req_size, n_bytes_read);
-        xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
-        free(buf);
-        return(-1);
-    }
+    unsigned n_bytes_read = fread(buf, 1, req_size, host_files[file_idx].fp);
 
     for(unsigned idx = 0; idx < n_bytes_read / MAX_XSCOPE_SIZE_BYTES; idx++){
         xscope_ep_request_upload(MAX_XSCOPE_SIZE_BYTES, &buf[idx * MAX_XSCOPE_SIZE_BYTES]);
@@ -96,7 +107,8 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
 
     if(VERBOSE) printf("[HOST] sent block %u\n", n_bytes_read);
 
-    if(feof(host_files[file_idx].fp)){
+    if(feof(host_files[file_idx].fp) 
+       || ferror(host_files[file_idx].fp)){
         if(VERBOSE) printf("[HOST] End of file\n");
         xscope_ep_request_upload(END_MARKER_LEN, (const unsigned char *)end_sting); //End
     }
@@ -105,6 +117,16 @@ int send_file_chunk(unsigned file_idx, unsigned req_size)
     return(0);
 }
 
+/**
+ * @brief Record xscope data
+ * 
+ * @param id id of the data
+ * @param timestamp timestamp of the data
+ * @param length length of the data
+ * @param dataval single data value
+ * @param databytes data buffer 
+ * @ingroup xscope_fileio_host_c
+ */
 void xscope_record(
   unsigned int id,
   unsigned long long timestamp,
@@ -233,6 +255,20 @@ void xscope_record(
             return;
         }
         break;
+                
+        case XSCOPE_ID_HOST_CLOSE:
+        {
+            assert(length == 1 && "length shall be equal to 1");
+            unsigned file_idx = databytes[0] - '0';
+            if(VERBOSE) printf("[HOST] closing file idx: %u\n", file_idx);
+            if(host_files[file_idx].fp != NULL)
+            {
+                fclose(host_files[file_idx].fp);
+                host_files[file_idx].fp = NULL;
+            }
+        }
+        break;
+        
 
         default:
         {
@@ -282,4 +318,3 @@ int main(int argc, char *argv[])
 
     return(0);
 }
-

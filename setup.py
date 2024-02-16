@@ -1,3 +1,5 @@
+# Copyright 2020-2024 XMOS LIMITED.
+# This Software is subject to the terms of the XMOS Public Licence: Version 1.
 from distutils.command.build import build
 from setuptools.command.develop import develop
 import os
@@ -45,7 +47,7 @@ class CustomDevelopCommand(develop):
 
 setuptools.setup(
     name="xscope_fileio",
-    version="1.1.2",
+    version="1.2.0",
     cmdclass={"build": CustomBuildCommand, "develop": CustomDevelopCommand,},
     # Note for anyone trying to copy this pattern:
     # package_data keys are NAMES OF PACKAGES, not dirs
