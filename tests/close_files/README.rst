@@ -1,7 +1,7 @@
 example: fileio_feature_close
 =============================
 
-This example show how to use open and close files with xscope_fileio. 
+This example shows how to use open and close files with xscope_fileio. 
  
 Build example
 -------------

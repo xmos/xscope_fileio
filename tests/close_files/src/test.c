@@ -56,7 +56,7 @@ void test_open_close_continously(chanend_t xscope_chan){
 
 
 // This test will open a file that was previously closed, and write some data to it.
-// the idea is to ensure that we can open and close reusiong the same file pointer
+// the idea is to ensure that we can open and close reusing the same file pointer
 // and change the data to write to the file.
 static
 void test_open_a_closed_file(chanend_t xscope_chan){

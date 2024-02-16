@@ -1,7 +1,7 @@
 example: fileio_features_xc
 ===========================
 
-This example show the basics functionality of xscope fileio using ``XC`` as the programming language. 
+This example shows the basics functionality of xscope fileio using ``XC`` as the programming language. 
 
 Build example (using xcommon_cmake)
 -----------------------------------

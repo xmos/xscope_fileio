@@ -1,7 +1,7 @@
 ---
 project: xscope_fileio
 title: Xscope Fileio
-version: 0.2.1
+version: 1.2.0
 
 documentation:
   exclude_patterns_path: doc/exclude_patterns.inc
