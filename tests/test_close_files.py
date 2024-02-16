@@ -1,3 +1,5 @@
+# Copyright 2024 XMOS LIMITED.
+# This Software is subject to the terms of the XMOS Public Licence: Version 1.
 import argparse
 import shutil
 from pathlib import Path
@@ -14,7 +16,7 @@ output_folder = (Path.cwd() / "output").absolute()
 
 
 def fn_close_files(adapter_id: str = None):
-    """This test perform several opening and closing of files on the device.
+    """This test performs several openings and closings of files on the device.
     It is intended to test the robustness of the file system and 
     the xscope_fclose function.
 

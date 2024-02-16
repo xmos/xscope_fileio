@@ -1,4 +1,5 @@
-// Copyright (c) 2020-2022, XMOS Ltd, All rights reserved
+// Copyright 2020-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 // Suppress some unwanted warnings in the Windows build
 #ifdef _WIN32

@@ -1,3 +1,5 @@
+// Copyright 2023-2024 XMOS LIMITED.
+// This Software is subject to the terms of the XMOS Public Licence: Version 1.
 // Test to see if it hangs when abused
 #include <stdio.h>
 #include <stdlib.h>

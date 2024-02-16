@@ -1,3 +1,5 @@
+# Copyright 2023-2024 XMOS LIMITED.
+# This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #We assume that the Xscope FileIO Python library has been installed via pip beforehand and is available to import. Please see readme for instuctions.
 import pytest
 import argparse
