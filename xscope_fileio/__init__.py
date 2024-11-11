@@ -17,7 +17,7 @@ import threading, queue
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = (Path(__file__).parent / "../host")
+HOST_PATH = (Path(__file__).parent / "../host").resolve()
 
 
 def _get_host_exe():
@@ -25,7 +25,7 @@ def _get_host_exe():
     if platform.system() == 'Windows':
         return str(HOST_PATH / "xscope_host_endpoint.exe")
     else:
-        return HOST_PATH / "xscope_host_endpoint"
+        return str(HOST_PATH / "xscope_host_endpoint")
 
 
 @contextlib.contextmanager

@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+UNRELEASED
+----------
+
+  * ADDED: Support for ARM Mac based Host 
+
 1.2.0
 -----
 

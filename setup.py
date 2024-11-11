@@ -1,23 +1,20 @@
 # Copyright 2020-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
-from distutils.command.build import build
-from setuptools.command.develop import develop
+
 import os
 import setuptools
 import subprocess
-import contextlib
 import platform
 
+from pathlib import Path
+from distutils.command.build import build
+from setuptools.command.develop import develop
 
-@contextlib.contextmanager
-def pushd(new_dir):
-    previous_dir = os.getcwd()
-    os.chdir(new_dir)
-    try:
-        yield
-    finally:
-        os.chdir(previous_dir)
-
+CWD = Path(__file__).parent.absolute()
+HOST_PATH = CWD / "host"
+CMD_CMAKE = "cmake -B build"
+CMD_MAKE = "make -C build"
+LIB_VERSION = "1.2.0"
 
 class CustomBuildCommand(build):
     """Customized distutils build command """
@@ -26,11 +23,10 @@ class CustomBuildCommand(build):
         # Can't assume a specific build command for Windows, so just build for Linux and Mac
         if platform.system() in ['Darwin', 'Linux']:
             # Make the host binary
-            with pushd("host/"):
-                subprocess.check_output(["cmake", "."])
-                subprocess.check_output(["make"])
+            subprocess.run(CMD_CMAKE, shell=True, check=True, cwd=HOST_PATH)
+            subprocess.run(CMD_MAKE, shell=True, check=True, cwd=HOST_PATH)
+        
         build.run(self)
-
 
 class CustomDevelopCommand(develop):
     """Customized setuptools develop command """
@@ -39,19 +35,16 @@ class CustomDevelopCommand(develop):
         # Can't assume a specific build command for Windows, so just build for Linux and Mac
         if platform.system() in ['Darwin', 'Linux']:
             # Make the host binary
-            with pushd("host/"):
-                subprocess.check_output(["cmake", "."])
-                subprocess.check_output(["make"])
+            subprocess.run(CMD_CMAKE, shell=True, check=True, cwd=HOST_PATH)
+            subprocess.run(CMD_MAKE, shell=True, check=True, cwd=HOST_PATH)
+        
         develop.run(self)
 
 
 setuptools.setup(
     name="xscope_fileio",
-    version="1.2.0",
+    version=LIB_VERSION,
     cmdclass={"build": CustomBuildCommand, "develop": CustomDevelopCommand,},
-    # Note for anyone trying to copy this pattern:
-    # package_data keys are NAMES OF PACKAGES, not dirs
-    # So it's "xscope_fileio" not "xscope_fileio/"
     package_data={
         "xscope_fileio": [
             "../host/Makefile",
@@ -61,3 +54,7 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
 )
+
+# Note:
+# package_data keys are NAMES OF PACKAGES, not dirs
+# So it's "xscope_fileio" not "xscope_fileio/"
