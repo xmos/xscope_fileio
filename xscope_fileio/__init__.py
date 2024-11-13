@@ -15,10 +15,9 @@ import threading, queue
 # The firmware will have already been loaded so 5s is more than enough
 # as long as the host CPU is not too busy. This can be quite long (10s+)
 # for a busy CPU
+
 XRUN_TIMEOUT = 20
-
-HOST_PATH = (Path(__file__).parent / "../host").resolve()
-
+HOST_PATH = Path(__file__).parent.parent / "host"
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
