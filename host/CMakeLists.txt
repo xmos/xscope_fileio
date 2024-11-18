@@ -10,7 +10,7 @@ set_property(TARGET xscope_host_endpoint PROPERTY C_STANDARD 99)
 
 # Set the output directory to the same directory as the CMake file
 set_target_properties(xscope_host_endpoint PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
 
 # Include directories

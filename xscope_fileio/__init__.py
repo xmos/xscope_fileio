@@ -1,15 +1,17 @@
 # Copyright 2020-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
 import contextlib
 import os
-from pathlib import Path
 import socket
 import sys
 import time
 import platform
-
 import subprocess
-import threading, queue
+import threading
+import queue
+
+from pathlib import Path
 
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
