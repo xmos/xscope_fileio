@@ -38,13 +38,17 @@ The host-side interface is written in Python. To run an xcore binary with access
 xscope fileIO,
 use:
 
-.. code-block:: console
+.. code-block:: python
+
+    import xscope_fileio
+
+.. code-block:: python
 
     xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
 
 This can be combined with xtagctl e.g.:
 
-.. code-block:: console
+.. code-block:: python
 
     with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
         xscope_fileio.run_on_target(adapter_id, device_xe)
