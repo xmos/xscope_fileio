@@ -11,4 +11,4 @@ To install ``xscope_fileio`` host tool manually, please follow the steps below:
 
 .. code-block:: console
 
-  python ../xscope_fileio/build_host.py
+  python build_host.py
