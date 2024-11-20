@@ -19,10 +19,23 @@ from pathlib import Path
 # for a busy CPU
 
 XRUN_TIMEOUT = 20
-HOST_PATH = Path(__file__).parent.parent / "host"
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
+    cwd = Path(__file__).parent
+    HOST_PATH_git = cwd.parent / "host"
+    HOST_PATH_pkg = cwd / "host"
+    
+    c1 = HOST_PATH_git.exists()
+    c2 = HOST_PATH_pkg.exists()
+    
+    if c1:
+        HOST_PATH = HOST_PATH_git
+    elif c2:
+        HOST_PATH = HOST_PATH_pkg
+    else:
+        assert 0, "Host exe not found. Please build the host app first"
+    
     if platform.system() == 'Windows':
         return str(HOST_PATH / "xscope_host_endpoint.exe")
     else:
