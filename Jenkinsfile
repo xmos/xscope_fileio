@@ -140,7 +140,7 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            withVS("vcvars32.bat") {
+            withVS("vcvars64.bat") {
               sh 'cmake -G "Ninja" .'
               sh 'ninja'
             }
