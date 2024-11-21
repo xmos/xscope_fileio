@@ -6,7 +6,6 @@ import subprocess
 from pathlib import Path
 
 CWD = Path(__file__).parent.absolute()
-HOST_PATH = CWD.parent / "host"
 
 def build_host_app():
     """Builds the host application
@@ -18,14 +17,14 @@ def build_host_app():
     if platform.system() in ["Darwin", "Linux"]:
         cmd_cmake = "cmake -B build"
         cmd_make = "make -C build"
-        subprocess.run(cmd_cmake, shell=True, check=True, cwd=HOST_PATH)
-        subprocess.run(cmd_make, shell=True, check=True, cwd=HOST_PATH)
+        subprocess.run(cmd_cmake, shell=True, check=True, cwd=CWD)
+        subprocess.run(cmd_make, shell=True, check=True, cwd=CWD)
     elif platform.system() == "Windows":
         try:
             cmd_cmake = "cmake -B build -G Ninja"
             cmd_make = "ninja -C build"
-            subprocess.run(cmd_cmake, shell=True, check=True, cwd=HOST_PATH)
-            subprocess.run(cmd_make, shell=True, check=True, cwd=HOST_PATH)
+            subprocess.run(cmd_cmake, shell=True, check=True, cwd=CWD)
+            subprocess.run(cmd_make, shell=True, check=True, cwd=CWD)
         except subprocess.CalledProcessError:
             print("Error: Build failed")
     else:
