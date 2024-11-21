@@ -131,7 +131,6 @@ pipeline {
         }
       }
     } // stage: xcore.ai
-
     stage('Windows build') {
       agent {
         label 'x86_64&&windows'
@@ -141,7 +140,7 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            withVS("vcvars64.bat") {
+            withVS("vcvars32.bat") {
               sh 'cmake -G "Ninja" .'
               sh 'ninja'
             }
@@ -155,21 +154,6 @@ pipeline {
         }
       }
     } // stage: Windows build
-
-    stage("Pypi - Windows"){
-      agent {label 'x86_64 && windows'}
-      steps {
-        checkout scm
-        createVenv("requirements.txt")
-        withVS("vcvars64.bat") {
-        withVenv {
-          sh "pip install poetry"
-          sh "poetry build -f wheel"
-          sh "poetry publish"
-        }}
-      } // steps
-    }
-
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
