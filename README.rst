@@ -42,7 +42,8 @@ use:
 
     import xscope_fileio
 
-.. code-block:: python
+    firmware_xe = "your_binary_app.xe"
+    adapter_id = "your_adapter_id"
 
     xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
 

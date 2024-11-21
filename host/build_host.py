@@ -15,13 +15,13 @@ def build_host_app():
     """
     print("Building xscope fileio host application for: ", platform.system())
     if platform.system() in ["Darwin", "Linux"]:
-        cmd_cmake = "cmake -B build"
+        cmd_cmake = "cmake --fresh -B build"
         cmd_make = "make -C build"
         subprocess.run(cmd_cmake, shell=True, check=True, cwd=CWD)
         subprocess.run(cmd_make, shell=True, check=True, cwd=CWD)
     elif platform.system() == "Windows":
         try:
-            cmd_cmake = "cmake -B build -G Ninja"
+            cmd_cmake = "cmake --fresh -B build -G Ninja"
             cmd_make = "ninja -C build"
             subprocess.run(cmd_cmake, shell=True, check=True, cwd=CWD)
             subprocess.run(cmd_make, shell=True, check=True, cwd=CWD)
