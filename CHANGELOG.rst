@@ -4,7 +4,7 @@ xscope fileio change log
 1.3.0
 -----
 
-  * ADDED: jenkins build/publish wheels for Linux, Windows and MacOS.
+  * ADDED:  script to build host app in host folder
   * CHANGED: setup.py replaced with pyproject.toml and poetry.
   * CHANGED: Update tools version in Jenkinsfile to 15.3.0. 
   * ADDED: Support for Python 3.10.
