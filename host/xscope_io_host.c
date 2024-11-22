@@ -138,6 +138,18 @@ void xscope_record(
     static unsigned write_size = 0;
 
     switch(id){
+        case XSCOPE_ID_CHECK_VERSION:
+        {
+            const unsigned length = 6;
+            const char host_version[length];
+            const char device_version[length];
+            snprintf(host_version, length, "%06d", XSCOPE_IO_VERSION);
+            strcpy(device_version, (const char *)databytes);
+            // print boths
+            printf("[HOST] Host version: %s\n", host_version);
+            printf("[HOST] Device version: %s\n", device_version);
+            break;
+        }
         case XSCOPE_ID_OPEN_FILE:
         {
             unsigned file_idx = databytes[0] - '0';
