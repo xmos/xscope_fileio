@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.28.0')
+@Library('xmos_jenkins_shared_library@v0.34.0')
 
 def runningOn(machine) {
   println "Stage running on:"
@@ -12,15 +12,6 @@ def buildApps(appList) {
   }
 }
 
-def buildDocs(String zipFileName) {
-  withVenv {
-    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
-    sh 'xmosdoc'
-    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-  }
-}
-
-
 getApproval()
 
 pipeline {
@@ -28,7 +19,7 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.2.1',
+      defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   } // parameters
@@ -85,14 +76,12 @@ pipeline {
             sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
                   buildApps([
                     "examples/fileio_features_xc",
                     "examples/throughput_c",
                     "tests/no_hang",
                     "tests/close_files",
                   ]) // buildApps
-                } // withEnv
               } // withTools
             } // dir
           } // steps
@@ -186,7 +175,7 @@ pipeline {
           checkout scm
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
-            buildDocs("xscope_fileio.zip")
+            buildDocs(archiveZipOnly: true)
           }
         }
       }

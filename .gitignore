@@ -171,7 +171,6 @@ build.ninja
 # tmp files
 *.out
 
-# excluding ednpoint
 # endpoint
 xscope_host_endpoint
 xscope_host_endpoint.exe

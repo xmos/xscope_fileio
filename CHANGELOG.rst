@@ -1,7 +1,7 @@
 xscope fileio change log
 ========================
 
-1.3.0
+1.3.1
 -----
 
   * ADDED:  script to build host app in host folder
