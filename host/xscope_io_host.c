@@ -140,15 +140,15 @@ void xscope_record(
     switch(id){
         case XSCOPE_ID_CHECK_VERSION:
         {
-            const char host_version[XSCOPE_IO_VERSION_LEN];
-            const char device_version[XSCOPE_IO_VERSION_LEN];
+            char host_version[XSCOPE_IO_VERSION_LEN];
+            char device_version[XSCOPE_IO_VERSION_LEN];
             snprintf(host_version, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
             strcpy(device_version, (const char *)databytes);
             // print boths
             if(VERBOSE) printf("[HOST] Host version: %s\n", host_version);
             if(VERBOSE) printf("[HOST] Device version: %s\n", device_version);
             // ensure is the same
-            assert(strcmp(host_version, device_version) == 0, "Host and device versions do not match");
+            assert(strcmp(host_version, device_version) == 0);
             break;
         }
         case XSCOPE_ID_OPEN_FILE:
