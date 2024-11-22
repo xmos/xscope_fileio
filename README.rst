@@ -83,13 +83,22 @@ Device usage example (single tile):
         chanend_t xscope_chan = chanend_alloc();
         xscope_io_init(xscope_chan); 
         printf("Hello world!\n");
-        xscope_check_version();
+        xscope_io_check_version();
         xscope_close_all_files();  
         chanend_free(xscope_chan);
         return 0;
     }
 
 This minimal example starts xscope_fileio, and check that device and host versions match. 
+For version 1.3.1 for example, this will print:
+
+.. code-block:: console
+
+    Starting host app...
+    [DEVICE] Hello world!
+    [HOST] Host version: 1.3.1
+    [HOST] Device version: 1.3.1
+    Running on target finished
 
 System Architecture
 -------------------
