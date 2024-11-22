@@ -61,17 +61,13 @@ void xscope_io_init(chanend_t xscope_end){
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
     xscope_io_init_flag = 1;
-    xscope_check_version();
 }
 
-void xscope_check_version(){
+void xscope_io_check_version(){
     xscope_fileio_lock_acquire();
-    // CONVERT XSCOPE_IO_VERSION to a char 6 bytes long
-    const unsigned length = 6;
-    char packet[length];
-    snprintf(packet, 6, "%06d", XSCOPE_IO_VERSION);
-    printf("Checking version: %s\n", packet);
-    xscope_bytes(XSCOPE_ID_CHECK_VERSION, length, (const unsigned char *)packet);
+    char packet[XSCOPE_IO_VERSION_LEN];
+    snprintf(packet, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    xscope_bytes(XSCOPE_ID_CHECK_VERSION, XSCOPE_IO_VERSION_LEN, (const unsigned char *)packet);
     xscope_fileio_lock_release();
 }
 

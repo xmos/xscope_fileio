@@ -69,6 +69,28 @@ can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt
 
     Note currently missing from fileio api: ``fprintf`` ,  ``fscanf``
 
+Device usage example (single tile):
+
+.. code-block:: c
+
+    #include <stdio.h>
+
+    #include <xscope.h>
+    #include <xcore/chanend.h>
+    #include <xscope_io_device.h>
+
+    int main(void) {
+        chanend_t xscope_chan = chanend_alloc();
+        xscope_io_init(xscope_chan); 
+        printf("Hello world!\n");
+        xscope_check_version();
+        xscope_close_all_files();  
+        chanend_free(xscope_chan);
+        return 0;
+    }
+
+This minimal example starts xscope_fileio, and check that device and host versions match. 
+
 System Architecture
 -------------------
 
