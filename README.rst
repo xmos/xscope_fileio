@@ -1,83 +1,67 @@
-Xscope FileIO
-=============
+:orphan:
 
-This library allows a program on the xCore to access binary files on the host machine
-via xscope. 
+xscope_fileio: FileIO over Xscope
+#################################
 
-Features:
+:vendor: XMOS
+:version: 1.3.1
+:scope: General Use
+:description: FileIO library over xscope
+:category: Filesystem
+:keywords: stdio, fileio, xscope, xscope_fileio
+:devices: xcore.ai, xcore-200
 
-#. Read and write binary files on the host machine from the xCore.
-#. “wb” or “rb” file access mode only
-#. 6-8MBytes/s Device to Host speed (compared to 2kBytes/s for standard fielio).
-#. Up to 1MBytes/s Host to Device speed.
+*******
+Summary
+*******
 
-Installation
+Provides a fast method for reading and writing files between an |xcore| device and a host computer. 
+It uses |xscope| to communicate between the two devices.
+
+
+********
+Features
+********
+
+  * 48000 and 44100 ADAT receivers
+  * 48000 and 44100 ADAT transmitters
+  * Application for loopback testing on Simulator or hardware
+
+************
+Known issues
 ************
 
-Xscope fileio module consist of two parts: 
+  * ADAT Rx: Requirement for 100 MHz reference clock (#18)
+  * ADAT Tx: No support for 256x master clock (i.e. 48 kHz from 12.288 MHz master clock) (#17)
 
-#. A python module: launches the device application and simultaneously launches the host application to communicate xscope data to/from.
-#. A host application: an executable that runs on the host machine and communicates with the device application.
+****************
+Development repo
+****************
 
-To install the xscope fileio python module, simply run:
+  * `lib_adat <https://www.github.com/xmos/lib_adat>`_
 
-.. code-block:: console
-    
-    pip install xscope_fileio
+**************
+Required tools
+**************
 
-The host application can be built from source, for more information see:
+  * XMOS XTC Tools: 15.3.0
 
-`host/README.rst <https://github.com/xmos/xscope_fileio/blob/develop/host/README.rst>`_
+*********************************
+Required libraries (dependencies)
+*********************************
 
-Host side API
--------------
+  * None
 
-The host-side interface is written in Python. To run an xcore binary with access to
-xscope fileIO,
-use:
+*************************
+Related application notes
+*************************
 
-.. code-block:: python
+The following application notes use this library:
 
-    import xscope_fileio
+  * `AN02003: SPDIF/ADAT/I²S Receive to I²S Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
 
-    firmware_xe = "your_binary_app.xe"
-    adapter_id = "your_adapter_id"
+*******
+Support
+*******
 
-    xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
-
-This can be combined with xtagctl e.g.:
-
-.. code-block:: python
-
-    with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
-        xscope_fileio.run_on_target(adapter_id, device_xe)
-
-
-Device side API
----------------
-
-Source and header files for device code are found in the ``xscope_fileio`` directory.
-
-The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
-to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
-
-You will also need a copy of ``config.xscope`` in your firmware directory. This
-enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You
-can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`` which you should rename to ``config.xscope``.
-
-.. note::
-
-    Note currently missing from fileio api: ``fprintf`` ,  ``fscanf``
-
-System Architecture
--------------------
-
-The ``run_on_target`` function calls ``xrun --xscope-port`` with the binary and specified target adapter,
-and simultaneously launches a host application to communicate xscope data to/from
-the xrun process via sockets. The host application responds to ``xscope_fileio`` API calls
-in the firmware code, reading/writing to the host file system.
-
-The call to ``run_on_target`` returns when the firmware exits.
-
-.. image:: doc/imgs/arch.png
-    :alt: System Architecture
+This package is supported by XMOS Ltd. Issues can be raised against the software at: http://www.xmos.com/support
