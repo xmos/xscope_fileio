@@ -18,21 +18,22 @@ Summary
 Provides a fast method for reading and writing files between an |xcore| device and a host computer. 
 It uses |xscope| to communicate between the two devices.
 
-
 ********
 Features
 ********
 
-  * 48000 and 44100 ADAT receivers
-  * 48000 and 44100 ADAT transmitters
+  * Device and host FileIO library over xscope. 
+  * Python module for seamless integration and execution of firmware.
+  * 6MB/s Device to Host speed (vs 2KB/s for stdio).
+  * 1MB/s Host to Device speed (vs 1KB/s for stdio).
   * Application for loopback testing on Simulator or hardware
 
 ************
 Known issues
 ************
 
-  * ADAT Rx: Requirement for 100 MHz reference clock (#18)
-  * ADAT Tx: No support for 256x master clock (i.e. 48 kHz from 12.288 MHz master clock) (#17)
+  * Missing the following stdio functions: ``fprintf`` , ``fscanf``. 
+  * Byte only access: ``wb`` or ``rb`` file access mode only.
 
 ****************
 Development repo
