@@ -2,6 +2,7 @@
 examples
 tests
 .doc_venv
+*.venv*
 
 **README*
 **LICENSE*

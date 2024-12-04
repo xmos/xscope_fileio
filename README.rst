@@ -1,5 +1,11 @@
 :orphan:
 
+.. |xtc_tools_version| replace:: 15.3.0
+.. |python_version|    replace:: 3.10
+.. |cmake_version|     replace:: 3.21
+.. _Python:             https://www.python.org/
+.. _CMAKE:              https://cmake.org/cmake/help/latest/
+
 xscope_fileio: FileIO over Xscope
 #################################
 
@@ -26,7 +32,7 @@ Features
   * Python module for seamless integration and execution of firmware.
   * 6MB/s Device to Host speed (vs 2KB/s for stdio).
   * 1MB/s Host to Device speed (vs 1KB/s for stdio).
-  * Application for loopback testing on Simulator or hardware
+  * Application for loopback testing on Simulator or Hardware.
 
 ************
 Known issues
@@ -39,13 +45,23 @@ Known issues
 Development repo
 ****************
 
-  * `lib_adat <https://www.github.com/xmos/lib_adat>`_
+  * `xscope_fileio <https://www.github.com/xmos/xscope_fileio>`_
+
+*************
+Documentation
+*************
+
+ * XMOS Libraries : `https://www.xmos.com/libraries/`_ 
+ * Documentation source : `xscope_fileio_docs <www.github.com/xmos/xscope_fileio/docs>
 
 **************
 Required tools
 **************
 
-  * XMOS XTC Tools: 15.3.0
+- XTC tools: |xtc_tools_version| `XTC tools`_.
+- Python: |python_version| or later Python_.
+- CMake: |cmake_version| or later CMake_.
+
 
 *********************************
 Required libraries (dependencies)
@@ -57,9 +73,7 @@ Required libraries (dependencies)
 Related application notes
 *************************
 
-The following application notes use this library:
-
-  * `AN02003: SPDIF/ADAT/I²S Receive to I²S Slave Bridge with ASRC <https://www.xmos.com/file/an02003>`_
+  * None
 
 *******
 Support

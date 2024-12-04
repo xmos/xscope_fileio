@@ -145,8 +145,8 @@ void xscope_record(
             snprintf(host_version, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
             strcpy(device_version, (const char *)databytes);
             // print boths
-            if(VERBOSE) printf("[HOST] Host version: %s\n", host_version);
-            if(VERBOSE) printf("[HOST] Device version: %s\n", device_version);
+            printf("[HOST] Host version: %s\n", host_version);
+            printf("[HOST] Device version: %s\n", device_version);
             // ensure is the same
             assert(strcmp(host_version, device_version) == 0);
             break;

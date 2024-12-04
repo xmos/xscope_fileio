@@ -18,4 +18,4 @@ build = "host/build_host.py"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<=3.12"
-numpy = "1.26.4"
+numpy = ">=1.26,<2"

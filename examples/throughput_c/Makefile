@@ -3,7 +3,7 @@ TARGET_EXEC ?= bin/fileio_test.xe
 
 XCC ?= xcc
 
-SRCS := main.xc test.c ../../xscope_fileio/src/xscope_io_device.c
+SRCS := main.c ../../xscope_fileio/src/xscope_io_device.c
 INC_DIRS += $(dir $(SRCS)) ../../xscope_fileio/api ../../xscope_fileio
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 

@@ -1,14 +1,17 @@
 // Copyright 2021-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#include <platform.h>
+
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+
+#include <platform.h>
 #include <xscope.h>
 #include <xcore/assert.h>
 #include <xcore/hwtimer.h>
-#include "xscope_io_device.h"
+#include <xcore/chanend.h>
 
-#include <assert.h>
+#include "xscope_io_device.h"
 
 #define IN_FILE_NAME    "throughput_ref.bin"
 #define OUT_FILE_NAME   "throughput_dut.bin"
@@ -49,17 +52,15 @@ void do_test(void){
         unsigned t3 = get_reference_time();
         write_total_time += t3 - t2;
     } while(num_bytes > 0);
-       
-
-
-
 
     printf("Throughput KBPS Read: %f, Write: %f\n", ticks_to_KBPS(read_total_time, fsize), ticks_to_KBPS(write_total_time, fsize));
 }
 
-void main_tile0(chanend_t xscope_chan)
-{
+int main(){
+    chanend_t xscope_chan = chanend_alloc();
     xscope_io_init(xscope_chan);
     do_test();
     xscope_close_all_files();
+    chanend_free(xscope_chan);
+    return 0;
 }
