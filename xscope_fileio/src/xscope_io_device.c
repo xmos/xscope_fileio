@@ -10,6 +10,7 @@
 #include <string.h>
 #include <xscope.h>
 #include <stdio.h>
+#include <assert.h>
 
 #define VERBOSE                 0
 
@@ -22,7 +23,7 @@ volatile unsigned xscope_io_init_flag = 0;
 __attribute__((weak))
 void xscope_fileio_lock_alloc(void) {
     file_access_lock = lock_alloc();
-    xassert(file_access_lock != 0);
+    assert(file_access_lock != 0);
 }
 
 __attribute__((weak))
@@ -63,17 +64,23 @@ void xscope_io_init(chanend_t xscope_end){
     xscope_io_init_flag = 1;
 }
 
+static inline void delay_ticks_xcore(unsigned ticks){
+  hwtimer_t tmr = hwtimer_alloc();
+  hwtimer_delay(tmr, ticks);
+  hwtimer_free(tmr);
+}
+
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
     /* Wait until xscope_fileio is initialized */
     while(xscope_fileio_is_initialized() == 0) {
-        delay_ticks(1);
+        delay_ticks_xcore(1);
     }
     xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);
     char packet[1 + MAX_FILENAME_LEN + 1];
     unsigned length = 1 + 1 + strlen(xscope_file.filename) + 1;
-    xassert(length <= 1 + 1 + MAX_FILENAME_LEN + 1);
+    assert(length <= 1 + 1 + MAX_FILENAME_LEN + 1);
     
     if(!strcmp(attributes, "rb")){
         xscope_file.mode = XSCOPE_IO_READ_BINARY;
@@ -90,8 +97,8 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     else{
         printf("Unknown file attribytes: %s. Please specify from: rb, rt, wb, wt\n", attributes);
     }
-    unsigned file_idx = get_available_file_idx();
-    xassert(file_idx != -1 && "Maximum number of files open exceeded");
+    int file_idx = get_available_file_idx();
+    assert(file_idx != -1); //&& "Maximum number of files open exceeded");
     packet[0] = '0' + file_idx;
     packet[1] = '0' + xscope_file.mode;
     strcpy(&packet[2], xscope_file.filename);
@@ -103,7 +110,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
 
 size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_read){
     xscope_fileio_lock_acquire();
-    xassert(xscope_file->mode == XSCOPE_IO_READ_BINARY || xscope_file->mode == XSCOPE_IO_READ_TEXT);
+    assert(xscope_file->mode == XSCOPE_IO_READ_BINARY || xscope_file->mode == XSCOPE_IO_READ_TEXT);
 
     unsigned end_marker_found = 0;
     unsigned n_bytes_read = 0;
@@ -138,7 +145,7 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
                 break;
             }
         }
-        xassert(n_bytes_read <= n_bytes_to_read);
+        assert(n_bytes_read <= n_bytes_to_read);
         if((n_bytes_read == n_bytes_to_read) || end_marker_found){
             chunk_complete = 1;
         }
@@ -151,7 +158,7 @@ size_t xscope_fread(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_
 
 void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_to_write){
     xscope_fileio_lock_acquire();
-    xassert(xscope_file->mode == XSCOPE_IO_WRITE_BINARY || xscope_file->mode == XSCOPE_IO_WRITE_TEXT);
+    assert(xscope_file->mode == XSCOPE_IO_WRITE_BINARY || xscope_file->mode == XSCOPE_IO_WRITE_TEXT);
 
     unsigned char packet[1 + sizeof(unsigned)];
     packet[0] = xscope_file->index + '0';
@@ -182,7 +189,7 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
 
 void xscope_fseek(xscope_file_t *xscope_file, int offset, int whence){
     xscope_fileio_lock_acquire();
-    xassert(whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END);
+    assert(whence == SEEK_SET || whence == SEEK_CUR || whence == SEEK_END);
     unsigned char packet[1 + 1 + sizeof(offset)];
     packet[0] = xscope_file->index + '0';
     packet[1] = whence + '0';
@@ -198,7 +205,7 @@ int xscope_ftell(xscope_file_t *xscope_file){
     xscope_bytes(XSCOPE_ID_TELL, 1, &idx);
     int offset, bytes_read = 0;
     xscope_data_from_host(c_xscope, (char *)&offset, &bytes_read);
-    xassert(bytes_read = sizeof(offset));
+    assert(bytes_read = sizeof(offset));
     if(VERBOSE) printf("Tell file id: %u offset %d\n", xscope_file->index, offset);
     xscope_fileio_lock_release();
     return offset;
@@ -218,6 +225,6 @@ void xscope_fclose(xscope_file_t *xscope_file){
         printf("Sent close file id: %d\n", xscope_file->index);
     }
     reset_available_file_idx(xscope_file->index);
-    delay_ticks(10); // sanity time to close file
+    delay_ticks_xcore(10); // sanity time to close file
     xscope_fileio_lock_release();
 }
