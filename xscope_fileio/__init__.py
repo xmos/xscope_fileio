@@ -1,31 +1,45 @@
 # Copyright 2020-2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
 import contextlib
 import os
-from pathlib import Path
 import socket
 import sys
 import time
 import platform
-
 import subprocess
-import threading, queue
+import threading
+import queue
+
+from pathlib import Path
 
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
 # as long as the host CPU is not too busy. This can be quite long (10s+)
 # for a busy CPU
+
 XRUN_TIMEOUT = 20
-
-HOST_PATH = (Path(__file__).parent / "../host")
-
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
+    cwd = Path(__file__).parent
+    HOST_PATH_git = cwd.parent / "host"
+    HOST_PATH_pkg = cwd / "host"
+    
+    c1 = HOST_PATH_git.exists()
+    c2 = HOST_PATH_pkg.exists()
+    
+    if c1:
+        HOST_PATH = HOST_PATH_git
+    elif c2:
+        HOST_PATH = HOST_PATH_pkg
+    else:
+        assert 0, "Host exe not found. Please build the host app first"
+    
     if platform.system() == 'Windows':
         return str(HOST_PATH / "xscope_host_endpoint.exe")
     else:
-        return HOST_PATH / "xscope_host_endpoint"
+        return str(HOST_PATH / "xscope_host_endpoint")
 
 
 @contextlib.contextmanager
@@ -206,3 +220,54 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     print("Running on target finished")
 
     return host_proc.returncode
+
+
+def get_adapter_id():
+    """
+    Gets adapter ID from xrun.
+    """
+    try:
+        xrun_out = subprocess.check_output(['xrun', '-l'], text=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        print('Error: %s' % e.output)
+        assert False
+    except FileNotFoundError:
+        msg = ("please ensure you have XMOS tools activated in your environment")
+        assert False, msg
+
+    xrun_out = xrun_out.split('\n')
+    # Check that the first 4 lines of xrun_out match the expected lines
+    expected_header = ["", "Available XMOS Devices", "----------------------", ""]
+    if len(xrun_out) < len(expected_header):
+        raise RuntimeError(
+            f"Error: xrun output:\n{xrun_out}\n"
+            f"does not contain expected header:\n{expected_header}"
+        )
+
+    header_match = True
+    for i, expected_line in enumerate(expected_header):
+        if xrun_out[i] != expected_line:
+            header_match = False
+            break
+
+    if not header_match:
+        raise RuntimeError(
+            f"Error: xrun output header:\n{xrun_out[:4]}\n"
+            f"does not match expected header:\n{expected_header}"
+        )
+
+    try:
+        if "No Available Devices Found" in xrun_out[4]:
+            raise RuntimeError(f"Error: No available devices found\n")
+
+    except IndexError:
+        raise RuntimeError(f"Error: xrun output is too short:\n{xrun_out}\n")
+
+    for line in xrun_out[6:]:
+        if line.strip():
+            adapterID = line[26:34].strip()
+            status = line[34:].strip()
+        else:
+            continue
+    print("adapter_id = ",adapterID)
+    return adapterID

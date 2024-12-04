@@ -1,80 +1,82 @@
-Xscope FileIO
-=============
+:orphan:
 
-This library allows a program on the xCore to access binary files on the host machine
-via xscope. 
+.. |xtc_tools_version| replace:: 15.3.0
+.. |python_version|    replace:: 3.10
+.. |cmake_version|     replace:: 3.21
+.. _Python:             https://www.python.org/
+.. _CMAKE:              https://cmake.org/cmake/help/latest/
 
-Features:
+xscope_fileio: FileIO over Xscope
+#################################
 
-#. Read and write binary files on the host machine from the xCore.
-#. “wb” or “rb” file access mode only
-#. 6-8MBytes/s Device to Host speed (compared to 2kBytes/s for standard fielio).
-#. Up to 1MBytes/s Host to Device speed.
+:vendor: XMOS
+:version: 1.3.1
+:scope: General Use
+:description: FileIO library over xscope
+:category: Filesystem
+:keywords: stdio, fileio, xscope, xscope_fileio
+:devices: xcore.ai, xcore-200
 
-Installation
+*******
+Summary
+*******
+
+Provides a fast method for reading and writing files between an |xcore| device and a host computer. 
+It uses |xscope| to communicate between the two devices.
+
+********
+Features
+********
+
+  * Device and host FileIO library over xscope. 
+  * Python module for seamless integration and execution of firmware.
+  * 6MB/s Device to Host speed (vs 2KB/s for stdio).
+  * 1MB/s Host to Device speed (vs 1KB/s for stdio).
+  * Application for loopback testing on Simulator or Hardware.
+
+************
+Known issues
 ************
 
-Xscope fileio module consist of two parts: 
+  * Missing the following stdio functions: ``fprintf`` , ``fscanf``. 
+  * Byte only access: ``wb`` or ``rb`` file access mode only.
 
-#. A python module: launches the device application and simultaneously launches the host application to communicate xscope data to/from.
-#. A host application: an executable that runs on the host machine and communicates with the device application.
+****************
+Development repo
+****************
 
-To install the xscope fileio python module, simply run:
+  * `xscope_fileio <https://www.github.com/xmos/xscope_fileio>`_
 
-.. code-block:: console
-    
-    pip install .
+*************
+Documentation
+*************
 
-For Linux and Mac, the host application is installed alongside the python module. 
-For Windows, you will have to build the host application yourself. 
-For more information for building the host app in windows see 
-`host/README <./host/README.rst>`_.
+ * XMOS Libraries : `https://www.xmos.com/libraries/`_ 
+ * Documentation source : `xscope_fileio_docs <www.github.com/xmos/xscope_fileio/docs>
 
+**************
+Required tools
+**************
 
-Host side API
--------------
-
-The host-side interface is written in Python. To run an xcore binary with access to
-xscope fileIO,
-use:
-
-.. code-block:: console
-
-    xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
-
-This can be combined with xtagctl e.g.:
-
-.. code-block:: console
-
-    with xtagctl.acquire("XCORE-AI-EXPLORER") as adapter_id:
-        xscope_fileio.run_on_target(adapter_id, device_xe)
+- XTC tools: |xtc_tools_version| `XTC tools`_.
+- Python: |python_version| or later Python_.
+- CMake: |cmake_version| or later CMake_.
 
 
-Device side API
----------------
+*********************************
+Required libraries (dependencies)
+*********************************
 
-Source and header files for device code are found in the ``xscope_fileio`` directory.
+  * None
 
-The device side application requires a multi-tile main since it uses the xscope_host_data(xscope_chan); service
-to communicate with the host, which requires this. See examples for XC and C applications for how to do this.
+*************************
+Related application notes
+*************************
 
-You will also need a copy of ``config.xscope`` in your firmware directory. This
-enables xscope in the tools and sets up the xscope probes used by fileio for communicating with the host app. You
-can find a copy in ``xscope_fileio/config.xscope xscope_fileio/config.xscope.txt`` which you should rename to ``config.xscope``.
+  * None
 
-.. note::
+*******
+Support
+*******
 
-    Note currently missing from fileio api: ``fprintf`` ,  ``fscanf``
-
-System Architecture
--------------------
-
-The ``run_on_target`` function calls ``xrun --xscope-port`` with the binary and specified target adapter,
-and simultaneously launches a host application to communicate xscope data to/from
-the xrun process via sockets. The host application responds to ``xscope_fileio`` API calls
-in the firmware code, reading/writing to the host file system.
-
-The call to ``run_on_target`` returns when the firmware exits.
-
-.. image:: doc/imgs/arch.png
-    :alt: System Architecture
+This package is supported by XMOS Ltd. Issues can be raised against the software at: http://www.xmos.com/support

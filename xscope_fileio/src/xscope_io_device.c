@@ -51,6 +51,11 @@ static inline void reset_available_file_idx(unsigned idx){
     available_files[idx] = 0;
 }
 
+static inline void delay_ticks_xcore(unsigned ticks){
+  hwtimer_t tmr = hwtimer_alloc();
+  hwtimer_delay(tmr, ticks);
+  hwtimer_free(tmr);
+}
 
 unsigned xscope_fileio_is_initialized(void) {
     return xscope_io_init_flag;
@@ -64,10 +69,12 @@ void xscope_io_init(chanend_t xscope_end){
     xscope_io_init_flag = 1;
 }
 
-static inline void delay_ticks_xcore(unsigned ticks){
-  hwtimer_t tmr = hwtimer_alloc();
-  hwtimer_delay(tmr, ticks);
-  hwtimer_free(tmr);
+void xscope_io_check_version(){
+    xscope_fileio_lock_acquire();
+    char packet[XSCOPE_IO_VERSION_LEN];
+    snprintf(packet, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    xscope_bytes(XSCOPE_ID_CHECK_VERSION, XSCOPE_IO_VERSION_LEN, (const unsigned char *)packet);
+    xscope_fileio_lock_release();
 }
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){

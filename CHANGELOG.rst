@@ -1,6 +1,16 @@
 xscope fileio change log
 ========================
 
+1.3.1
+-----
+
+  * ADDED: xscope_io_check_version function for checking host and device versions.
+  * ADDED:  script to build host app in host folder
+  * CHANGED: setup.py replaced with pyproject.toml and poetry.
+  * CHANGED: Update tools version in Jenkinsfile to 15.3.0. 
+  * ADDED: Support for Python 3.10.
+  * CHANGED: Remove comment for unsupported ARM-based Mac hosts.
+
 1.2.0
 -----
 

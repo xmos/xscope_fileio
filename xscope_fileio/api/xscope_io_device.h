@@ -142,6 +142,15 @@ void xscope_close_all_files(void);
  */
 void xscope_fclose(xscope_file_t *xscope_file);
 
+/**
+ * @brief Checks library version
+ * 
+ * Sends a host current device version and requests
+ * the host to compare with its version. 
+ * If versions do not match, host will raise an error.
+ */
+void xscope_io_check_version();
+
 #ifdef __XC__
 }
 #endif

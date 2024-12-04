@@ -1,5 +1,5 @@
 #############
-Xscope fileio
+Xscope FileIO
 #############
 
 This library allows a program on the xCore to access binary files on the host machine via xscope.
@@ -7,5 +7,6 @@ This library allows a program on the xCore to access binary files on the host ma
 .. toctree::
   :maxdepth: 1
 
-  ./doc/01_device
-  ./doc/02_host
+  00_quickstart
+  01_device
+  02_host
