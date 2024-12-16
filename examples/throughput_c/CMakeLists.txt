@@ -7,8 +7,7 @@ set(XMOS_SANDBOX_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
 
 # target ans srcs
 set(APP_HW_TARGET XCORE-AI-EXPLORER)
-set(APP_XC_SRCS main.xc)
-set(APP_C_SRCS test.c)
+set(APP_C_SRCS main.c)
 
 # flags
 set(APP_COMPILER_FLAGS
