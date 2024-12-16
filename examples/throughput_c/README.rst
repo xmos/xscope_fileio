@@ -25,7 +25,9 @@ Run the following command from top-level directory:
 
 .. code-block:: console
 
-  python run_example.py --adapter-id "your-adapter-id"
+  python run_example.py
+
+This will xrun the code from the device with id=0 (default). 
 
 Output
 ------

@@ -119,14 +119,20 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
 
 
 
-def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
+def run_on_target(
+        adapter_id: str | int | None,
+        firmware_xe: str,
+        use_xsim: bool = False,
+        **kwargs: dict
+    ) -> int:
     """
     Run a target application using xrun or xsim along with a host application.
 
     Parameters
     ----------
-    adapter_id : int
-        The adapter ID for the target application.
+    adapter_id : str or int or None
+        Argument for xrun. If str xrun will use --adapter-id, if int will use --id.
+        Use None when using xsim.
     firmware_xe : str
         The path to the firmware executable.
     use_xsim : bool, optional
@@ -163,22 +169,25 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     To run the target application using xsim:
     >>> run_on_target(None, 'firmware.xe', use_xsim=True)
     """
+    
+    if isinstance(adapter_id, int):
+        adapt_args = f"--id {adapter_id}"
+    if isinstance(adapter_id, str):
+        adapt_args = f"--adapter-id {adapter_id}"
+    
+    # get open port
     port = _get_open_port()
-    xrun_cmd = (
-        f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
-    )
-    xsim_cmd = ["--xscope", f"-realtime localhost:{port}", firmware_xe]
-
-    sh_print = lambda x: _print_output(x, True)
-
+    
     # Start and run in background
+    xrun_cmd = (f'xrun --xscope-port localhost:{port} {adapt_args} {firmware_xe}')
+    xsim_cmd = (f'xsim --xscope "-realtime localhost:{port}" {firmware_xe}')
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         print(xsim_cmd)
-        xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
+        xrun_proc = subprocess.Popen(xsim_cmd, shell=True) # shell=True for xscope opts
     else:
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
+        xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd.split(), **kwargs)
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
@@ -190,7 +199,6 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
-
     print("Starting host app...", end="\n")
 
     host_exe = _get_host_exe()
