@@ -69,6 +69,15 @@ void xscope_print(
   }
 }
 
+static
+void xscope_host_check_version(unsigned char *databytes){
+    char host_version[XSCOPE_IO_VERSION_LEN];
+    char device_version[XSCOPE_IO_VERSION_LEN];
+    snprintf(host_version, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    strcpy(device_version, (const char *)databytes);
+    assert(strcmp(host_version, device_version) == 0);
+    printf("[HOST] Using xscope_fileio version: %s\n", host_version);
+}
 
 void xscope_register(
   unsigned int id,
@@ -268,7 +277,12 @@ void xscope_record(
             }
         }
         break;
-        
+    
+        case XSCOPE_ID_CHECK_VERSION:
+        {
+            xscope_host_check_version(databytes);
+            break;
+        }
 
         default:
         {
@@ -278,6 +292,15 @@ void xscope_record(
     }
 }
 
+static inline
+void sleep_ms(unsigned milliseconds)
+{
+    #if _WIN32
+        Sleep(milliseconds);
+    #else
+        usleep(milliseconds * 1000);
+    #endif
+}
 
 int main(int argc, char *argv[])
 {
@@ -294,22 +317,16 @@ int main(int argc, char *argv[])
         running = 0;
     }
 
+    //Back off for 10ms to reduce processor usage during poll
     while(running){
-        //Back off for 10ms to reduce processor usage during poll
-#if _WIN32
-        Sleep(10);
-#else
-        usleep(10000);
-#endif
+        sleep_ms(10);
     }
 
+    // Exit and give another 100ms to allow any remaining outs from the device to arrive before we terminate
     if(VERBOSE) printf("[HOST] Exit received\n");
-    //Wait another 100ms to allow any remaining outs from the device to arrive before we terminate
-#if _WIN32
-    Sleep(100);
-#else
-    usleep(100000);
-#endif
+    sleep_ms(100);
+
+    // Close any open files
     for(unsigned idx = 0; idx < MAX_FILES_OPEN; idx++){
         if(host_files[idx].fp != NULL){
             fclose(host_files[idx].fp);
