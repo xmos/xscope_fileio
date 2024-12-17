@@ -71,23 +71,21 @@ pipeline {
             }
           }
         }
-        stage('Build') {
-          steps {
-            sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
-            dir('xscope_fileio') {
-              withTools(params.TOOLS_VERSION) {
-                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                  buildApps([
-                    "examples/fileio_features_xc",
-                    "examples/throughput_c",
-                    "tests/no_hang",
-                    "tests/close_files",
-                  ]) // buildApps
-                } // withEnv
-              } // withTools
-            } // dir
-          } // steps
-        } // stage 'Build'
+
+        stage('Build examples') {
+              steps {
+                withTools(params.TOOLS_VERSION) {
+                  dir("${REPO}/examples") {
+                    script {
+                      // Build all apps in the examples directory
+                      sh 'cmake  -B build -G "Unix Makefiles" -DDEPS_CLONE_SHALLOW=TRUE'
+                      sh 'xmake -C build'
+                    } // script
+                  } // dir
+                } //withTools
+              } // steps
+            }  // Build examples
+
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
