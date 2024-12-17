@@ -131,23 +131,22 @@ pipeline {
         }
       }
     } // stage: xcore.ai
+
     stage('Windows build') {
       agent {
         label 'x86_64&&windows'
       }
       steps {
         checkout scm
-
         withTools(params.TOOLS_VERSION) {
-          dir('host') {
-            withVS("vcvars32.bat") {
-              sh 'cmake -G "Ninja" .'
-              sh 'ninja'
-            }
-            archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
-          }
+          withVenv {
+          sh "pip install poetry"
+          sh "poetry build"
+          archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+          }}
         }
       }
+
       post {
         cleanup {
           xcoreCleanSandbox()
