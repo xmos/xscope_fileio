@@ -49,12 +49,10 @@ void do_test(void){
         unsigned t3 = get_reference_time();
         write_total_time += t3 - t2;
     } while(num_bytes > 0);
-       
 
-
-
-
-    printf("Throughput KBPS Read: %f, Write: %f\n", ticks_to_KBPS(read_total_time, fsize), ticks_to_KBPS(write_total_time, fsize));
+    printf("Throughput KBPS Read: %f, Write: %f\n", 
+    ticks_to_KBPS(read_total_time, fsize), 
+    ticks_to_KBPS(write_total_time, fsize));
 }
 
 void main_tile0(chanend_t xscope_chan)
@@ -62,4 +60,12 @@ void main_tile0(chanend_t xscope_chan)
     xscope_io_init(xscope_chan);
     do_test();
     xscope_close_all_files();
+}
+
+int main(){
+    chanend_t xscope_chan = chanend_alloc();
+    xscope_io_init(xscope_chan);
+    main_tile0(xscope_chan);
+    chanend_free(xscope_chan);
+    return 0;
 }
