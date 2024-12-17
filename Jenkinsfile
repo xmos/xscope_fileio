@@ -85,6 +85,20 @@ pipeline {
                 } // dir
               } // steps
             }  // Build examples
+        
+          stage('Build tests') {
+              steps {
+                dir("xscope_fileio/tests") {
+                  withTools(params.TOOLS_VERSION) {
+                    script {
+                      // Build all apps in the examples directory
+                      sh 'cmake  -B build -G "Unix Makefiles" -DDEPS_CLONE_SHALLOW=TRUE'
+                      sh 'xmake -C build'
+                    } // script
+                  } // withTools 
+                } // dir
+              } // steps
+            }  // Build examples
 
         stage('Cleanup xtagctl'){
           steps {
