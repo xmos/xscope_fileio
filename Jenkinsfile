@@ -142,20 +142,18 @@ pipeline {
       steps {
         checkout scm
         withTools(params.TOOLS_VERSION) {
-          withVenv {
-          sh "pip install poetry"
-          sh "poetry build"
-          archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
-          }}
+            withVenv {
+            sh "pip install poetry"
+            sh "poetry build"
+            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+            }
+          }
         }
-      }
-
       post {
-        cleanup {
-          xcoreCleanSandbox()
-        }
+        cleanup {xcoreCleanSandbox()}
       }
     } // stage: Windows build
+    
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
