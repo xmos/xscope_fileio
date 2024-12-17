@@ -17,4 +17,4 @@ packages = [
 build = "host/build_host.py"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<=3.12"
+python = ">=3.9"

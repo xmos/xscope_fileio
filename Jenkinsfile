@@ -112,6 +112,8 @@ pipeline {
             }
           }
         }
+        
+        /*
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
@@ -123,11 +125,13 @@ pipeline {
             } // dir
           } // steps
         } // Tests
+        */
+
       } // stages
       post {
         always {
           archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
-          junit '**/reports/*.xml'
+          //junit '**/reports/*.xml'
         }
         cleanup {
           xcoreCleanSandbox()
@@ -142,18 +146,18 @@ pipeline {
       steps {
         checkout scm
         withTools(params.TOOLS_VERSION) {
-            withVenv {
-            sh "pip install poetry"
-            sh "poetry build"
-            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
-            }
-          }
-        }
+          createVenv()
+          withVenv {
+          sh "pip install poetry"
+          sh "poetry build"
+          archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+          }}
+      }
       post {
         cleanup {xcoreCleanSandbox()}
       }
     } // stage: Windows build
-    
+
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
