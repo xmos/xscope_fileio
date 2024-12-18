@@ -148,16 +148,28 @@ pipeline {
       }
     } // stage: xcore.ai
 
-    stage('Windows build') {
-      agent {
-        label 'x86_64&&windows'
-      }
-      steps {
-        buildPyWheel()
-      }
-      post {
-        cleanup {xcoreCleanSandbox()}
-      }
+    stage('Windows wheel build') {
+      agent {label 'x86_64&&windows'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Windows build
+
+    stage('Mac x64 wheel build') {
+      agent {label 'x86_64&&macOS'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Windows build
+
+    stage('Mac arm64 wheel build') {
+      agent {label 'arm64&&macos'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Windows build
+
+    stage('Linux x64 build') {
+      agent {label 'x86_64 && linux'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Windows build
 
     stage('Update view files') {
