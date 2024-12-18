@@ -15,7 +15,7 @@ def buildApps(appList) {
 def buildPyWheel() {
     checkout scm
     withTools(params.TOOLS_VERSION) {
-        createVenv()
+        createVenv("requirements.txt")
         withVenv {
             sh "pip install poetry"
             sh "poetry build"
