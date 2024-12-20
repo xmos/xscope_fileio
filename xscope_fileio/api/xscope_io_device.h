@@ -13,6 +13,11 @@
 #include <stdint.h>
 #include "xscope_io_common.h"
 
+// version check probe
+#ifndef CHECK_VERSION
+#define CHECK_VERSION 0
+#endif
+
 /**
  * @defgroup xscope_fileio_device     Doxygen group for XScope file I/O device API
  */
