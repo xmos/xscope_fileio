@@ -17,8 +17,7 @@ def buildPyWheel() {
     withTools(params.TOOLS_VERSION) {
         createVenv("requirements.txt")
         withVenv {
-            sh "pip install poetry"
-            sh "poetry build"
+            sh "python -m build"
             archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
         }
     }
