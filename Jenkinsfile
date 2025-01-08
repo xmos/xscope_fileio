@@ -154,23 +154,23 @@ pipeline {
       post {cleanup {xcoreCleanSandbox()}}
     } // stage: Windows build
 
-    stage('Mac x64 wheel build') {
+    stage('Mac_x64 wheel build') {
       agent {label 'x86_64&&macOS'}
       steps {buildPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Windows build
+    } // stage: Mac_x64 build
 
-    stage('Mac arm64 wheel build') {
+    stage('Mac_arm64 wheel build') {
       agent {label 'arm64&&macos'}
       steps {buildPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Windows build
+    } // stage: Mac_arm64 build
 
-    stage('Linux x64 build') {
+    stage('Linux_x64 build') {
       agent {label 'x86_64 && linux'}
       steps {buildPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Windows build
+    } // stage: Linux_x64 build
 
     stage('Update view files') {
       agent {
