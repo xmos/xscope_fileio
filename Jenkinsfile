@@ -5,13 +5,6 @@ def runningOn(machine) {
   println machine
 }
 
-def buildApps(appList) {
-  appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build -j\$(nproc)"
-  }
-}
-
 getApproval()
 
 pipeline {
@@ -23,6 +16,9 @@ pipeline {
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   } // parameters
+  environment {
+    REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
+  } // environment
   options {
     skipDefaultCheckout()
     timestamps()
