@@ -174,8 +174,10 @@ def run_on_target(
     
     if isinstance(adapter_id, int):
         adapt_args = f"--id {adapter_id}"
-    if isinstance(adapter_id, str):
+    elif isinstance(adapter_id, str):
         adapt_args = f"--adapter-id {adapter_id}"
+    else:
+        adapt_args = ""
     
     # get open port
     port = _get_open_port()
