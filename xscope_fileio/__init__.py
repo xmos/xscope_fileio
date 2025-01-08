@@ -11,6 +11,8 @@ import platform
 import subprocess
 import threading, queue
 
+from typing import Union
+
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
 # as long as the host CPU is not too busy. This can be quite long (10s+)
@@ -120,7 +122,7 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
 
 
 def run_on_target(
-        adapter_id: str | int | None,
+        adapter_id: Union[str, int, None],
         firmware_xe: str,
         use_xsim: bool = False,
         **kwargs: dict
@@ -172,8 +174,10 @@ def run_on_target(
     
     if isinstance(adapter_id, int):
         adapt_args = f"--id {adapter_id}"
-    if isinstance(adapter_id, str):
+    elif isinstance(adapter_id, str):
         adapt_args = f"--adapter-id {adapter_id}"
+    else:
+        adapt_args = ""
     
     # get open port
     port = _get_open_port()
