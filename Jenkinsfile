@@ -1,25 +1,9 @@
-@Library('xmos_jenkins_shared_library@v0.28.0')
+@Library('xmos_jenkins_shared_library@v0.37.0')
 
 def runningOn(machine) {
   println "Stage running on:"
   println machine
 }
-
-def buildApps(appList) {
-  appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build -j\$(nproc)"
-  }
-}
-
-def buildDocs(String zipFileName) {
-  withVenv {
-    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
-    sh 'xmosdoc'
-    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-  }
-}
-
 
 getApproval()
 
@@ -28,10 +12,13 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.2.1',
+      defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   } // parameters
+  environment {
+    REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
+  } // environment
   options {
     skipDefaultCheckout()
     timestamps()
@@ -80,23 +67,23 @@ pipeline {
             }
           }
         }
-        stage('Build') {
-          steps {
-            sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
-            dir('xscope_fileio') {
-              withTools(params.TOOLS_VERSION) {
-                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                  buildApps([
-                    "examples/fileio_features_xc",
-                    "examples/throughput_c",
-                    "tests/no_hang",
-                    "tests/close_files",
-                  ]) // buildApps
-                } // withEnv
-              } // withTools
-            } // dir
-          } // steps
-        } // stage 'Build'
+
+        stage('Build examples') {
+              steps {
+                dir("xscope_fileio/examples") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+        
+          stage('Build tests') {
+              steps {
+                dir("xscope_fileio/tests") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
@@ -140,7 +127,7 @@ pipeline {
 
         withTools(params.TOOLS_VERSION) {
           dir('host') {
-            withVS("vcvars32.bat") {
+            withVS("vcvars64.bat") {
               sh 'cmake -G "Ninja" .'
               sh 'ninja'
             }
@@ -186,7 +173,7 @@ pipeline {
           checkout scm
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
-            buildDocs("xscope_fileio.zip")
+            buildDocs(archiveZipOnly: true)
           }
         }
       }
