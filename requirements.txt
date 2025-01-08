@@ -5,3 +5,6 @@
 numpy==1.26.4
 flake8==6.1.0
 pytest==8.0.0
+
+# self-install
+-e ./
