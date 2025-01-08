@@ -62,7 +62,7 @@ def test_close_files(adapter_id: str = None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
-    parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
+    parser.add_argument("--adapter-id", help="adapter_id to use", required=True)
     args = parser.parse_args()
 
     test_close_files(args.adapter_id)
