@@ -75,13 +75,7 @@ pipeline {
         stage('Build examples') {
               steps {
                 dir("xscope_fileio/examples") {
-                  withTools(params.TOOLS_VERSION) {
-                    script {
-                      // Build all apps in the examples directory
-                      sh 'cmake  -B build -G "Unix Makefiles" -DDEPS_CLONE_SHALLOW=TRUE'
-                      sh 'xmake -C build'
-                    } // script
-                  } // withTools 
+                  xcoreBuild()
                 } // dir
               } // steps
             }  // Build examples
