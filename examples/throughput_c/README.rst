@@ -8,8 +8,7 @@ Build example (using xcommon_cmake)
 
 .. warning::
 
-  Make sure ``xscope_fileio`` host application is installed.
-  Make sure ``XCOMMON_CMAKE_PATH`` environment variable is set to the directory where ``xcommon_cmake`` is located.
+  Make sure ``xscope_fileio`` python package and host application are installed.
 
 Run the following command from the current directory: 
 
@@ -32,4 +31,5 @@ This will xrun the code from the device with id=0 (default).
 Output
 ------
 
-The output will be several files in the current directory inside the output folder. 
+The example writes and reads files on the host computer and measures the KBPS throughput. Once finished, the measurements are displayed on the console.
+
