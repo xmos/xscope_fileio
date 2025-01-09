@@ -1,15 +1,8 @@
-@Library('xmos_jenkins_shared_library@v0.35.0')
+@Library('xmos_jenkins_shared_library@v0.37.0')
 
 def runningOn(machine) {
   println "Stage running on:"
   println machine
-}
-
-def buildApps(appList) {
-  appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build -j\$(nproc)"
-  }
 }
 
 def buildPyWheel() {
@@ -35,6 +28,9 @@ pipeline {
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   } // parameters
+  environment {
+    REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
+  } // environment
   options {
     skipDefaultCheckout()
     timestamps()
@@ -87,13 +83,7 @@ pipeline {
         stage('Build examples') {
               steps {
                 dir("xscope_fileio/examples") {
-                  withTools(params.TOOLS_VERSION) {
-                    script {
-                      // Build all apps in the examples directory
-                      sh 'cmake  -B build -G "Unix Makefiles" -DDEPS_CLONE_SHALLOW=TRUE'
-                      sh 'xmake -C build'
-                    } // script
-                  } // withTools 
+                  xcoreBuild()
                 } // dir
               } // steps
             }  // Build examples
@@ -101,13 +91,7 @@ pipeline {
           stage('Build tests') {
               steps {
                 dir("xscope_fileio/tests") {
-                  withTools(params.TOOLS_VERSION) {
-                    script {
-                      // Build all apps in the examples directory
-                      sh 'cmake  -B build -G "Unix Makefiles" -DDEPS_CLONE_SHALLOW=TRUE'
-                      sh 'xmake -C build'
-                    } // script
-                  } // withTools 
+                  xcoreBuild()
                 } // dir
               } // steps
             }  // Build examples
