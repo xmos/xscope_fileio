@@ -11,21 +11,25 @@ import platform
 import subprocess
 import threading, queue
 
+from typing import Union
+
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
 # as long as the host CPU is not too busy. This can be quite long (10s+)
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = (Path(__file__).parent / "../host")
+HOST_PATH = (Path(__file__).parent.parent / "host")
 
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
     if platform.system() == 'Windows':
-        return str(HOST_PATH / "xscope_host_endpoint.exe")
+        endp = HOST_PATH / "xscope_host_endpoint.exe"
     else:
-        return HOST_PATH / "xscope_host_endpoint"
+        endp = HOST_PATH / "xscope_host_endpoint"
+    assert(endp.exists())
+    return str(endp)
 
 
 @contextlib.contextmanager
@@ -119,14 +123,20 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
 
 
 
-def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
+def run_on_target(
+        adapter_id: Union[str, int, None],
+        firmware_xe: str,
+        use_xsim: bool = False,
+        **kwargs: dict
+    ) -> int:
     """
     Run a target application using xrun or xsim along with a host application.
 
     Parameters
     ----------
-    adapter_id : int
-        The adapter ID for the target application.
+    adapter_id : str or int or None
+        Argument for xrun. If str xrun will use --adapter-id, if int will use --id.
+        Use None when using xsim.
     firmware_xe : str
         The path to the firmware executable.
     use_xsim : bool, optional
@@ -163,22 +173,27 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     To run the target application using xsim:
     >>> run_on_target(None, 'firmware.xe', use_xsim=True)
     """
+    
+    if isinstance(adapter_id, int):
+        adapt_arg, did = "--id", f"{adapter_id}"
+    elif isinstance(adapter_id, str):
+        adapt_arg, did = "--adapter-id", f"{adapter_id}"
+    else:
+        adapt_arg, did = "", ""
+    
+    # get open port
     port = _get_open_port()
-    xrun_cmd = (
-        f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
-    )
-    xsim_cmd = ["--xscope", f"-realtime localhost:{port}", firmware_xe]
-
-    sh_print = lambda x: _print_output(x, True)
-
+    
     # Start and run in background
+    xrun_cmd = ["xrun", "--xscope-port", f"localhost:{port}", adapt_arg, did, firmware_xe]
+    xsim_cmd = ["xsim", "--xscope", f"-realtime localhost:{port}", firmware_xe]
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         print(xsim_cmd)
-        xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
+        xrun_proc = subprocess.Popen(xsim_cmd)
     else:
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
+        xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd, **kwargs)
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
@@ -190,7 +205,6 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
     print()
-
     print("Starting host app...", end="\n")
 
     host_exe = _get_host_exe()
