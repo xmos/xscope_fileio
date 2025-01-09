@@ -172,5 +172,5 @@ build.ninja
 *.out
 
 # endpoint
-xscope_host_endpoint
-xscope_host_endpoint.exe
+# xscope_host_endpoint
+# xscope_host_endpoint.exe

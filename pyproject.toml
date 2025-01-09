@@ -14,12 +14,12 @@ requires-python = ">=3.9"
 [project.urls]
 Homepage = "https://github.com/xmos/xscope_fileio"
 
-[tool.hatch.build.targets.wheel]
-artifacts = ["host/xscope_host_endpoint*"]
-
 [[tool.hatch.build.hooks.build-scripts.scripts]]
 commands = ["python host/build_host.py"]
 artifacts = []
 
-[tool.hatch.build.hooks.custom]
+[tool.hatch.build.targets.wheel.force-include]
+"host" = "xscope_fileio/host"
+
+[tool.hatch.build.hooks.custom] # dynamic wheel name
 path = "xscope_fileio/_hatch_build.py"
