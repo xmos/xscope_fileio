@@ -22,7 +22,6 @@ XRUN_TIMEOUT = 20
 
 HOST_PATH = files("xscope_fileio").parent.joinpath("host")
 
-
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
     if platform.system() == 'Windows':
