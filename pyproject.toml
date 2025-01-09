@@ -1,20 +1,25 @@
 [build-system]
-requires = ["poetry-core", "cmake>=3.21"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling", "hatch-build-scripts"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[project]
 name = "xscope-fileio"
 version = "1.3.1"
 description = "Python module for managing files using xscope"
-authors = ["XMOS"]
-license = "LICENSE.rst"
+authors = [{name = "XMOS"}]
+license = {file = "LICENSE.rst"}
 readme = "README.rst"
-homepage = "https://github.com/xmos/xscope_fileio"
-packages = [
-    { include = "xscope_fileio" },
-    { include = "host", to = "xscope_fileio"},
-]
-build = "host/build_host.py"
+requires-python = ">=3.9"
 
-[tool.poetry.dependencies]
-python = ">=3.9,<=3.12"
+[project.urls]
+Homepage = "https://github.com/xmos/xscope_fileio"
+
+[tool.hatch.build.targets.wheel]
+artifacts = ["host/xscope_host_endpoint*"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = ["python host/build_host.py"]
+artifacts = []
+
+[tool.hatch.build.hooks.custom]
+path = "xscope_fileio/_hatch_build.py"

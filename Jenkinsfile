@@ -1,25 +1,21 @@
-@Library('xmos_jenkins_shared_library@v0.28.0')
+@Library('xmos_jenkins_shared_library@v0.37.0')
 
 def runningOn(machine) {
   println "Stage running on:"
   println machine
 }
 
-def buildApps(appList) {
-  appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build -j\$(nproc)"
-  }
+def buildPyWheel() {
+    checkout scm
+    withTools(params.TOOLS_VERSION) {
+        createVenv("requirements.txt")
+        withVenv {
+            sh "pip install build"
+            sh "python -m build"
+            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+        }
+    }
 }
-
-def buildDocs(String zipFileName) {
-  withVenv {
-    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
-    sh 'xmosdoc'
-    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-  }
-}
-
 
 getApproval()
 
@@ -28,10 +24,13 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.2.1',
+      defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
   } // parameters
+  environment {
+    REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
+  } // environment
   options {
     skipDefaultCheckout()
     timestamps()
@@ -80,23 +79,23 @@ pipeline {
             }
           }
         }
-        stage('Build') {
-          steps {
-            sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
-            dir('xscope_fileio') {
-              withTools(params.TOOLS_VERSION) {
-                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                  buildApps([
-                    "examples/fileio_features_xc",
-                    "examples/throughput_c",
-                    "tests/no_hang",
-                    "tests/close_files",
-                  ]) // buildApps
-                } // withEnv
-              } // withTools
-            } // dir
-          } // steps
-        } // stage 'Build'
+
+        stage('Build examples') {
+              steps {
+                dir("xscope_fileio/examples") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+        
+          stage('Build tests') {
+              steps {
+                dir("xscope_fileio/tests") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
@@ -109,6 +108,7 @@ pipeline {
             }
           }
         }
+        
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
@@ -120,10 +120,10 @@ pipeline {
             } // dir
           } // steps
         } // Tests
+
       } // stages
       post {
         always {
-          archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
           junit '**/reports/*.xml'
         }
         cleanup {
@@ -132,27 +132,30 @@ pipeline {
       }
     } // stage: xcore.ai
 
-    stage('Windows build') {
-      agent {
-        label 'x86_64&&windows'
-      }
-      steps {
-        checkout scm
-        withTools(params.TOOLS_VERSION) {
-          withVenv {
-          sh "pip install poetry"
-          sh "poetry build"
-          archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
-          }}
-        }
-      }
-
-      post {
-        cleanup {
-          xcoreCleanSandbox()
-        }
-      }
+    stage('Windows wheel build') {
+      agent {label 'x86_64&&windows'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Windows build
+
+    stage('Mac_x64 wheel build') {
+      agent {label 'x86_64&&macOS'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Mac_x64 build
+
+    stage('Mac_arm64 wheel build') {
+      agent {label 'arm64&&macos'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Mac_arm64 build
+
+    stage('Linux_x64 build') {
+      agent {label 'x86_64 && linux'}
+      steps {buildPyWheel()}
+      post {cleanup {xcoreCleanSandbox()}}
+    } // stage: Linux_x64 build
+
     stage('Update view files') {
       agent {
         label 'x86_64 && linux'
@@ -185,7 +188,7 @@ pipeline {
           checkout scm
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
-            buildDocs("xscope_fileio.zip")
+            buildDocs(archiveZipOnly: true)
           }
         }
       }
