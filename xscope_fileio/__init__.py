@@ -19,15 +19,17 @@ from typing import Union
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = (Path(__file__).parent / "../host")
+HOST_PATH = (Path(__file__).parent.parent / "host")
 
 
 def _get_host_exe():
     """ Returns the path the the host exe. Builds if the host exe doesn't exist """
     if platform.system() == 'Windows':
-        return str(HOST_PATH / "xscope_host_endpoint.exe")
+        endp = HOST_PATH / "xscope_host_endpoint.exe"
     else:
-        return HOST_PATH / "xscope_host_endpoint"
+        endp = HOST_PATH / "xscope_host_endpoint"
+    assert(endp.exists())
+    return str(endp)
 
 
 @contextlib.contextmanager
@@ -173,25 +175,25 @@ def run_on_target(
     """
     
     if isinstance(adapter_id, int):
-        adapt_args = f"--id {adapter_id}"
+        adapt_arg, did = "--id", f"{adapter_id}"
     elif isinstance(adapter_id, str):
-        adapt_args = f"--adapter-id {adapter_id}"
+        adapt_arg, did = "--adapter-id", f"{adapter_id}"
     else:
-        adapt_args = ""
+        adapt_arg, did = "", ""
     
     # get open port
     port = _get_open_port()
     
     # Start and run in background
-    xrun_cmd = (f'xrun --xscope-port localhost:{port} {adapt_args} {firmware_xe}')
-    xsim_cmd = (f'xsim --xscope "-realtime localhost:{port}" {firmware_xe}')
+    xrun_cmd = ["xrun", "--xscope-port", f"localhost:{port}", adapt_arg, did, firmware_xe]
+    xsim_cmd = ["xsim", "--xscope", f"-realtime localhost:{port}", firmware_xe]
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         print(xsim_cmd)
-        xrun_proc = subprocess.Popen(xsim_cmd, shell=True) # shell=True for xscope opts
+        xrun_proc = subprocess.Popen(xsim_cmd)
     else:
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd.split(), **kwargs)
+        xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd, **kwargs)
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
