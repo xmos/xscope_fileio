@@ -12,31 +12,17 @@ class CustomBuildHook(BuildHookInterface):
         build_data["tag"] = self.get_tag()
 
     def build_host_app(self):
-        """Builds the host application
-
-        Raises:
-            NotImplementedError: If the platform is not supported
-        """
         HOST_PATH = Path(self.root) / "host"
-        print("Building xscope fileio host application for: ", platform.system())
+        print("Building host application for: ", platform.system())
         print("HOST_PATH: ", HOST_PATH)
 
-        if platform.system() in ["Darwin", "Linux"]:
-            cmd_cmake = ["cmake", "--fresh", "-B", "build"]
-            cmd_make = ["make", "-C", "build"]
-            subprocess.run(cmd_cmake, check=True, cwd=HOST_PATH)
-            subprocess.run(cmd_make, check=True, cwd=HOST_PATH)
-        elif platform.system() == "Windows":
-            try:
-                cmd_cmake = ["cmake", "--fresh", "-B", "build", "-G", "Ninja"]
-                cmd_make = ["ninja", "-C", "build"]
-                subprocess.run(cmd_cmake, check=True, cwd=HOST_PATH)
-                subprocess.run(cmd_make, check=True, cwd=HOST_PATH)
-            except subprocess.CalledProcessError:
-                print("Error: Build failed")
-        else:
+        if platform.system() not in ["Darwin", "Linux", "Windows"]:
             raise NotImplementedError(f"Unsupported platform: {platform.system()}")
 
+        cmd_cmake = ["cmake", "--fresh", "-B", "build", "-G", "Ninja"]
+        cmd_make = ["ninja", "-C", "build"]
+        subprocess.run(cmd_cmake, check=True, cwd=HOST_PATH)
+        subprocess.run(cmd_make, check=True, cwd=HOST_PATH)
 
     def get_tag(self):
         python_tag = "py3"  # Python 3+ only

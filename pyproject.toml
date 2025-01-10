@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-build-scripts"]
+requires = ["hatchling", "cmake>=3.23", "ninja"]
 build-backend = "hatchling.build"
 
 [project]
