@@ -9,6 +9,14 @@ To install ``xscope_fileio`` host tool manually, please follow the steps below:
 
 3. From the current directory, run the following command:
 
-.. code-block:: console
+ .. code-block:: console
 
-  python build_host.py
+  # Linux and Mac
+  cmake -B build
+  make -C build
+
+  # Windows
+  cmake -G Ninja -B build
+  ninja -C build
+  
+Your ``xscope_fileio`` host app is now ready to use.
