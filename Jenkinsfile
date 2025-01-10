@@ -123,10 +123,10 @@ pipeline {
         
         stage('Tests') {
           steps { 
-            dir('xscope_fileio/tests') {
+            dir('xscope_fileio') {
               withVenv {
                 withTools(params.TOOLS_VERSION) {
-                  sh 'pytest' // info: configuration opts in pytest.ini
+                  sh 'pytest tests' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
