@@ -177,7 +177,7 @@ def run_on_target(
     # raise invalid argument error
     if adapter_id is None and use_xsim is False:
         raise ValueError("Invalid argument: adapter_id must be set when xsim is False")
-    
+
     if isinstance(adapter_id, int):
         adapt_arg, did = "--id", f"{adapter_id}"
     elif isinstance(adapter_id, str):
@@ -189,13 +189,13 @@ def run_on_target(
     port = _get_open_port()
     
     # Start and run in background
+    exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         xsim_cmd = ["xsim", "--xscope", f"-realtime localhost:{port}", firmware_xe]
         print(xsim_cmd)
         xrun_proc = subprocess.Popen(xsim_cmd)
     else:
         xrun_cmd = ["xrun", "--xscope-port", f"localhost:{port}", adapt_arg, did, firmware_xe]
-        exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
         print(xrun_cmd)
         xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd, **kwargs)
 
