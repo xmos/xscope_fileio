@@ -1,13 +1,11 @@
 # Copyright 2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
+
 import argparse
-import shutil
 from pathlib import Path
+from multiprocessing import Process
 
 import xscope_fileio
-import xtagctl
-
-from multiprocessing import Process
 
 test_path = Path(__file__).parent
 firmware_xe = test_path / "simple" / "bin" / "test_simple.xe"
@@ -25,7 +23,7 @@ def test_simple(adapter_id: str = None):
     This function is just a wrapper to control
     time of execution of the close files test in case of hang
     """
-    pr = Process(target=fn_simple, args=())
+    pr = Process(target=fn_simple, args=(adapter_id,))
     pr.start()
     pr.join(timeout=30)
     return_code = pr.exitcode

@@ -23,6 +23,7 @@ def testPyWheel() {
         createVenv("requirements.txt")
         withVenv {
             sh "pip install --find-links=dist xscope_fileio --force-reinstall"
+            sh "pip install cmake ninja"
             sh "cmake -G Ninja -B build -S tests/simple && cmake --build build"
             sh "python tests/test_simple.py"
         }

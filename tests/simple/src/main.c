@@ -33,6 +33,7 @@ void main_tile0(chanend_t xscope_chan)
     for (int i = 0; i < buff_size; i++) {
         xassert(data_in[i] == data_out[i]);
     }
+    printf("Data read back matches data written\n");
 }
 
 int main(){
