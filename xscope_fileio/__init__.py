@@ -175,8 +175,8 @@ def run_on_target(
     """
     
     # raise invalid argument error
-    c1 = adapter_id is None and use_xsim is False
-    assert c1, "Invalid argument: adapter_id must be set when xsim is False"
+    if adapter_id is None and use_xsim is False:
+        raise ValueError("Invalid argument: adapter_id must be set when xsim is False")
     
     if isinstance(adapter_id, int):
         adapt_arg, did = "--id", f"{adapter_id}"
