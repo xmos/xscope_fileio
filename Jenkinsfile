@@ -24,7 +24,8 @@ def testPyWheel() {
         withVenv {
             sh "pip install --find-links=dist xscope_fileio --force-reinstall"
             sh "pip install cmake ninja"
-            sh "cmake -G Ninja -B build -S tests/simple && cmake --build build"
+            sh "cmake -G Ninja -B build -S tests/simple"
+            sh "cmake --build build"
             sh "python tests/test_simple.py"
         }
     }
@@ -124,10 +125,10 @@ pipeline {
         
         stage('Tests') {
           steps { 
-            dir('xscope_fileio') {
+            dir('xscope_fileio/tests') {
               withVenv {
                 withTools(params.TOOLS_VERSION) {
-                  sh 'pytest tests' // info: configuration opts in pytest.ini
+                  // sh 'pytest' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
@@ -136,9 +137,9 @@ pipeline {
 
       } // stages
       post {
-        always {
-          junit '**/reports/*.xml'
-        }
+        //always {
+          // junit '**/reports/*.xml'
+        //}
         cleanup {
           xcoreCleanSandbox()
         }
@@ -148,25 +149,29 @@ pipeline {
     stage('Windows wheel build') {
       agent {label 'x86_64&&windows'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
+      post {cleanup {xcoreCleansandbox()}
+      }
     } // stage: Windows build
 
     stage('Mac_x64 wheel build') {
       agent {label 'x86_64&&macOS'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
+      post {cleanup {xcoreCleansandbox()}
+      }
     } // stage: Mac_x64 build
 
     stage('Mac_arm64 wheel build') {
       agent {label 'arm64&&macos'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
+      post {cleanup {xcoreCleansandbox()}
+      }
     } // stage: Mac_arm64 build
 
     stage('Linux_x64 build') {
       agent {label 'x86_64 && linux'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
+      post {cleanup {xcoreCleansandbox()}
+      }
     } // stage: Linux_x64 build
 
     stage('Update view files') {
