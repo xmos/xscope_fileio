@@ -149,53 +149,27 @@ pipeline {
     stage('Windows wheel build') {
       agent {label 'x86_64&&windows'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleansandbox()}
-      }
+      post {cleanup {xcoreCleansandbox()}}
     } // stage: Windows build
 
     stage('Mac_x64 wheel build') {
       agent {label 'x86_64&&macOS'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleansandbox()}
-      }
+      post {cleanup {xcoreCleansandbox()}}
     } // stage: Mac_x64 build
 
     stage('Mac_arm64 wheel build') {
       agent {label 'arm64&&macos'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleansandbox()}
-      }
+      post {cleanup {xcoreCleansandbox()}}
     } // stage: Mac_arm64 build
 
     stage('Linux_x64 build') {
       agent {label 'x86_64 && linux'}
       steps {buildPyWheel() ; testPyWheel()}
-      post {cleanup {xcoreCleansandbox()}
-      }
+      post {cleanup {xcoreCleansandbox()}}
     } // stage: Linux_x64 build
-
-    stage('Update view files') {
-      agent {
-        label 'x86_64 && linux'
-      }
-      when {
-        expression { return currentBuild.currentResult == "SUCCESS" }
-      }
-      steps {
-        script {
-          current_scm = checkout scm
-          env.SAVED_GIT_URL = current_scm.GIT_URL
-          env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
-        }
-        updateViewfiles()
-      }
-      post {
-        cleanup {
-          cleanWs()
-        }
-      }
-    }
-
+    
     stage('Docs') {
       agent {
         label 'documentation'
