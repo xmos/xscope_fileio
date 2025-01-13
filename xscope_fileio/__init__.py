@@ -20,14 +20,18 @@ from importlib.resources import files
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = files("host")
-
 def _get_host_exe():
-    """ Returns the path the the host exe. Builds if the host exe doesn't exist """
-    if platform.system() == 'Windows':
-        endp = HOST_PATH / "xscope_host_endpoint.exe"
-    else:
-        endp = HOST_PATH / "xscope_host_endpoint"
+    """ Returns the path the the host exe """
+    package_path = files("xscope_fileio")
+    host_path_wh = package_path / "host"
+    host_path_ed = package_path.parent / "host"
+    # check is none exists
+    if not host_path_wh.exists() and not host_path_ed.exists():
+        raise FileNotFoundError(f"Host not found at {host_path_wh} or {host_path_ed}")
+    # if wheel is installed, use that, otherwise use the editable version
+    host_path = host_path_wh if host_path_wh.exists() else host_path_ed
+    endp = "xscope_host_endpoint.exe" if platform.system() == 'Windows' else "xscope_host_endpoint"
+    endp = host_path / endp
     assert endp.exists(), f"Host not found at {endp}" 
     return str(endp)
 

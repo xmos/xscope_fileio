@@ -15,9 +15,8 @@ requires-python = ">=3.9"
 Homepage = "https://github.com/xmos/xscope_fileio"
 
 [tool.hatch.build.targets.wheel]
-packages = ["xscope_fileio", "host"]
+packages = ["xscope_fileio"]
 
-# endpoint and dynamic wheel name
 [tool.hatch.build.hooks.custom]
 path = "xscope_fileio/_hatch_build.py"
 

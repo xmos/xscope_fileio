@@ -170,7 +170,3 @@ build.ninja
 
 # tmp files
 *.out
-
-# endpoint
-# xscope_host_endpoint
-# xscope_host_endpoint.exe
