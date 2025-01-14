@@ -7,6 +7,7 @@ def runningOn(machine) {
 
 def buildandTestPyWheel() {
     checkout scm
+    dir('xscope_fileio') {
     createVenv("requirements.txt")
     withVenv {
       withTools(params.TOOLS_VERSION) {
@@ -18,6 +19,7 @@ def buildandTestPyWheel() {
             sh "pytest tests/test_simple.py"
             archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
         }
+    }
     }
 }
 
