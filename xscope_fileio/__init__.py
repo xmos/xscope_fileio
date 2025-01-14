@@ -171,6 +171,7 @@ def run_on_target(
     port = _get_open_port()
     
     # Start and run in background
+    firmware_xe = str(Path(firmware_xe).resolve())
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
         xsim_cmd = ["xsim", "--xscope", f"-realtime localhost:{port}", firmware_xe]
@@ -199,10 +200,16 @@ def run_on_target(
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
 
+    # if device exited with error, terminate devide process
     if host_proc.returncode != 0:
-        xrun_proc.terminate() # The host app won't have stopped xrun so kill it here
+        xrun_proc.terminate()
         assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
-
-    print("Running on target finished")
-
+    
+    # if xrun proc still alive, terminate it
+    if xrun_proc.poll() is None:
+        # XTC 15.3.0 wont exit properly xscope using xsim
+        xrun_proc.terminate()
+                
+    print(f"Host finished with return code {host_proc.returncode}")
+    print(f"Device finished with return code {xrun_proc.returncode}")
     return host_proc.returncode

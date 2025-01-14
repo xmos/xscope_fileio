@@ -170,3 +170,4 @@ build.ninja
 
 # tmp files
 *.out
+test_junit.xml
