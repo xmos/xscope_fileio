@@ -5,28 +5,18 @@ def runningOn(machine) {
   println machine
 }
 
-def buildPyWheel() {
+def buildandTestPyWheel() {
     checkout scm
     withTools(params.TOOLS_VERSION) {
         createVenv("requirements.txt")
         withVenv {
-            sh "pip install build"
+            sh "pip install build cmake ninja"
             sh "python -m build --wheel"
-            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
-        }
-    }
-}
-
-def testPyWheel() {
-    checkout scm
-    withTools(params.TOOLS_VERSION) {
-        createVenv("requirements.txt")
-        withVenv {
             sh "pip install --find-links=dist xscope_fileio --force-reinstall"
-            sh "pip install cmake ninja"
             sh "cmake -G Ninja -B build -S tests/simple"
             sh "cmake --build build"
             sh "python tests/test_simple.py"
+            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
         }
     }
 }
@@ -148,25 +138,25 @@ pipeline {
 
     stage('Windows wheel build') {
       agent {label 'x86_64&&windows'}
-      steps {buildPyWheel() ; testPyWheel()}
+      steps {buildandTestPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
     } // stage: Windows build
 
     stage('Mac_x64 wheel build') {
       agent {label 'x86_64&&macOS'}
-      steps {buildPyWheel() ; testPyWheel()}
+      steps {buildandTestPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
     } // stage: Mac_x64 build
 
     stage('Mac_arm64 wheel build') {
       agent {label 'arm64&&macos'}
-      steps {buildPyWheel() ; testPyWheel()}
+      steps {buildandTestPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
     } // stage: Mac_arm64 build
 
     stage('Linux_x64 build') {
       agent {label 'x86_64 && linux'}
-      steps {buildPyWheel() ; testPyWheel()}
+      steps {buildandTestPyWheel()}
       post {cleanup {xcoreCleanSandbox()}}
     } // stage: Linux_x64 build
 
