@@ -7,9 +7,9 @@ def runningOn(machine) {
 
 def buildandTestPyWheel() {
     checkout scm
-    withTools(params.TOOLS_VERSION) {
-        createVenv("requirements.txt")
-        withVenv {
+    createVenv("requirements.txt")
+    withVenv {
+      withTools(params.TOOLS_VERSION) {
             sh "pip install build cmake ninja"
             sh "python -m build --wheel"
             sh "pip install --find-links=dist xscope_fileio --force-reinstall"
@@ -139,25 +139,25 @@ pipeline {
     stage('Windows wheel build') {
       agent {label 'x86_64&&windows'}
       steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
-      post {cleanup {xcoreCleanSandbox(); cleanWs()}}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Windows build
 
     stage('Mac_x64 wheel build') {
       agent {label 'x86_64&&macOS'}
       steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox(); cleanWs()}}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Mac_x64 build
 
     stage('Mac_arm64 wheel build') {
       agent {label 'arm64&&macos'}
       steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox(); cleanWs()}}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Mac_arm64 build
 
     stage('Linux_x64 build') {
       agent {label 'x86_64 && linux'}
       steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox(); cleanWs()}}
+      post {cleanup {xcoreCleanSandbox()}}
     } // stage: Linux_x64 build
 
     stage('Docs') {
