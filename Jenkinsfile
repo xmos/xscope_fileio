@@ -6,21 +6,22 @@ def runningOn(machine) {
 }
 
 def buildandTestPyWheel() {
+  runningOn(env.NODE_NAME)
+  dir('xscope_fileio') {
     checkout scm
-    dir('xscope_fileio') {
-    createVenv("requirements.txt")
-    withVenv {
-      withTools(params.TOOLS_VERSION) {
-            sh "pip install build cmake ninja"
-            sh "python -m build --wheel"
-            sh "pip install --find-links=dist xscope_fileio --force-reinstall"
-            sh "cmake -G Ninja -B build -S tests/simple"
-            sh "cmake --build build"
-            sh "pytest tests/test_simple.py"
-            archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
-        }
+    withTools(params.TOOLS_VERSION) {
+      createVenv(reqFile:"requirements.txt")
+      withVenv {
+        sh "pip install build cmake ninja"
+        sh "python -m build --wheel"
+        sh "pip install --find-links=dist xscope_fileio --force-reinstall"
+        sh "cmake -G Ninja -B build -S tests/simple"
+        sh "cmake --build build"
+        sh "pytest tests/test_simple.py"
+        archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+      }
     }
-    }
+  }
 }
 
 getApproval()
@@ -64,10 +65,9 @@ pipeline {
           steps {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                createVenv("requirements.txt")
+                createVenv(reqFile:"requirements.txt")
                 withVenv {
                   sh "pip install -e xtagctl/"
-                  sh "pip install -r requirements.txt"
                  }
               }
             }
