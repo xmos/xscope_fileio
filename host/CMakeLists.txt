@@ -5,7 +5,7 @@ project(xscope_fileio)
 set(CMAKE_BUILD_TYPE "Release")
 
 # Universal Mac OS binary
-set(CMAKE_OSX_ARCHITECTURES arm64 x86_64)
+# set(CMAKE_OSX_ARCHITECTURES arm64 x86_64)
 
 # Add executable
 add_executable(xscope_host_endpoint xscope_io_host.c)
