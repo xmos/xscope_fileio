@@ -4,7 +4,6 @@
 import time
 import argparse
 from pathlib import Path
-from multiprocessing import Process
 
 import xscope_fileio
 

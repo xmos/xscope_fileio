@@ -15,7 +15,7 @@ def buildandTestPyWheel() {
             sh "pip install --find-links=dist xscope_fileio --force-reinstall"
             sh "cmake -G Ninja -B build -S tests/simple"
             sh "cmake --build build"
-            sh "python tests/test_simple.py"
+            sh "pytest tests/test_simple.py"
             archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
         }
     }
