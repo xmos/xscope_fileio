@@ -1,6 +1,7 @@
 # Copyright 2024 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
+import time
 import argparse
 from pathlib import Path
 from multiprocessing import Process
@@ -28,8 +29,9 @@ def test_simple(adapter_id: str = None):
     pr.join(timeout=30)
     return_code = pr.exitcode
     pr.terminate()
-    assert return_code == 0, "ERROR: test_close_files failed"
+    assert return_code == 0, "ERROR: test_simple failed"
     assert not pr.is_alive(), "ERROR: xscope_fileio process did not quit"
+    time.sleep(10) # give 10 seconds to xsim to close
 
 
 if __name__ == "__main__":

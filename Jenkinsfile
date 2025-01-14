@@ -138,7 +138,7 @@ pipeline {
 
     stage('Windows wheel build') {
       agent {label 'x86_64&&windows'}
-      steps {buildandTestPyWheel()}
+      steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
       post {cleanup {xcoreCleanSandbox(); cleanWs()}}
     } // stage: Windows build
 
