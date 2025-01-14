@@ -205,11 +205,11 @@ def run_on_target(
         xrun_proc.terminate()
         assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
     
-    # if xrun proc still alive, terminate it
+    # if xrun proc still alive for some reason, terminate it
     if xrun_proc.poll() is None:
-        # XTC 15.3.0 wont exit properly xscope using xsim
+        print("Terminating device app manually...")
         xrun_proc.terminate()
-                
+    
     print(f"Host finished with return code {host_proc.returncode}")
     print(f"Device finished with return code {xrun_proc.returncode}")
     return host_proc.returncode
