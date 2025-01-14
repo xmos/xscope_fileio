@@ -20,6 +20,7 @@ from importlib.resources import files
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
+
 def _get_host_exe():
     """ Returns the path the the host exe """
     package_path = files("xscope_fileio")
@@ -34,26 +35,6 @@ def _get_host_exe():
     endp = host_path / endp
     assert endp.exists(), f"Host not found at {endp}" 
     return str(endp)
-
-
-@contextlib.contextmanager
-def pushd(new_dir):
-    """
-    Context manager to temporarily change the current working directory.
-    """
-    previous_dir = os.getcwd()
-    os.chdir(new_dir)
-    try:
-        yield
-    finally:
-        os.chdir(previous_dir)
-
-
-def _print_output(x, verbose):
-    if verbose:
-        print(x, end="")
-    else:
-        print(".", end="", flush=True)
 
 
 def _get_open_port():
@@ -87,9 +68,6 @@ class _XrunExitHandler:
 
     def xcore_done(self, cmd, success, exit_code):
         if not success:
-            # xrun_cmd = f"--dump-state --adapter-id {self.adapter_id} {self.firmware_xe}"
-            # dump = sh.xrun(xrun_cmd.split(), _out=_print_output)
-            # sys.stderr.write(dump.stdout.decode())
             self.host_process.terminate()
 
 def popenAndCall(onExit, *popenArgs, **popenKWArgs):
