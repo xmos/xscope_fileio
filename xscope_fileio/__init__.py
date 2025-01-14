@@ -199,17 +199,14 @@ def run_on_target(
     host_proc = subprocess.Popen([host_exe] + host_args.split(), **kwargs)
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
-
+    xrun_proc.wait(10) # should be done already
+    
     # if device exited with error, terminate devide process
     if host_proc.returncode != 0:
         xrun_proc.terminate()
         assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
     
-    # if xrun proc still alive for some reason, terminate it
-    if xrun_proc.poll() is None:
-        print("Terminating device app manually...")
-        xrun_proc.terminate()
-    
+    # print return codes
     print(f"Host finished with return code {host_proc.returncode}")
     print(f"Device finished with return code {xrun_proc.returncode}")
     return host_proc.returncode
