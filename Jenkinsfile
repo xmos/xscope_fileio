@@ -129,7 +129,7 @@ pipeline {
 
       } // stages
       post {
-        //always {
+        always {
           // junit '**/reports/*.xml'
         //}
         cleanup {
