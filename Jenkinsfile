@@ -131,7 +131,7 @@ pipeline {
       post {
         always {
           junit '**/reports/*.xml'
-        //}
+        }
         cleanup {
           xcoreCleanSandbox()
         }
