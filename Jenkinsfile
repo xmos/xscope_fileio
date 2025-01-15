@@ -5,7 +5,7 @@ def runningOn(machine) {
   println machine
 }
 
-def buildandTestPyWheel() {
+def buildandTestPyWheel(delocate = false) {
   runningOn(env.NODE_NAME)
   dir('xscope_fileio') {
     checkout scm
@@ -14,6 +14,10 @@ def buildandTestPyWheel() {
       withVenv {
         sh "pip install build cmake ninja"
         sh "python -m build --wheel"
+        if (delocate) { // delocate fixes wheels on macos
+          sh "pip install delocate"
+          sh "delocate-wheel dist/*.whl"
+        }
         sh "pip install --find-links=dist xscope_fileio --force-reinstall"
         sh "cmake -G Ninja -B build -S tests/simple"
         sh "cmake --build build"
@@ -146,9 +150,15 @@ pipeline {
           post {cleanup {xcoreCleanSandbox()}}
         } // stage: Windows build
 
+        stage('Mac_x64 wheel build') {
+          agent {label 'sw-hw-usba-mac0'}
+          steps {buildandTestPyWheel(delocate = true)}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_x64 build
+
         stage('Mac_arm64 wheel build') {
           agent {label 'arm64&&macos'}
-          steps {buildandTestPyWheel()}
+          steps {buildandTestPyWheel(delocate = true)}
           post {cleanup {xcoreCleanSandbox()}}
         } // stage: Mac_arm64 build
 

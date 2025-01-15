@@ -17,7 +17,6 @@ def test_simple(adapter_id: str = None):
     use_xsim = True if adapter_id is None else False
     return_code = xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=use_xsim)
     assert return_code == 0, "ERROR: test_simple failed"
-    time.sleep(10) # give 10 seconds to xsim to close
 
 
 if __name__ == "__main__":
