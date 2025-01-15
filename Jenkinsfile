@@ -145,12 +145,6 @@ pipeline {
           steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
           post {cleanup {xcoreCleanSandbox()}}
         } // stage: Windows build
-        
-        stage('Mac_x64 wheel build') {
-          agent {label 'sw-hw-usba-mac0'}
-          steps {buildandTestPyWheel()}
-          post {cleanup {xcoreCleanSandbox()}}
-        } // stage: Mac_x64 build
 
         stage('Mac_arm64 wheel build') {
           agent {label 'arm64&&macos'}
