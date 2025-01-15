@@ -1,4 +1,4 @@
-example: fileio_feature_close
+Test Simple
 =============================
 
 This example shows how to use open and close files with xscope_fileio. 
