@@ -120,7 +120,7 @@ pipeline {
             dir('xscope_fileio/tests') {
               withVenv {
                 withTools(params.TOOLS_VERSION) {
-                  // sh 'pytest' // info: configuration opts in pytest.ini
+                  sh 'pytest' // info: configuration opts in pytest.ini
                 } // withTools
               } // withVenv
             } // dir
