@@ -138,29 +138,33 @@ pipeline {
       }
     } // stage: xcore.ai
 
-    stage('Windows wheel build') {
-      agent {label 'x86_64&&windows'}
-      steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
-      post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Windows build
+    stage('Build and Test Wheels') {
+      parallel {
+        stage('Windows wheel build') {
+          agent {label 'x86_64&&windows'}
+          steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Windows build
 
-    stage('Mac_x64 wheel build') {
-      agent {label 'x86_64&&macOS'}
-      steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Mac_x64 build
+        stage('Mac_x64 wheel build') {
+          agent {label 'x86_64&&macOS'}
+          steps {buildandTestPyWheel()}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_x64 build
 
-    stage('Mac_arm64 wheel build') {
-      agent {label 'arm64&&macos'}
-      steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Mac_arm64 build
+        stage('Mac_arm64 wheel build') {
+          agent {label 'arm64&&macos'}
+          steps {buildandTestPyWheel()}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_arm64 build
 
-    stage('Linux_x64 build') {
-      agent {label 'x86_64 && linux'}
-      steps {buildandTestPyWheel()}
-      post {cleanup {xcoreCleanSandbox()}}
-    } // stage: Linux_x64 build
+        stage('Linux_x64 build') {
+          agent {label 'x86_64 && linux'}
+          steps {buildandTestPyWheel()}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Linux_x64 build
+      } // parallel
+    } // stage: Build and Test Wheels
 
     stage('Docs') {
       agent {
