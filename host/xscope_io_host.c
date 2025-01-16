@@ -323,6 +323,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    // Connect to the xscope server, register the callbacks
     xscope_ep_set_print_cb(xscope_print);
     xscope_ep_set_register_cb(xscope_register);
     xscope_ep_set_record_cb(xscope_record);
@@ -336,7 +337,8 @@ int main(int argc, char *argv[])
         sleep_ms(10);
     }
 
-    // Exit and give another 100ms to allow any remaining outs from the device to arrive before we terminate
+    // Exit and give another 100ms to allow any remaining outs 
+    // from the device to arrive before we terminate
     if(VERBOSE) printf("[HOST] Exit received\n");
     sleep_ms(100);
 
@@ -346,6 +348,8 @@ int main(int argc, char *argv[])
             fclose(host_files[idx].fp);
         }
     }
+
+    // Disconnect from the xscope server
     int ret = xscope_ep_disconnect();
     if(VERBOSE) printf("[HOST] xscope_ep_disconnect() returned %d\n", ret);
     return(0);
