@@ -191,22 +191,16 @@ def run_on_target(
             xrun_proc.terminate()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
-    print()
-    print("Starting host app...", end="\n")
-
+    print("\nStarting host app...\n")
     host_exe = _get_host_exe()
     host_args = f"{port}"
     host_proc = subprocess.Popen([host_exe] + host_args.split(), **kwargs)
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
-    xrun_proc.wait(10) # should be done already
     
     # if device exited with error, terminate devide process
     if host_proc.returncode != 0:
         xrun_proc.terminate()
         assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
     
-    # print return codes
-    print(f"Host finished with return code {host_proc.returncode}")
-    print(f"Device finished with return code {xrun_proc.returncode}")
     return host_proc.returncode
