@@ -346,6 +346,7 @@ int main(int argc, char *argv[])
             fclose(host_files[idx].fp);
         }
     }
-
+    int ret = xscope_ep_disconnect();
+    if(VERBOSE) printf("[HOST] xscope_ep_disconnect() returned %d\n", ret);
     return(0);
 }

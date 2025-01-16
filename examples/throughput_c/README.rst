@@ -1,5 +1,5 @@
-example: fileio_features_c
-===========================
+Example: fileio_features_c
+==========================
 
 This example shows the basics functionality of xscope fileio using ``C`` as the programming language. 
 
@@ -32,4 +32,3 @@ Output
 ------
 
 The example writes and reads files on the host computer and measures the KBPS throughput. Once finished, the measurements are displayed on the console.
-

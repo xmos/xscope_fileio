@@ -6,6 +6,7 @@
 #include <xcore/select.h>
 #include <xcore/assert.h>
 #include <xcore/lock.h>
+#include <syscall.h>
 
 #include <string.h>
 #include <xscope.h>
@@ -218,7 +219,11 @@ int xscope_ftell(xscope_file_t *xscope_file){
 void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
-    hwtimer_t t = hwtimer_alloc(); hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
+    if (!_is_simulation()){
+        hwtimer_t t = hwtimer_alloc(); 
+        hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
+        hwtimer_free(t);
+    }
 }
 
 void xscope_fclose(xscope_file_t *xscope_file){

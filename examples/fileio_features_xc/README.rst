@@ -1,4 +1,4 @@
-example: fileio_features_xc
+Example: fileio_features_xc
 ===========================
 
 This example shows the basics functionality of xscope fileio using ``XC`` as the programming language. 
