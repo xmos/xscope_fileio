@@ -1,5 +1,5 @@
 Test Simple
-=============================
+===========
 
 This example shows how to use open and close files with xscope_fileio. 
  
