@@ -1,9 +1,9 @@
 // Copyright 2020-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef XSCOPE_IO_COMMON_H_
-#define XSCOPE_IO_COMMON_H_
 
-#define XSCOPE_IO_VERSION       "1.3.1"
+#pragma once
+
+#define XSCOPE_IO_VERSION		"1.3.1"
 #define XSCOPE_IO_VERSION_LEN   8
 
 #define MAX_XSCOPE_SIZE_BYTES   256
@@ -30,5 +30,3 @@ enum{
     XSCOPE_ID_HOST_CLOSE    = 7,
     XSCOPE_ID_CHECK_VERSION = 8   
 };
-
-#endif
