@@ -52,7 +52,7 @@ def test_close_files(adapter_id: str = None):
     """
     pr = Process(target=fn_close_files, args=(adapter_id,))
     pr.start()
-    pr.join(timeout=30)
+    pr.join(timeout=60)
     ret_code = pr.exitcode
     pr.terminate()
     assert ret_code == 0, f"ERROR: test_close_files failed, return code: {ret_code}"

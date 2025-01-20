@@ -90,7 +90,7 @@ void xscope_host_check_version(unsigned char *databytes){
             printf("[HOST] host: %s, device: %s\n", host_version, device_version);
         }
     }
-    printf("[HOST] Using xscope_fileio version: %s\n", host_version);
+    printf("\n[HOST] Using xscope_fileio version: %s\n", host_version);
 }
 
 void xscope_register(
