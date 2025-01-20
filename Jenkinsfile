@@ -5,6 +5,39 @@ def runningOn(machine) {
   println machine
 }
 
+def versionsPairs = [
+    "pyproject.toml": /version[\s='\"]*([\d.]+)/,
+    "settings.yml": /version[\s:'\"]*([\d.]+)/,
+    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
+    "**/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
+    //"**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+]
+
+def buildandTestPyWheel(delocate = false) {
+  runningOn(env.NODE_NAME)
+  dir('xscope_fileio') {
+    checkout scm
+    withTools(params.TOOLS_VERSION) {
+      createVenv(reqFile:"requirements.txt")
+      withVenv {
+        sh "pip install build cmake ninja"
+        sh "python -m build --wheel"
+        if (delocate) { // delocate fixes wheels on macos
+          sh "pip install delocate"
+          sh "delocate-wheel dist/*.whl"
+        }
+        sh "pip install --find-links=dist xscope_fileio --force-reinstall"
+        dir('tests') {
+          sh "cmake -G Ninja -B build -S simple"
+          sh "cmake --build build"
+          sh "pytest test_simple.py"
+        }
+        archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+      }
+    }
+  }
+}
+
 getApproval()
 
 pipeline {
@@ -46,10 +79,9 @@ pipeline {
           steps {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                createVenv("requirements.txt")
+                createVenv(reqFile:"requirements.txt")
                 withVenv {
                   sh "pip install -e xtagctl/"
-                  sh "pip install -r requirements.txt"
                  }
               }
             }
@@ -96,6 +128,7 @@ pipeline {
             }
           }
         }
+        
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
@@ -107,10 +140,10 @@ pipeline {
             } // dir
           } // steps
         } // Tests
+
       } // stages
       post {
         always {
-          archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
           junit '**/reports/*.xml'
         }
         cleanup {
@@ -118,50 +151,34 @@ pipeline {
         }
       }
     } // stage: xcore.ai
-    stage('Windows build') {
-      agent {
-        label 'x86_64&&windows'
-      }
-      steps {
-        checkout scm
 
-        withTools(params.TOOLS_VERSION) {
-          dir('host') {
-            withVS("vcvars64.bat") {
-              sh 'cmake -G "Ninja" .'
-              sh 'ninja'
-            }
-            archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
-          }
-        }
-      }
-      post {
-        cleanup {
-          xcoreCleanSandbox()
-        }
-      }
-    } // stage: Windows build
-    stage('Update view files') {
-      agent {
-        label 'x86_64 && linux'
-      }
-      when {
-        expression { return currentBuild.currentResult == "SUCCESS" }
-      }
-      steps {
-        script {
-          current_scm = checkout scm
-          env.SAVED_GIT_URL = current_scm.GIT_URL
-          env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
-        }
-        updateViewfiles()
-      }
-      post {
-        cleanup {
-          cleanWs()
-        }
-      }
-    }
+    stage('Build and Test Wheels') {
+      parallel {
+        stage('Windows wheel build') {
+          agent {label 'x86_64&&windows'}
+          steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Windows build
+
+        stage('Mac_x64 wheel build') {
+          agent {label 'sw-hw-usba-mac0'}
+          steps {buildandTestPyWheel(delocate = true)}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_x64 build
+
+        stage('Mac_arm64 wheel build') {
+          agent {label 'arm64&&macos'}
+          steps {buildandTestPyWheel(delocate = true)}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_arm64 build
+
+        stage('Linux_x64 wheel build') {
+          agent {label 'x86_64 && linux'}
+          steps {buildandTestPyWheel()}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Linux_x64 build
+      } // parallel
+    } // stage: Build and Test Wheels
 
     stage('Docs') {
       agent {
@@ -174,6 +191,7 @@ pipeline {
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
             buildDocs(archiveZipOnly: true)
+            versionChecks checkReleased: false, versionsPairs: versionsPairs
           }
         }
       }

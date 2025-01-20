@@ -81,9 +81,16 @@ void test_open_a_closed_file(chanend_t xscope_chan){
 
 void main_tile0(chanend_t xscope_chan)
 {
-    xscope_io_init(xscope_chan);
     test_close_unordered(xscope_chan);
     test_open_close_continously(xscope_chan);
     test_open_a_closed_file(xscope_chan);
+}
+
+int main(){
+    chanend_t xscope_chan = chanend_alloc();
+    xscope_io_init(xscope_chan);
+    main_tile0(xscope_chan);
     xscope_close_all_files();
+    chanend_free(xscope_chan);
+    return 0;
 }
