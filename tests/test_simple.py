@@ -10,14 +10,16 @@ import xscope_fileio
 test_path = Path(__file__).parent
 firmware_xe = test_path / "simple" / "bin" / "test_simple.xe"
 
+
 def test_simple(adapter_id: str = None):
     """
     This function runs test simple binary on the target.
     """
     use_xsim = True if adapter_id is None else False
-    return_code = xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=use_xsim)
+    return_code = xscope_fileio.run_on_target(
+        adapter_id, firmware_xe, use_xsim=use_xsim
+    )
     assert return_code == 0, "ERROR: test_simple failed"
-    return return_code
 
 
 if __name__ == "__main__":
