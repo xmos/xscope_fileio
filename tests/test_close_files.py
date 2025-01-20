@@ -24,7 +24,7 @@ def fn_close_files(adapter_id: str = None):
         adapter_id (str, optional): _description_. Defaults to None.
     """
 
-    ret_code = 1
+    ret_code = -1
     # renew the folder
     shutil.rmtree(output_folder, ignore_errors=True)
     output_folder.mkdir(parents=False, exist_ok=True)
@@ -36,12 +36,11 @@ def fn_close_files(adapter_id: str = None):
     if adapter_id is None:
         with xtagctl.acquire("XCORE-AI-EXPLORER", timeout=10) as adapter_id:
             print(f"Found adapter_id: {adapter_id}")
-            rtrn_code = xscope_fileio.run_on_target(
+            ret_code = xscope_fileio.run_on_target(
                 adapter_id, firmware_xe, use_xsim=False
             )
     else:
         ret_code = xscope_fileio.run_on_target(adapter_id, firmware_xe, use_xsim=False)
-
     assert ret_code == 0, f"xscope_fileio.run_on_target() failed, return code: {ret_code}"
 
 
