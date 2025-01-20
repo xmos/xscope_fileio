@@ -5,6 +5,14 @@ def runningOn(machine) {
   println machine
 }
 
+def versionsPairs = [
+    "pyproject.toml": /version[\s='\"]*([\d.]+)/,
+    "settings.yml": /version[\s:'\"]*([\d.]+)/,
+    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
+    "**/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
+    "**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+]
+
 def buildandTestPyWheel(delocate = false) {
   runningOn(env.NODE_NAME)
   dir('xscope_fileio') {
@@ -181,6 +189,7 @@ pipeline {
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
             buildDocs(archiveZipOnly: true)
+            versionChecks checkReleased: false, versionsPairs: versionsPairs
           }
         }
       }
