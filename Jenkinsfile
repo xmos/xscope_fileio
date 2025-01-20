@@ -27,7 +27,7 @@ def buildandTestPyWheel(delocate = false) {
           sh "delocate-wheel dist/*.whl"
         }
         sh "pip install --find-links=dist xscope_fileio --force-reinstall"
-        dir('xscope_fileio/tests') {
+        dir('tests') {
           sh "cmake -G Ninja -B build -S simple"
           sh "cmake --build build"
           sh "pytest test_simple.py"
