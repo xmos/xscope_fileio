@@ -11,7 +11,7 @@ def versionsPairs = [
     //"CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
     "**/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
     "**/module_build_info": /VERSION[\s='\"]*([\d.]+)/,
-    //"**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+    "**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
 ]
 
 def buildandTestPyWheel(delocate = false) {
