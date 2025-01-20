@@ -10,7 +10,7 @@
 
 #include "xscope_io_device.h"
 
-void main_tile0(chanend_t xscope_chan)
+void main_tile0()
 {
     // create a random array in data_in
     const char filename[] = "test_file.out";
@@ -39,7 +39,7 @@ void main_tile0(chanend_t xscope_chan)
 int main(){
     chanend_t xscope_chan = chanend_alloc();
     xscope_io_init(xscope_chan);
-    main_tile0(xscope_chan);
+    main_tile0();
     xscope_close_all_files();
     chanend_free(xscope_chan);
     return 0;

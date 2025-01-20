@@ -5,6 +5,14 @@ def runningOn(machine) {
   println machine
 }
 
+def versionsPairs = [
+    "pyproject.toml": /version[\s='\"]*([\d.]+)/,
+    "settings.yml": /version[\s:'\"]*([\d.]+)/,
+    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
+    "**/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
+    //"**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+]
+
 def buildandTestPyWheel(delocate = false) {
   runningOn(env.NODE_NAME)
   dir('xscope_fileio') {
@@ -19,9 +27,11 @@ def buildandTestPyWheel(delocate = false) {
           sh "delocate-wheel dist/*.whl"
         }
         sh "pip install --find-links=dist xscope_fileio --force-reinstall"
-        sh "cmake -G Ninja -B build -S tests/simple"
-        sh "cmake --build build"
-        sh "pytest tests/test_simple.py"
+        dir('tests') {
+          sh "cmake -G Ninja -B build -S simple"
+          sh "cmake --build build"
+          sh "pytest test_simple.py"
+        }
         archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
       }
     }
@@ -181,6 +191,7 @@ pipeline {
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
             buildDocs(archiveZipOnly: true)
+            versionChecks checkReleased: false, versionsPairs: versionsPairs
           }
         }
       }
