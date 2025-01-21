@@ -4,7 +4,7 @@
 #pragma once
 
 #define XSCOPE_IO_VERSION		"1.3.1"
-#define XSCOPE_IO_VERSION_LEN   8
+#define XSCOPE_IO_VERSION_LEN   16
 
 #define MAX_XSCOPE_SIZE_BYTES   256
 #define END_MARKER_STRING       "finally_the_end!!" //17 * 8 = 136 bits of unlikely data 

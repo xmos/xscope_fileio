@@ -70,11 +70,13 @@ void xscope_print(
 }
 
 static
-void xscope_host_check_version(unsigned char *databytes){
+void xscope_host_check_version(unsigned char *databytes, unsigned int databytes_len){
+    assert(databytes_len == XSCOPE_IO_VERSION_LEN);
     char host_version[XSCOPE_IO_VERSION_LEN];
     char device_version[XSCOPE_IO_VERSION_LEN];
     snprintf(host_version, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
-    strcpy(device_version, (const char *)databytes);
+    strncpy(device_version, (const char *)databytes, XSCOPE_IO_VERSION_LEN);
+    device_version[XSCOPE_IO_VERSION_LEN - 1] = '\0'; // Ensure null termination
     if(strcmp(host_version, device_version) != 0){
         int host_major, host_minor, host_patch;
         int device_major, device_minor, device_patch;
@@ -294,7 +296,7 @@ void xscope_record(
     
         case XSCOPE_ID_CHECK_VERSION:
         {
-            xscope_host_check_version(databytes);
+            xscope_host_check_version(databytes, length);
             break;
         }
 
