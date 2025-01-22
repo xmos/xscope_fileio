@@ -21,7 +21,7 @@ float ticks_to_KBPS(unsigned ticks, unsigned num_bytes){
     return kb/time_s;
 }
 
-void do_test(void){
+void main_tile0(void){
     xscope_file_t read_xscope_file = xscope_open_file(IN_FILE_NAME, "rb");
     xscope_file_t write_xscope_file = xscope_open_file(OUT_FILE_NAME, "wb");
 
@@ -55,17 +55,11 @@ void do_test(void){
     ticks_to_KBPS(write_total_time, fsize));
 }
 
-void main_tile0(chanend_t xscope_chan)
-{
-    xscope_io_init(xscope_chan);
-    do_test();
-    xscope_close_all_files();
-}
-
 int main(){
     chanend_t xscope_chan = chanend_alloc();
     xscope_io_init(xscope_chan);
-    main_tile0(xscope_chan);
+    main_tile0();
+    xscope_close_all_files();
     chanend_free(xscope_chan);
     return 0;
 }

@@ -51,6 +51,16 @@ static inline void reset_available_file_idx(unsigned idx){
     available_files[idx] = 0;
 }
 
+static void xscope_io_check_version(){
+    if(CHECK_VERSION != XSCOPE_ID_CHECK_VERSION){
+        printf("xscope_fileio version can't be verified\n");
+        printf("missing probe CHECK_VERSION, please verify config.xscope\n");
+        return;
+    }
+    char packet[XSCOPE_IO_VERSION_LEN];
+    snprintf(packet, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    xscope_bytes(XSCOPE_ID_CHECK_VERSION, XSCOPE_IO_VERSION_LEN, (const unsigned char *)packet);
+}
 
 unsigned xscope_fileio_is_initialized(void) {
     return xscope_io_init_flag;
@@ -61,6 +71,7 @@ void xscope_io_init(chanend_t xscope_end){
     xscope_mode_lossless();
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
+    xscope_io_check_version();
     xscope_io_init_flag = 1;
 }
 

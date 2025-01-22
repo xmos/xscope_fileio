@@ -87,6 +87,6 @@ def test_throughput_parallel():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
-    parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
+    parser.add_argument("--adapter-id", help="adapter_id to use", required=True)
     args = parser.parse_args()
     run_throughput(64, args.adapter_id)
