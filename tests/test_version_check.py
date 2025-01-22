@@ -16,7 +16,8 @@ python_path = sys.executable
 test_cases = [
     ("1.3.1", "1.3.1", 0, ""),  # no change
     ("1.3.1", "1.3.2", 0, ""),  # patch version change
-    ("1.3.1", "1.4.0", 0, "Warning"),  # minor version change
+    ("1.3.1", "1.4.0", 0, ""),  # minor version change
+    ("1.3.1", "140",   1, ""),  # non valid version
     ("1.3.1", "2.3.0", 1, "Error"),  # major version change
 ]
 
@@ -68,4 +69,4 @@ def test_device_version_change(initial, new, return_code, msg):
 
 
 if __name__ == "__main__":
-    pytest.main(["-s", __file__])
+    pytest.main(["-v", __file__])

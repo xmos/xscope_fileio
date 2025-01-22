@@ -87,12 +87,12 @@ void xscope_host_check_version(unsigned char *databytes, unsigned int databytes_
             printf("[HOST] host: %s, device: %s\n", host_version, device_version);
             exit(1);
         }
-        if (host_minor != device_minor) { // just warn
-            printf("[HOST] Warning! xscope_fileio <minor> version mismatch\n");
-            printf("[HOST] host: %s, device: %s\n", host_version, device_version);
+        if (host_minor != device_minor) {
+            printf("[HOST] Info: host version:%s, device version:%s\n", host_version, device_version);
+            return;
         }
     }
-    printf("\n[HOST] Using xscope_fileio version: %s\n", host_version);
+    printf("[HOST] Using xscope_fileio version: %s\n", host_version);
 }
 
 void xscope_register(
