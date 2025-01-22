@@ -1,7 +1,10 @@
 // Copyright 2020-2024 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
-#ifndef XSCOPE_IO_COMMON_H_
-#define XSCOPE_IO_COMMON_H_
+
+#pragma once
+
+#define XSCOPE_IO_VERSION		"1.3.1"
+#define XSCOPE_IO_VERSION_LEN   16
 
 #define MAX_XSCOPE_SIZE_BYTES   256
 #define END_MARKER_STRING       "finally_the_end!!" //17 * 8 = 136 bits of unlikely data 
@@ -24,7 +27,6 @@ enum{
     XSCOPE_ID_SEEK          = 4,
     XSCOPE_ID_TELL          = 5,
     XSCOPE_ID_HOST_QUIT     = 6, 
-    XSCOPE_ID_HOST_CLOSE    = 7,   
+    XSCOPE_ID_HOST_CLOSE    = 7,
+    XSCOPE_ID_CHECK_VERSION = 8   
 };
-
-#endif
