@@ -49,6 +49,11 @@ pipeline {
       defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
+    string(
+        name: 'XMOSDOC_VERSION',
+        defaultValue: 'v6.3.0',
+        description: 'xmosdoc version'
+    )
   } // parameters
   environment {
     REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
