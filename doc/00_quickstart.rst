@@ -14,7 +14,7 @@ The |xscope_fileio| library consists of three components:
 Architecture
 ------------
 
-The Python function ``run_on_target`` calls ``xrun --xscope-port`` with the binary and specified target adapter, and simultaneously launches a host application to communicate xscope data to/from the xrun process via ``sockets``. 
+The Python function :func:`xscope_fileio.run_on_target` calls ``xrun --xscope-port`` with the binary and specified target adapter, and simultaneously launches a host application to communicate xscope data to/from the xrun process via ``sockets``. 
 The host application responds to |xscope_fileio| API calls in the firmware code, reading/writing to the host file system. 
 For doing so it uses known probes to communicate with the host app. These probes can be found in the ``config.xscope`` file. 
 

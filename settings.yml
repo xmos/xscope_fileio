@@ -9,7 +9,7 @@ documentation:
   exclude_patterns_path: doc/exclude_patterns.inc
   substitutions_path: doc/substitutions.inc
   root_doc: doc/index.rst
-  cognidox_part_number: XXX
+  cognidox_part_number: XM-015249-UG
   doxygen_projects:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc
@@ -23,4 +23,5 @@ documentation:
       pdf_short: yes
       
 software:
-  cognidox_part_number: XXX
+  cognidox_part_number: XM-015250-SM
+ 
