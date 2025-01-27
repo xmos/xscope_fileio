@@ -1,11 +1,5 @@
 :orphan:
 
-.. |xtc_tools_version| replace:: 15.3.0
-.. |python_version|    replace:: 3.10
-.. |cmake_version|     replace:: 3.21
-.. _Python:             https://www.python.org/
-.. _CMAKE:              https://cmake.org/cmake/help/latest/
-
 xscope_fileio: FileIO over Xscope
 #################################
 
@@ -21,8 +15,8 @@ xscope_fileio: FileIO over Xscope
 Summary
 *******
 
-Provides a fast method for reading and writing files between an |xcore| device and a host computer. 
-It uses |xscope| to communicate between the two devices.
+Provides a fast method for reading and writing files between an ``xcore.ai`` device and a host computer. 
+It uses ``xscope`` to communicate between the two devices.
 
 ********
 Features
@@ -45,14 +39,14 @@ Known issues
 Development repo
 ****************
 
-  * `xscope_fileio <https://www.github.com/xmos/xscope_fileio>`_
+  * `xscope_fileio Repository`_.
 
 *************
 Documentation
 *************
 
- * XMOS Libraries : `https://www.xmos.com/libraries/`_ 
- * Documentation source : `xscope_fileio_docs <www.github.com/xmos/xscope_fileio/docs>
+ * XMOS Libraries : `XMOS Website`_ .
+ * Documentation source : `xscope_fileio Doc Source`_.`
 
 **************
 Required tools

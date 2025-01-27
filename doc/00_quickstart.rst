@@ -9,7 +9,7 @@ The |xscope_fileio| library consists of three components:
 
 * **Host Application**: an executable that runs on the host machine and communicates with the device application.
 
-* **Python Package**: launches the device application and simultaneously launches the host application to communicate ``xscope`` data to/from.
+* **Python Package**: launches the device application and simultaneously launches the host application to communicate ``xscope`` data  between them.
 
 Architecture
 ------------
@@ -18,7 +18,7 @@ The Python function :func:`xscope_fileio.run_on_target` calls ``xrun --xscope-po
 The host application responds to |xscope_fileio| API calls in the firmware code, reading/writing to the host file system. 
 For doing so it uses known probes to communicate with the host app. These probes can be found in the ``config.xscope`` file. 
 
-The diagram of the system architecture can be shown in :ref:`Figure 1 <fig-system-architecture>`.
+The diagram of the system architecture appears in :ref:`Figure 1 <fig-system-architecture>`.
 
 .. _fig-system-architecture:
 .. figure:: ./imgs/arch.png
@@ -41,12 +41,12 @@ In order to use the |xscope_fileio| library, the following requirements must be 
 
 .. note::
 
-  For running the examples on Hardware the `XMOS Evaluation Board <https://www.xmos.com/xk-evk-xu316>`_ is required. 
+  For running the examples on Hardware the `XMOS Evaluation Board`_ is required. 
 
 Device Installation
 -------------------
 
-The library can be obtained from the `XMOS Website <https://www.xmos.com/libraries>`_, which provides the latest stable release, or from the `XMOS GitHub Repository <https://github.com/xmos/xscope_fileio>`_, where you can access the latest development version and contribute to its ongoing improvement.
+The library can be obtained from the `XMOS Website`_, which provides the latest stable release, or from the `xscope_fileio Repository`_, where you can access the latest development version and contribute to its ongoing improvement.
 
 The library can be used either as a dependency in a project or as a standalone library.
 
@@ -72,7 +72,7 @@ To use the **Device Library** library as dependency, the user needs to:
 
 At CMake configuration time, the tools will automatically download the library and integrate it into the project.
 
-To use the **Device Library** as a standalone library, the easiest way is to download the library and copy it to the user directory. The library provides some examples that can be used as a starting point for developing applications that require xscope_fileio operations. More information is provided on the :ref:`quickstart` section of this document .
+To use the **Device Library** as a standalone library, the easiest way is to download the library and copy it to the user directory. The library provides some examples that can be used as a starting point for developing applications that require xscope_fileio operations. More information is provided on the :ref:`quickstart` section of this document.
 
 For more information on the device side API, please refer to the :ref:`device-reference`.
 
