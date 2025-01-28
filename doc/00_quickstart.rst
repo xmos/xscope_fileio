@@ -5,7 +5,7 @@ This section covers the principle of operation of the |xscope_fileio| library an
 
 The |xscope_fileio| library consists of three components:
 
-* **Device Library**: provides functions for managing files from an xcore.ai. The functions are similar to the ones used in the C Standard Library ``<stdio.h>``, like fopen, fread, fwrite, and fclose.
+* **Device Library**: provides functions for managing host files from an xcore.ai. The functions are similar to the ones used in the C Standard Library ``<stdio.h>``, like fopen, fread, fwrite, and fclose.
 
 * **Host Application**: an executable that runs on the host machine and communicates with the device application.
 
@@ -14,9 +14,13 @@ The |xscope_fileio| library consists of three components:
 Architecture
 ------------
 
-The Python function :func:`xscope_fileio.run_on_target` calls ``xrun --xscope-port`` with the binary and specified target adapter, and simultaneously launches a host application to communicate xscope data to/from the xrun process via ``sockets``. 
-The host application responds to |xscope_fileio| API calls in the firmware code, reading/writing to the host file system. 
-For doing so it uses known probes to communicate with the host app. These probes can be found in the ``config.xscope`` file. 
+Xscope is a high-speed protocol between the host and the target that runs over an XMOS Link. It enables high-speed communication between the device and the host.  
+
+The |xscope_fileio| library uses this protocol to manipulate host files and perform file operations. Certain types of messages, known as probes, are allowed depending on the type of file operation performed. These probes are stored in a file called ``config.xscope``.  
+
+Finally, the **Python Package** simplifies the communication process through Python function calls. For instance, the Python function :func:`xscope_fileio.run_on_target` runs the firmware binary on a specified device while simultaneously launching a host application to exchange xscope data.  
+
+For more information about XMOS tools or xscope, please refer to the `XTC Tools Documentation <https://www.xmos.com/documentation/XM-014363-PC/html/>`_ and `Xscope Documentation <https://www.xmos.com/documentation/XM-014363-PC/html/tools-guide/tools-ref/xscope/index.html>`_.
 
 The diagram of the system architecture appears in :ref:`Figure 1 <fig-system-architecture>`.
 
@@ -71,6 +75,11 @@ To use the **Device Library** library as dependency, the user needs to:
   config.xscope
 
 At CMake configuration time, the tools will automatically download the library and integrate it into the project.
+
+.. note:: 
+  
+  The ``config.xscope`` file defines the probes or types of messages allowed between the host and device. The ``config.xscope`` file is located in the current library, inside the ``xscope_fileio`` folder. It is fetched by the build system when added as a dependency or can be downloaded manually from the repository at the same location. 
+
 
 To use the **Device Library** as a standalone library, the easiest way is to download the library and copy it to the user directory. The library provides some examples that can be used as a starting point for developing applications that require xscope_fileio operations. More information is provided on the :ref:`quickstart` section of this document.
 
