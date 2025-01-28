@@ -1,5 +1,9 @@
 :orphan:
 
+.. |xtc_tools_version_| replace:: 15.3.0
+.. |python_version_|    replace:: 3.10
+.. |cmake_version_|     replace:: 3.23
+
 xscope_fileio: FileIO over Xscope
 #################################
 
@@ -39,22 +43,22 @@ Known issues
 Development repo
 ****************
 
-  * `xscope_fileio Repository`_.
+  * `xscope_fileio Repository <https://www.github.com/xmos/xscope_fileio>`_.
 
 *************
 Documentation
 *************
 
- * XMOS Libraries : `XMOS Website`_ .
- * Documentation source : `xscope_fileio Doc Source`_.`
+ * XMOS Libraries : `XMOS Website <https://www.xmos.com/libraries>`_.
+ * Documentation source : `xscope_fileio Doc Source <https://github.com/xmos/xscope_fileio/tree/master/doc>`_.
 
 **************
 Required tools
 **************
 
-- XTC tools: |xtc_tools_version| `XTC tools`_.
-- Python: |python_version| or later Python_.
-- CMake: |cmake_version| or later CMake_.
+- XTC tools: |xtc_tools_version_| `XTC tools`_.
+- Python: |python_version_| or later Python_.
+- CMake: |cmake_version_| or later CMake_.
 
 
 *********************************

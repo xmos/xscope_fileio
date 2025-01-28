@@ -1,4 +1,4 @@
-# python_version 3.9
+# python_version 3.10
 # pip_version 24.*
 
 # dependencies
