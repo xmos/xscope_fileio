@@ -10,6 +10,7 @@ documentation:
   substitutions_path: doc/substitutions.inc
   root_doc: doc/index.rst
   cognidox_part_number: XM-015249-UG
+  use_numpydoc: true
   doxygen_projects:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc

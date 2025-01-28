@@ -21,6 +21,7 @@ Python Module API
 -----------------
 
 .. automodule:: xscope_fileio
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :noindex:
