@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.23)
 include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
 project(xscope_fileio_close)
 
@@ -19,6 +19,8 @@ set(APP_COMPILER_FLAGS
   -fxscope
   -Wno-xcore-fptrgroup
 )
-set(APP_XSCOPE_SRCS config.xscope)
+
+# deps
 set(APP_DEPENDENT_MODULES  xscope_fileio)
+
 XMOS_REGISTER_APP()
