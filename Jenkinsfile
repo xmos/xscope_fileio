@@ -196,7 +196,7 @@ pipeline {
           checkout scm
           createVenv("requirements.txt")
           withTools(params.TOOLS_VERSION) {
-            buildDocs(archiveZipOnly: true)
+            buildDocs xmosdocVenvPath: "${WORKSPACE}", archiveZipOnly: true // needs python run
             versionChecks checkReleased: false, versionsPairs: versionsPairs
           }
         }
