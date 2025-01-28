@@ -195,10 +195,12 @@ pipeline {
         dir('xscope_fileio') {
           checkout scm
           createVenv("requirements.txt")
-          withTools(params.TOOLS_VERSION) {
-            buildDocs xmosdocVenvPath: "${WORKSPACE}", archiveZipOnly: true // needs python run
-            versionChecks checkReleased: false, versionsPairs: versionsPairs
-          }
+          withVenv {
+            withTools(params.TOOLS_VERSION) {
+              buildDocs xmosdocVenvPath: "${WORKSPACE}", archiveZipOnly: true // needs python run
+              versionChecks checkReleased: false, versionsPairs: versionsPairs
+            } // withTools
+          } // withVenv
         }
       }
       post {
