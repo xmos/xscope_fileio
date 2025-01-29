@@ -8,7 +8,6 @@ message("XMOS_SANDBOX_DIR: ${XMOS_SANDBOX_DIR}")
 
 # target
 set(APP_HW_TARGET XCORE-AI-EXPLORER)
-set(APP_INCLUDES src)
 
 # flags
 set(APP_COMPILER_FLAGS
