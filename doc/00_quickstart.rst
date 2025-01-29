@@ -16,7 +16,9 @@ Architecture
 
 Xscope is a high-speed protocol between the host and the target that runs over an XMOS Link. It enables high-speed communication between the device and the host.  
 
-The |xscope_fileio| library uses this protocol to manipulate host files and perform file operations. Certain types of messages, known as probes, are allowed depending on the type of file operation performed. These probes are stored in a file called ``config.xscope``.  
+The |xscope_fileio| library uses this protocol to manipulate host files and perform file operations. Certain types of messages, known as probes, are allowed depending on the type of file operation performed. These probes are stored in a file called ``config.xscope``.
+
+This Library uses ``XCommon CMake`` as build system. ``XCommon CMake`` is a build system based on ``CMake`` for xcore applications and libraries. More information can be found in `XCommon CMake Documentation <https://www.xmos.com/documentation/XM-015090-PC/html/>`_.
 
 Finally, the **Python Package** simplifies the communication process through Python function calls. For instance, the Python function :func:`xscope_fileio.run_on_target` runs the firmware binary on a specified device while simultaneously launching a host application to exchange xscope data.  
 
@@ -62,7 +64,7 @@ To use the **Device Library** library as dependency, the user needs to:
 
   #include <xscope_fileio.h>
 
-2. Add `xscope_fileio` to the project dependencies:
+2. Add `xscope_fileio` to the project dependencies in the application ``CMakeLists.txt``:
 
 .. code-block:: console
 
