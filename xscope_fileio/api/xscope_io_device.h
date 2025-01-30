@@ -43,7 +43,7 @@ extern "C" {
  *
  * This function starts the xcope connection on host and also initialises
  * the channel end for use later when reading data from host to device. This must
- * be called before attempting to read or write.
+ * be called before attempting to open a file.
  *
  * @param xscope_end The app side channel end connected to xscope_host_data() task
  *                  in the top-level application.
