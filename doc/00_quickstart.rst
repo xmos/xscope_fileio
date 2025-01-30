@@ -56,7 +56,7 @@ The library can be obtained from the `XMOS Website`_, which provides the latest 
 
 The library can be used either as a dependency in a project or as a standalone library.
 
-To use the **Device Library** library as dependency, the user needs to:
+To use the **Device Library** as dependency, the user needs to:
 
 1. Import the library header file in the source code:
 

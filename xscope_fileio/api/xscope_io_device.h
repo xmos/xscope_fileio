@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief initialises XScope I/O
  *
- * This function starts the xcope connection on host and also initialises
+ * This function starts the xscope connection on host and also initialises
  * the channel end for use later when reading data from host to device. This must
  * be called before attempting to open a file.
  *
