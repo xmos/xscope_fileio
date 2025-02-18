@@ -1,4 +1,4 @@
-# Copyright 2020-2024 XMOS LIMITED.
+# Copyright 2020-2025 XMOS LIMITED.
 # This Software is subject to the terms of the XMOS Public Licence: Version 1.
 import contextlib
 import os
@@ -11,41 +11,30 @@ import platform
 import subprocess
 import threading, queue
 
+from typing import Union
+from importlib.resources import files
+
 # How long in seconds we would expect xrun to open a port for the host app
 # The firmware will have already been loaded so 5s is more than enough
 # as long as the host CPU is not too busy. This can be quite long (10s+)
 # for a busy CPU
 XRUN_TIMEOUT = 20
 
-HOST_PATH = (Path(__file__).parent / "../host")
-
 
 def _get_host_exe():
-    """ Returns the path the the host exe. Builds if the host exe doesn't exist """
-    if platform.system() == 'Windows':
-        return str(HOST_PATH / "xscope_host_endpoint.exe")
-    else:
-        return HOST_PATH / "xscope_host_endpoint"
-
-
-@contextlib.contextmanager
-def pushd(new_dir):
-    """
-    Context manager to temporarily change the current working directory.
-    """
-    previous_dir = os.getcwd()
-    os.chdir(new_dir)
-    try:
-        yield
-    finally:
-        os.chdir(previous_dir)
-
-
-def _print_output(x, verbose):
-    if verbose:
-        print(x, end="")
-    else:
-        print(".", end="", flush=True)
+    """ Returns the path the the host exe """
+    package_path = files("xscope_fileio")
+    host_path_wh = package_path / "host"
+    host_path_ed = package_path.parent / "host"
+    # check is none exists
+    if not host_path_wh.exists() and not host_path_ed.exists():
+        raise FileNotFoundError(f"Host not found at {host_path_wh} or {host_path_ed}")
+    # if wheel is installed, use that, otherwise use the editable version
+    host_path = host_path_wh if host_path_wh.exists() else host_path_ed
+    endp = "xscope_host_endpoint.exe" if platform.system() == 'Windows' else "xscope_host_endpoint"
+    endp = host_path / endp
+    assert endp.exists(), f"Host not found at {endp}" 
+    return str(endp)
 
 
 def _get_open_port():
@@ -79,9 +68,6 @@ class _XrunExitHandler:
 
     def xcore_done(self, cmd, success, exit_code):
         if not success:
-            # xrun_cmd = f"--dump-state --adapter-id {self.adapter_id} {self.firmware_xe}"
-            # dump = sh.xrun(xrun_cmd.split(), _out=_print_output)
-            # sys.stderr.write(dump.stdout.decode())
             self.host_process.terminate()
 
 def popenAndCall(onExit, *popenArgs, **popenKWArgs):
@@ -119,14 +105,20 @@ def popenAndCall(onExit, *popenArgs, **popenKWArgs):
 
 
 
-def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
+def run_on_target(
+        adapter_id: Union[str, int, None],
+        firmware_xe: str,
+        use_xsim: bool = False,
+        **kwargs: dict
+    ) -> int:
     """
     Run a target application using xrun or xsim along with a host application.
 
     Parameters
     ----------
-    adapter_id : int
-        The adapter ID for the target application.
+    adapter_id : str or int or None
+        Argument for xrun. If str xrun will use --adapter-id, if int will use --id.
+        Use None when using xsim.
     firmware_xe : str
         The path to the firmware executable.
     use_xsim : bool, optional
@@ -163,22 +155,32 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
     To run the target application using xsim:
     >>> run_on_target(None, 'firmware.xe', use_xsim=True)
     """
+    
+    # raise invalid argument error
+    if adapter_id is None and use_xsim is False:
+        raise ValueError("Invalid argument: adapter_id must be set when xsim is False")
+
+    if isinstance(adapter_id, int):
+        adapt_arg, did = "--id", f"{adapter_id}"
+    elif isinstance(adapter_id, str):
+        adapt_arg, did = "--adapter-id", f"{adapter_id}"
+    else:
+        adapt_arg, did = "", ""
+    
+    # get open port
     port = _get_open_port()
-    xrun_cmd = (
-        f"--xscope-port localhost:{port} --adapter-id {adapter_id} {firmware_xe}"
-    )
-    xsim_cmd = ["--xscope", f"-realtime localhost:{port}", firmware_xe]
-
-    sh_print = lambda x: _print_output(x, True)
-
+    
     # Start and run in background
+    firmware_xe = str(Path(firmware_xe).resolve())
     exit_handler = _XrunExitHandler(adapter_id, firmware_xe)
     if use_xsim:
+        xsim_cmd = ["xsim", "--xscope", f"-realtime localhost:{port}", firmware_xe]
         print(xsim_cmd)
-        xrun_proc = subprocess.Popen(['xsim'] + xsim_cmd)
+        xrun_proc = subprocess.Popen(xsim_cmd)
     else:
+        xrun_cmd = ["xrun", "--xscope-port", f"localhost:{port}", adapt_arg, did, firmware_xe]
         print(xrun_cmd)
-        xrun_proc = popenAndCall(exit_handler.xcore_done, ["xrun"] + xrun_cmd.split(), **kwargs)
+        xrun_proc = popenAndCall(exit_handler.xcore_done, xrun_cmd, **kwargs)
 
     print("Waiting for xrun", end="")
     timeout = time.time() + XRUN_TIMEOUT
@@ -189,20 +191,16 @@ def run_on_target(adapter_id, firmware_xe, use_xsim=False, **kwargs):
             xrun_proc.terminate()
             assert 0, f"xrun timed out - took more than {XRUN_TIMEOUT} seconds to start"
 
-    print()
-
-    print("Starting host app...", end="\n")
-
+    print("\nStarting host app...\n")
     host_exe = _get_host_exe()
     host_args = f"{port}"
     host_proc = subprocess.Popen([host_exe] + host_args.split(), **kwargs)
     exit_handler.set_host_process(host_proc)
     host_proc.wait()
-
+    
+    # if device exited with error, terminate devide process
     if host_proc.returncode != 0:
-        xrun_proc.terminate() # The host app won't have stopped xrun so kill it here
+        xrun_proc.terminate()
         assert 0, f'\nERROR: host app exited with error code {host_proc.returncode}\n'
-
-    print("Running on target finished")
-
+    
     return host_proc.returncode

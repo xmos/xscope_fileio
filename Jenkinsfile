@@ -1,25 +1,43 @@
-@Library('xmos_jenkins_shared_library@v0.28.0')
+@Library('xmos_jenkins_shared_library@v0.37.0')
 
 def runningOn(machine) {
   println "Stage running on:"
   println machine
 }
 
-def buildApps(appList) {
-  appList.each { app ->
-    sh "cmake -G 'Unix Makefiles' -S ${app} -B ${app}/build"
-    sh "xmake -C ${app}/build -j\$(nproc)"
+def versionsPairs = [
+    "pyproject.toml": /version[\s='\"]*([\d.]+)/,
+    "settings.yml": /version[\s:'\"]*([\d.]+)/,
+    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
+    "**/xscope_fileio/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
+    "**/xscope_fileio/module_build_info": /VERSION[\s='\"]*([\d.]+)/,
+    "**/xscope_fileio/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+]
+
+def buildandTestPyWheel(delocate = false) {
+  runningOn(env.NODE_NAME)
+  dir('xscope_fileio') {
+    checkout scm
+    withTools(params.TOOLS_VERSION) {
+      createVenv(reqFile:"requirements.txt")
+      withVenv {
+        sh "pip install build cmake ninja"
+        sh "python -m build --wheel"
+        if (delocate) { // delocate fixes wheels on macos
+          sh "pip install delocate"
+          sh "delocate-wheel dist/*.whl"
+        }
+        sh "pip install --find-links=dist xscope_fileio --force-reinstall"
+        dir('tests') {
+          sh "cmake -G Ninja -B build -S simple"
+          sh "cmake --build build"
+          sh "pytest test_simple.py"
+        }
+        archiveArtifacts artifacts: "dist/*.whl", allowEmptyArchive: true, fingerprint: true
+      }
+    }
   }
 }
-
-def buildDocs(String zipFileName) {
-  withVenv {
-    sh 'pip install git+ssh://git@github.com/xmos/xmosdoc'
-    sh 'xmosdoc'
-    zip zipFile: zipFileName, archive: true, dir: "doc/_build"
-  }
-}
-
 
 getApproval()
 
@@ -28,10 +46,18 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.2.1',
+      defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
+    string(
+        name: 'XMOSDOC_VERSION',
+        defaultValue: 'v6.3.0',
+        description: 'xmosdoc version'
+    )
   } // parameters
+  environment {
+    REPO_NAME = 'xscope_fileio' //TODO remove this after Jenkins Shared Library Update
+  } // environment
   options {
     skipDefaultCheckout()
     timestamps()
@@ -59,10 +85,9 @@ pipeline {
           steps {
             dir('xscope_fileio') {
               withTools(params.TOOLS_VERSION) {
-                createVenv("requirements.txt")
+                createVenv(reqFile:"requirements.txt")
                 withVenv {
                   sh "pip install -e xtagctl/"
-                  sh "pip install -r requirements.txt"
                  }
               }
             }
@@ -80,23 +105,23 @@ pipeline {
             }
           }
         }
-        stage('Build') {
-          steps {
-            sh "git clone -b develop git@github.com:xmos/xcommon_cmake ${WORKSPACE}/xcommon_cmake"
-            dir('xscope_fileio') {
-              withTools(params.TOOLS_VERSION) {
-                withEnv(["XMOS_CMAKE_PATH=${WORKSPACE}/xcommon_cmake"]) {
-                  buildApps([
-                    "examples/fileio_features_xc",
-                    "examples/throughput_c",
-                    "tests/no_hang",
-                    "tests/close_files",
-                  ]) // buildApps
-                } // withEnv
-              } // withTools
-            } // dir
-          } // steps
-        } // stage 'Build'
+
+        stage('Build examples') {
+              steps {
+                dir("xscope_fileio/examples") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+        
+          stage('Build tests') {
+              steps {
+                dir("xscope_fileio/tests") {
+                  xcoreBuild()
+                } // dir
+              } // steps
+            }  // Build examples
+
         stage('Cleanup xtagctl'){
           steps {
             dir('xscope_fileio') {
@@ -109,6 +134,7 @@ pipeline {
             }
           }
         }
+        
         stage('Tests') {
           steps { 
             dir('xscope_fileio/tests') {
@@ -120,10 +146,10 @@ pipeline {
             } // dir
           } // steps
         } // Tests
+
       } // stages
       post {
         always {
-          archiveArtifacts artifacts: "**/*.bin", fingerprint: true, allowEmptyArchive: true
           junit '**/reports/*.xml'
         }
         cleanup {
@@ -131,50 +157,34 @@ pipeline {
         }
       }
     } // stage: xcore.ai
-    stage('Windows build') {
-      agent {
-        label 'x86_64&&windows'
-      }
-      steps {
-        checkout scm
 
-        withTools(params.TOOLS_VERSION) {
-          dir('host') {
-            withVS("vcvars32.bat") {
-              sh 'cmake -G "Ninja" .'
-              sh 'ninja'
-            }
-            archiveArtifacts artifacts: "xscope_host_endpoint.exe", fingerprint: true
-          }
-        }
-      }
-      post {
-        cleanup {
-          xcoreCleanSandbox()
-        }
-      }
-    } // stage: Windows build
-    stage('Update view files') {
-      agent {
-        label 'x86_64 && linux'
-      }
-      when {
-        expression { return currentBuild.currentResult == "SUCCESS" }
-      }
-      steps {
-        script {
-          current_scm = checkout scm
-          env.SAVED_GIT_URL = current_scm.GIT_URL
-          env.SAVED_GIT_COMMIT = current_scm.GIT_COMMIT
-        }
-        updateViewfiles()
-      }
-      post {
-        cleanup {
-          cleanWs()
-        }
-      }
-    }
+    stage('Build and Test Wheels') {
+      parallel {
+        stage('Windows wheel build') {
+          agent {label 'x86_64&&windows'}
+          steps {withVS("vcvars64.bat") {buildandTestPyWheel()}}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Windows build
+
+        stage('Mac_x64 wheel build') {
+          agent {label 'sw-hw-usba-mac0'}
+          steps {buildandTestPyWheel(delocate = true)}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_x64 build
+
+        stage('Mac_arm64 wheel build') {
+          agent {label 'arm64&&macos'}
+          steps {buildandTestPyWheel(delocate = true)}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Mac_arm64 build
+
+        stage('Linux_x64 wheel build') {
+          agent {label 'x86_64 && linux'}
+          steps {buildandTestPyWheel()}
+          post {cleanup {xcoreCleanSandbox()}}
+        } // stage: Linux_x64 build
+      } // parallel
+    } // stage: Build and Test Wheels
 
     stage('Docs') {
       agent {
@@ -182,14 +192,15 @@ pipeline {
       }
       steps {
         runningOn(env.NODE_NAME)
-        dir('xscope_fileio') {
-          checkout scm
-          createVenv("requirements.txt")
+        checkout scm
+        createVenv("requirements.txt")
+        withVenv {
           withTools(params.TOOLS_VERSION) {
-            buildDocs("xscope_fileio.zip")
-          }
-        }
-      }
+            buildDocs xmosdocVenvPath: "${WORKSPACE}", archiveZipOnly: true // needs python run
+            versionChecks checkReleased: false, versionsPairs: versionsPairs
+          } // withTools
+        } // withVenv
+      } // steps
       post {
         cleanup {
           cleanWs()

@@ -1,6 +1,16 @@
 xscope fileio change log
 ========================
 
+1.3.1
+-----
+
+  * ADDED: Quickstart Guide documentation.
+  * ADDED: xrun with ``--id`` option to run_on_target if ``adapter_id`` is ``int``.  
+  * ADDED: Library version check between host and target.  
+  * CHANGED: Update XTC tools version to ``15.3.0``.  
+  * CHANGED: Replacement of setup.py with pyproject.toml using Hatch.  
+  * REMOVED: Makefiles in examples and test applications.  
+
 1.2.0
 -----
 
@@ -85,3 +95,4 @@ xscope fileio change log
 0.0.1
 -----
   * ADDED: Initial version with support for fread & frwite + python helper
+

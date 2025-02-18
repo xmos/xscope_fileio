@@ -1,4 +1,4 @@
-// Copyright 2020-2024 XMOS LIMITED.
+// Copyright 2020-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include "xscope_io_device.h"
 #include <xcore/chanend.h>
@@ -6,6 +6,7 @@
 #include <xcore/select.h>
 #include <xcore/assert.h>
 #include <xcore/lock.h>
+#include <syscall.h>
 
 #include <string.h>
 #include <xscope.h>
@@ -50,6 +51,16 @@ static inline void reset_available_file_idx(unsigned idx){
     available_files[idx] = 0;
 }
 
+static void xscope_io_check_version(){
+    if(CHECK_VERSION != XSCOPE_ID_CHECK_VERSION){
+        printf("xscope_fileio version can't be verified\n");
+        printf("missing probe CHECK_VERSION, please verify config.xscope\n");
+        return;
+    }
+    char packet[XSCOPE_IO_VERSION_LEN];
+    snprintf(packet, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    xscope_bytes(XSCOPE_ID_CHECK_VERSION, XSCOPE_IO_VERSION_LEN, (const unsigned char *)packet);
+}
 
 unsigned xscope_fileio_is_initialized(void) {
     return xscope_io_init_flag;
@@ -60,6 +71,7 @@ void xscope_io_init(chanend_t xscope_end){
     xscope_mode_lossless();
     c_xscope = xscope_end;
     xscope_connect_data_from_host(c_xscope);
+    xscope_io_check_version();
     xscope_io_init_flag = 1;
 }
 
@@ -207,7 +219,11 @@ int xscope_ftell(xscope_file_t *xscope_file){
 void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
-    hwtimer_t t = hwtimer_alloc(); hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
+    if (!_is_simulation()){
+        hwtimer_t t = hwtimer_alloc(); 
+        hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
+        hwtimer_free(t);
+    }
 }
 
 void xscope_fclose(xscope_file_t *xscope_file){

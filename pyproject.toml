@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling", "cmake>=3.23", "ninja"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xscope-fileio"
+version = "1.3.1"
+description = "Python module for managing files using xscope"
+authors = [{name = "XMOS"}]
+license = {file = "LICENSE.rst"}
+readme = "README.rst"
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/xmos/xscope_fileio"
+
+[tool.hatch.build.targets.wheel]
+packages = ["xscope_fileio"]
+
+[tool.hatch.build.hooks.custom]
+path = "xscope_fileio/_hatch_build.py"
+
+[tool.hatch.build.targets.wheel.force-include]
+"host" = "xscope_fileio/host"

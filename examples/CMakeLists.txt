@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.23)
+include($ENV{XMOS_CMAKE_PATH}/xcommon.cmake)
+project(xscope_fileio)
+add_subdirectory(throughput_c)
+add_subdirectory(fileio_features_xc)

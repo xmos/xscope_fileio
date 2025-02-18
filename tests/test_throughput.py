@@ -8,6 +8,7 @@ We assume that the Xscope FileIO Python library has been installed via pip befor
 Please see readme for instuctions.
 """
 import os
+import time
 import tempfile
 import argparse
 import numpy as np
@@ -21,7 +22,10 @@ import xtagctl
 file_dir = Path(__file__).parent.absolute()
 root_dir = Path(__file__).parent.parent.absolute()
 
-test_sizes_hw1 = [64]
+# Test sizes for each hardware
+# Hw1 will run a single big file
+# Hw2 will run multiple small files
+test_sizes_hw1 = [64]        # in MB
 test_sizes_hw2 = [5, 10, 7]  # in MB
 
 
@@ -58,9 +62,10 @@ def run_throughput_for_sizes(test_sizes: list = [3]):
     # Run the throughput test for each size, sequentially
     for size in test_sizes:
         run_throughput(size)
+        time.sleep(1)  # give time to the target to reconnect
 
 
-def join_all_processes(proc_list, timeout=90):
+def join_all_processes(proc_list, timeout=120):
     for proc in proc_list:
         proc.join(timeout=timeout)
         assert not proc.is_alive(), f"ERROR: process {proc.name} is still running"
@@ -82,6 +87,6 @@ def test_throughput_parallel():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
-    parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
+    parser.add_argument("--adapter-id", help="adapter_id to use", required=True)
     args = parser.parse_args()
     run_throughput(64, args.adapter_id)

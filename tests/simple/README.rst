@@ -1,5 +1,5 @@
-Test: close_files
-=================
+Test Simple
+===========
 
 This example shows how to use open and close files with xscope_fileio. 
  
@@ -25,7 +25,7 @@ Run the following command from top-level directory:
 
 .. code-block:: console
 
-  python tests/test_close_files.py --adapter-id "your-adapter-id"
+  python tests/test_simple.py
 
 
 Output

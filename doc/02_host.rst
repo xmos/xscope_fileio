@@ -1,4 +1,7 @@
-Host documentation
+
+.. _host-reference:
+
+Host Documentation
 ==================
 
 Introduction
@@ -7,17 +10,18 @@ Introduction
 This documentation is for the host side of the Xscope fileio module. 
 There is a python application that runs the binary file on device and launches an endpoint that coomunicates with it on host side.
 
-C endpoint API
---------------
+Host Endpoint API
+-----------------
 
 .. doxygengroup:: xscope_fileio_host_c
     :project: xscope_fileio
     :members:
 
-Python module
--------------
+Python Module API
+-----------------
 
 .. automodule:: xscope_fileio
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :noindex:

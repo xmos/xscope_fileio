@@ -1,4 +1,4 @@
-// Copyright 2020-2024 XMOS LIMITED.
+// Copyright 2020-2025 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
 // Suppress some unwanted warnings in the Windows build
@@ -69,6 +69,31 @@ void xscope_print(
   }
 }
 
+static
+void xscope_host_check_version(unsigned char *databytes, unsigned int databytes_len){
+    assert(databytes_len == XSCOPE_IO_VERSION_LEN);
+    char host_version[XSCOPE_IO_VERSION_LEN];
+    char device_version[XSCOPE_IO_VERSION_LEN];
+    snprintf(host_version, XSCOPE_IO_VERSION_LEN, "%s", XSCOPE_IO_VERSION);
+    strncpy(device_version, (const char *)databytes, XSCOPE_IO_VERSION_LEN);
+    device_version[XSCOPE_IO_VERSION_LEN - 1] = '\0'; // Ensure null termination
+    if(strcmp(host_version, device_version) != 0){
+        int host_major, host_minor, host_patch;
+        int device_major, device_minor, device_patch;
+        sscanf(host_version, "%d.%d.%d", &host_major, &host_minor, &host_patch);
+        sscanf(device_version, "%d.%d.%d", &device_major, &device_minor, &device_patch);
+        if (host_major != device_major) {
+            printf("[HOST] Error! xscope_fileio <major> version mismatch\n");
+            printf("[HOST] host: %s, device: %s\n", host_version, device_version);
+            exit(1);
+        }
+        if (host_minor != device_minor) {
+            printf("[HOST] Info: host version:%s, device version:%s\n", host_version, device_version);
+            return;
+        }
+    }
+    printf("[HOST] Using xscope_fileio version: %s\n", host_version);
+}
 
 void xscope_register(
   unsigned int id,
@@ -268,7 +293,12 @@ void xscope_record(
             }
         }
         break;
-        
+    
+        case XSCOPE_ID_CHECK_VERSION:
+        {
+            xscope_host_check_version(databytes, length);
+            break;
+        }
 
         default:
         {
@@ -278,6 +308,15 @@ void xscope_record(
     }
 }
 
+static inline
+void sleep_ms(unsigned milliseconds)
+{
+    #if _WIN32
+        Sleep(milliseconds);
+    #else
+        usleep(milliseconds * 1000);
+    #endif
+}
 
 int main(int argc, char *argv[])
 {
@@ -286,6 +325,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    // Connect to the xscope server, register the callbacks
     xscope_ep_set_print_cb(xscope_print);
     xscope_ep_set_register_cb(xscope_register);
     xscope_ep_set_record_cb(xscope_record);
@@ -294,27 +334,25 @@ int main(int argc, char *argv[])
         running = 0;
     }
 
+    //Back off for 10ms to reduce processor usage during poll
     while(running){
-        //Back off for 10ms to reduce processor usage during poll
-#if _WIN32
-        Sleep(10);
-#else
-        usleep(10000);
-#endif
+        sleep_ms(10);
     }
 
+    // Exit and give another 100ms to allow any remaining outs 
+    // from the device to arrive before we terminate
     if(VERBOSE) printf("[HOST] Exit received\n");
-    //Wait another 100ms to allow any remaining outs from the device to arrive before we terminate
-#if _WIN32
-    Sleep(100);
-#else
-    usleep(100000);
-#endif
+    sleep_ms(100);
+
+    // Close any open files
     for(unsigned idx = 0; idx < MAX_FILES_OPEN; idx++){
         if(host_files[idx].fp != NULL){
             fclose(host_files[idx].fp);
         }
     }
 
+    // Disconnect from the xscope server
+    int ret = xscope_ep_disconnect();
+    if(VERBOSE) printf("[HOST] xscope_ep_disconnect() returned %d\n", ret);
     return(0);
 }

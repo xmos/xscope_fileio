@@ -45,6 +45,6 @@ if __name__ == '__main__':
     It can be used passing an adapter id or with xtagctl.acquire() to get one
     """
     parser = argparse.ArgumentParser(description="Run xscope_fileio_close.xe")
-    parser.add_argument("--adapter-id", help="adapter_id to use", default=None)
+    parser.add_argument("--adapter-id", help="adapter_id to use", required=True)
     args = parser.parse_args()
     test_non_existsing_file(args.adapter_id)
