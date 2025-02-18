@@ -1,7 +1,7 @@
 Test: No Hang
 =============
 
-This test opens a file that does no exist and verifies that the program does not hang.
+This test opens a file that does not exist and verifies that the program does not hang.
 Host app and device app terminate with the device error.
 
 Build example

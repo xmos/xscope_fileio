@@ -8,10 +8,10 @@ def runningOn(machine) {
 def versionsPairs = [
     "pyproject.toml": /version[\s='\"]*([\d.]+)/,
     "settings.yml": /version[\s:'\"]*([\d.]+)/,
-    //"CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
-    "**/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
-    "**/module_build_info": /VERSION[\s='\"]*([\d.]+)/,
-    "**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
+    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
+    "**/xscope_fileio/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
+    "**/xscope_fileio/module_build_info": /VERSION[\s='\"]*([\d.]+)/,
+    "**/xscope_fileio/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
 ]
 
 def buildandTestPyWheel(delocate = false) {
@@ -48,6 +48,11 @@ pipeline {
       name: 'TOOLS_VERSION',
       defaultValue: '15.3.0',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
+    )
+    string(
+        name: 'XMOSDOC_VERSION',
+        defaultValue: 'v6.3.0',
+        description: 'xmosdoc version'
     )
   } // parameters
   environment {
@@ -187,15 +192,15 @@ pipeline {
       }
       steps {
         runningOn(env.NODE_NAME)
-        dir('xscope_fileio') {
-          checkout scm
-          createVenv("requirements.txt")
+        checkout scm
+        createVenv("requirements.txt")
+        withVenv {
           withTools(params.TOOLS_VERSION) {
-            buildDocs(archiveZipOnly: true)
+            buildDocs xmosdocVenvPath: "${WORKSPACE}", archiveZipOnly: true // needs python run
             versionChecks checkReleased: false, versionsPairs: versionsPairs
-          }
-        }
-      }
+          } // withTools
+        } // withVenv
+      } // steps
       post {
         cleanup {
           cleanWs()

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.23)
 project(xscope_fileio)
 
 # Set build type to Release if not set
@@ -34,5 +34,5 @@ if (XSCOPE_ENDPOINT_LIB)
   target_link_libraries(xscope_host_endpoint PRIVATE ${XSCOPE_ENDPOINT_LIB})
   message(STATUS "Found xscope endpoint library: ${XSCOPE_ENDPOINT_LIB}")
 else ()
-  message(FATAL_ERROR "xscope endpoint library not found in XMOS_TOOL_PATH/lib.")
+  message(FATAL_ERROR "xscope endpoint library not found in $ENV{XMOS_TOOL_PATH}/lib.")
 endif ()
