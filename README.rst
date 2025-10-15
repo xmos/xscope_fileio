@@ -1,7 +1,7 @@
 :orphan:
 
-.. |xtc_tools_version_| replace:: 15.3.0
-.. |python_version_|    replace:: 3.10
+.. |xtc_tools_version_| replace:: 15.3.1
+.. |python_version_|    replace:: 3.12
 .. |cmake_version_|     replace:: 3.23
 
 xscope_fileio: FileIO over Xscope

@@ -5,6 +5,8 @@ UNRELEASED
 ----------
 
   * CHANGED: Upload delay between blocks for stability on some hosts.
+  * CHANGED: Update XTC tools version to ``15.3.1``.
+
 
 1.3.1
 -----
@@ -12,7 +14,7 @@ UNRELEASED
   * ADDED: Quickstart Guide documentation.
   * ADDED: xrun with ``--id`` option to run_on_target if ``adapter_id`` is ``int``.  
   * ADDED: Library version check between host and target.  
-  * CHANGED: Update XTC tools version to ``15.3.0``.  
+  * CHANGED: Update XTC tools version to ``15.3.0``.
   * CHANGED: Replacement of setup.py with pyproject.toml using Hatch.  
   * REMOVED: Makefiles in examples and test applications.  
 
