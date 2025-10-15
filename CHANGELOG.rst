@@ -1,6 +1,11 @@
 xscope fileio change log
 ========================
 
+UNRELEASED
+----------
+
+  * CHANGED: Upload delay between blocks for stability on some hosts.
+
 1.3.1
 -----
 

@@ -78,7 +78,9 @@ void xscope_io_init(chanend_t xscope_end){
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
     /* Wait until xscope_fileio is initialized */
     while(xscope_fileio_is_initialized() == 0) {
-        delay_ticks(1);
+        hwtimer_t t = hwtimer_alloc();
+        hwtimer_delay(t, 10);
+        hwtimer_free(t);
     }
     xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
@@ -178,13 +180,14 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
         if(n_bytes_to_write - sent_so_far >=  MAX_XSCOPE_SIZE_BYTES){
             xscope_bytes(XSCOPE_ID_WRITE_BYTES, MAX_XSCOPE_SIZE_BYTES, (const unsigned char*)&buffer[sent_so_far]);
             sent_so_far += MAX_XSCOPE_SIZE_BYTES;
+            hwtimer_t t = hwtimer_alloc();
+            hwtimer_delay(t, 10000); // Magic number found to make xscope stable on Ubu agents, else you get WRITE ERROR ON UPLOAD ....
+            hwtimer_free(t);         // This equates to 100 microseconds
         }
         else{
             xscope_bytes(XSCOPE_ID_WRITE_BYTES, n_bytes_to_write - sent_so_far, (const unsigned char*)&buffer[sent_so_far]);
             sent_so_far = n_bytes_to_write;
         }
-        // delay_ticks(10000); /// Magic number found to make xscope stable on MAC, else you get WRITE ERROR ON UPLOAD ....
-        // Not needed with tools 15.0.1
     }
     while (sent_so_far < n_bytes_to_write);
 
@@ -220,7 +223,7 @@ void xscope_close_all_files(void){
     xscope_bytes(XSCOPE_ID_HOST_QUIT, 1, (unsigned char*)"!");
     if(VERBOSE) printf("Sent close files\n");
     if (!_is_simulation()){
-        hwtimer_t t = hwtimer_alloc(); 
+        hwtimer_t t = hwtimer_alloc();
         hwtimer_delay(t, 5000000); //50ms to allow messages to make it before xgdb quit
         hwtimer_free(t);
     }
@@ -234,6 +237,8 @@ void xscope_fclose(xscope_file_t *xscope_file){
         printf("Sent close file id: %d\n", xscope_file->index);
     }
     reset_available_file_idx(xscope_file->index);
-    delay_ticks(10); // sanity time to close file
+    hwtimer_t t = hwtimer_alloc();
+    hwtimer_delay(t, 10); // sanity time to close file
+    hwtimer_free(t);
     xscope_fileio_lock_release();
 }
