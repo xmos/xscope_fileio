@@ -1,4 +1,4 @@
-@Library('xmos_jenkins_shared_library@v0.37.0')
+@Library('xmos_jenkins_shared_library@v0.42.0')
 
 def runningOn(machine) {
   println "Stage running on:"
@@ -46,12 +46,12 @@ pipeline {
   parameters {
     string(
       name: 'TOOLS_VERSION',
-      defaultValue: '15.3.0',
+      defaultValue: '15.3.1',
       description: 'The tools version to build with (check /projects/tools/ReleasesTools/)'
     )
     string(
         name: 'XMOSDOC_VERSION',
-        defaultValue: 'v6.3.0',
+        defaultValue: 'v8.0.0',
         description: 'xmosdoc version'
     )
   } // parameters
