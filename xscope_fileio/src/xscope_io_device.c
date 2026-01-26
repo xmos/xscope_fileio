@@ -102,7 +102,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     else{
         printf("Unknown file attribytes: %s. Please specify from: rb, rt, wb, wt\n", attributes);
     }
-    unsigned file_idx = get_available_file_idx();
+    int file_idx = get_available_file_idx();
     xassert(file_idx != -1 && "Maximum number of files open exceeded");
     packet[0] = '0' + file_idx;
     packet[1] = '0' + xscope_file.mode;

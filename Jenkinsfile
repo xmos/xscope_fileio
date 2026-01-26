@@ -14,7 +14,7 @@ def versionsPairs = [
     "**/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
 ]
 
-def buildandTestPyWheel(delocate = false) {
+def buildandTestPyWheel(delocate = false, auditwheel = false) {
   runningOn(env.NODE_NAME)
   dir('xscope_fileio') {
     checkout scm
@@ -26,6 +26,10 @@ def buildandTestPyWheel(delocate = false) {
         if (delocate) { // delocate fixes wheels on macos
           sh "pip install delocate"
           sh "delocate-wheel dist/*.whl"
+        }
+        if (auditwheel) { // auditwheel fixes Linux manylinux compliance
+          sh "pip install patchelf auditwheel"
+          sh "auditwheel repair dist/*.whl -w dist/"
         }
         sh "pip install --find-links=dist xscope_fileio --force-reinstall"
         dir('tests') {
@@ -175,7 +179,7 @@ pipeline {
 
         stage('Linux_x64 wheel build') {
           agent {label 'x86_64 && linux'}
-          steps {buildandTestPyWheel()}
+          steps {buildandTestPyWheel(auditwheel = true)}
           post {cleanup {xcoreCleanSandbox()}}
         } // stage: Linux_x64 build
       } // parallel
