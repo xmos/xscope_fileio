@@ -184,7 +184,7 @@ pipeline {
 
         stage('Linux_x64 wheel build') {
           agent {label 'x86_64 && linux'}
-          steps {buildandTestPyWheel(auditwheel = true)}
+          steps {buildandTestPyWheel(delocate = false, auditwheel = true)}
           post {cleanup {xcoreCleanSandbox()}}
         } // stage: Linux_x64 build
       } // parallel
