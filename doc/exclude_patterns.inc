@@ -3,6 +3,7 @@ examples
 tests
 .doc_venv
 
-**README*
 **LICENSE*
 **CHANGELOG*
+*.venv*
+*host*

@@ -1,17 +1,28 @@
----
-project: xscope_fileio
-title: Xscope Fileio
+# This file relates to internal XMOS infrastructure and should be ignored by users
+
+lib_name: xscope_fileio
+project: '{{lib_name}}'
+title: '{{lib_name}}: FileIO over Xscope'
 version: 1.3.1
 
 documentation:
   exclude_patterns_path: doc/exclude_patterns.inc
+  substitutions_path: doc/substitutions.inc
+  root_doc: doc/index.rst
+  cognidox_part_number: XM-015249-UG
+  use_numpydoc: true
   doxygen_projects:
     xscope_fileio:
       doxyfile_path: doc/Doxyfile.inc
   pdfs:
-    doc/01_device:
-      pdf_title: "{{title}} - device documentation"
-      pdf_filename: "{{project}}_device_doc_v{{version}}"
-    doc/02_host:
-      pdf_title: "{{title}} - host documentation"
-      pdf_filename: "{{project}}_host_doc_v{{version}}"
+    doc/index.rst:
+      pdf_title: '{{title}}'
+      pdf_filename: '{{lib_name}}_v{{version}}'
+    README.rst:
+      pdf_title: '{{title}} (README)'
+      pdf_filename: '{{lib_name}}_v{{version}}_readme'
+      pdf_short: yes
+      
+software:
+  cognidox_part_number: XM-015250-SM
+ 

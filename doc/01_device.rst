@@ -1,4 +1,7 @@
-Device documentation
+
+.. _device-reference:
+
+Device Documentation
 ====================
 
 Introduction
@@ -13,8 +16,8 @@ To use xscope_fileio in your application, include the following header file:
 
     #include "xscope_fileio_device.h"
     
-Xscope fileio device
---------------------
+Device API
+----------
 
 .. doxygengroup:: xscope_fileio_device
     :project: xscope_fileio
