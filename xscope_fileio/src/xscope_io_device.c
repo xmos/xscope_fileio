@@ -1,4 +1,4 @@
-// Copyright 2020-2025 XMOS LIMITED.
+// Copyright 2020-2026 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 #include "xscope_io_device.h"
 #include <xcore/chanend.h>
@@ -53,8 +53,10 @@ static inline void reset_available_file_idx(unsigned idx){
 
 static void xscope_io_check_version(){
     if(CHECK_VERSION != XSCOPE_ID_CHECK_VERSION){
-        printf("xscope_fileio version can't be verified\n");
-        printf("missing probe CHECK_VERSION, please verify config.xscope\n");
+        if(VERBOSE){
+            printf("xscope_fileio version can't be verified\n");
+            printf("missing probe CHECK_VERSION, please verify config.xscope\n");
+        }
         return;
     }
     char packet[XSCOPE_IO_VERSION_LEN];
@@ -102,7 +104,7 @@ xscope_file_t xscope_open_file(const char* filename, char* attributes){
     else{
         printf("Unknown file attribytes: %s. Please specify from: rb, rt, wb, wt\n", attributes);
     }
-    unsigned file_idx = get_available_file_idx();
+    int file_idx = get_available_file_idx();
     xassert(file_idx != -1 && "Maximum number of files open exceeded");
     packet[0] = '0' + file_idx;
     packet[1] = '0' + xscope_file.mode;

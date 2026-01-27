@@ -1,6 +1,12 @@
 xscope fileio change log
 ========================
 
+UNRELEASED
+----------
+
+  * CHANGED: Update tools version in Jenkinsfile to ``15.3.1``.
+  * CHANGED: Update minimum Python version to 3.10.
+
 1.3.1
 -----
 

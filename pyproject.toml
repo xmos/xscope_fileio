@@ -9,7 +9,7 @@ description = "Python module for managing files using xscope"
 authors = [{name = "XMOS"}]
 license = {file = "README.rst", content-type = "text/x-rst"}
 readme = {file = "README.rst", content-type = "text/x-rst"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.urls]
 Homepage = "https://github.com/xmos/xscope_fileio"
