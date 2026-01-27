@@ -8,7 +8,6 @@ def runningOn(machine) {
 def versionsPairs = [
     "pyproject.toml": /version[\s='\"]*([\d.]+)/,
     "settings.yml": /version[\s:'\"]*([\d.]+)/,
-    "CHANGELOG.rst": /(\d+\.\d+\.\d+)/,
     "**/xscope_fileio/lib_build_info.cmake": /set\(LIB_VERSION \"?([\d.]+)/,
     "**/xscope_fileio/module_build_info": /VERSION[\s='\"]*([\d.]+)/,
     "**/xscope_fileio/xscope_io_common.h": /#define\s+XSCOPE_IO_VERSION\s+"(\d+\.\d+\.\d+)"/
