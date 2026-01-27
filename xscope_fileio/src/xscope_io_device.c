@@ -54,8 +54,8 @@ static inline void reset_available_file_idx(unsigned idx){
 static void xscope_io_check_version(){
     if(CHECK_VERSION != XSCOPE_ID_CHECK_VERSION){
         if(VERBOSE){
-        printf("xscope_fileio version can't be verified\n");
-        printf("missing probe CHECK_VERSION, please verify config.xscope\n");
+            printf("xscope_fileio version can't be verified\n");
+            printf("missing probe CHECK_VERSION, please verify config.xscope\n");
         }
         return;
     }
