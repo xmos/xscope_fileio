@@ -79,9 +79,12 @@ void xscope_io_init(chanend_t xscope_end){
 
 xscope_file_t xscope_open_file(const char* filename, char* attributes){
     /* Wait until xscope_fileio is initialized */
+    hwtimer_t tmr = hwtimer_alloc();
     while(xscope_fileio_is_initialized() == 0) {
-        delay_ticks(1);
+        hwtimer_delay(tmr, 1);
     }
+    hwtimer_free(tmr);
+
     xscope_fileio_lock_acquire();
     xscope_file_t xscope_file;
     strcpy(xscope_file.filename, filename);
@@ -185,8 +188,6 @@ void xscope_fwrite(xscope_file_t *xscope_file, uint8_t *buffer, size_t n_bytes_t
             xscope_bytes(XSCOPE_ID_WRITE_BYTES, n_bytes_to_write - sent_so_far, (const unsigned char*)&buffer[sent_so_far]);
             sent_so_far = n_bytes_to_write;
         }
-        // delay_ticks(10000); /// Magic number found to make xscope stable on MAC, else you get WRITE ERROR ON UPLOAD ....
-        // Not needed with tools 15.0.1
     }
     while (sent_so_far < n_bytes_to_write);
 
@@ -236,6 +237,8 @@ void xscope_fclose(xscope_file_t *xscope_file){
         printf("Sent close file id: %d\n", xscope_file->index);
     }
     reset_available_file_idx(xscope_file->index);
-    delay_ticks(10); // sanity time to close file
+    hwtimer_t tmr = hwtimer_alloc();
+    hwtimer_delay(tmr, 10); // sanity time to close file
+    hwtimer_free(tmr);
     xscope_fileio_lock_release();
 }
