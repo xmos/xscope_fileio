@@ -14,11 +14,14 @@ void main_tile0()
 {
     // create a random array in data_in
     const char filename[] = "test_file.out";
-    const size_t buff_size = 256;
+    const size_t buff_size = 128 * 1024 * sizeof(uint8_t);
     uint8_t data_in[buff_size];
     uint8_t data_out[buff_size];
+    int64_t checksum_in = 0;
+    int64_t checksum_out = 0;
     for (int i = 0; i < buff_size; i++) {
         data_in[i] = rand() % 256;
+        checksum_in += data_in[i];
     }
 
     // write the data to a file
@@ -32,8 +35,11 @@ void main_tile0()
     xscope_fclose(&fp2);
     for (int i = 0; i < buff_size; i++) {
         xassert(data_in[i] == data_out[i]);
+        checksum_out += data_out[i];
     }
+    xassert(checksum_in == checksum_out);
     printf("Data read back matches data written\n");
+    printf("Checksum in: %lld, Checksum out: %lld\n", checksum_in, checksum_out);
 }
 
 int main(){

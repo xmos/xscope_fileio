@@ -5,8 +5,12 @@ project(fileio_test)
 # sandbox
 set(XMOS_SANDBOX_DIR ${CMAKE_CURRENT_LIST_DIR}/../../..)
 
-# target ans srcs
-set(APP_HW_TARGET XCORE-AI-EXPLORER)
+# target
+if(CMAKE_C_COMPILER_VERSION VERSION_EQUAL "3.6.0") # XS3 (XTC 15.3.1)
+set(APP_HW_TARGET XK-EVK-XU316)
+else() # vx4
+set(APP_HW_TARGET XK-EVK-XU416)
+endif()
 
 # flags
 set(APP_COMPILER_FLAGS
@@ -15,7 +19,6 @@ set(APP_COMPILER_FLAGS
   -report
   -Wall
   -fxscope
-  -Wno-xcore-fptrgroup
 )
 
 # deps
